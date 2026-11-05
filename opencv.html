@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenCV 教程 · AI Code Study</title>
+<meta name="description" content="OpenCV 上手指南：安装与 BGR 坑、图像读写与绘制、滤波与边缘检测、轮廓分析、视频处理，以及批量加水印实战与避坑清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/opencv.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV 教程 · AI Code Study">
+<meta property="og:description" content="OpenCV 上手指南：安装与 BGR 坑、图像读写与绘制、滤波与边缘检测、轮廓分析、视频处理，以及批量加水印实战与避坑清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/opencv.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OpenCV 教程 · AI Code Study">
+<meta name="twitter:description" content="OpenCV 上手指南：安装与 BGR 坑、图像读写与绘制、滤波与边缘检测、轮廓分析、视频处理，以及批量加水印实战与避坑清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "OpenCV：让程序看懂图像",
+  "description": "OpenCV 上手指南：安装与 BGR 坑、图像读写与绘制、滤波与边缘检测、轮廓分析、视频处理，以及批量加水印实战与避坑清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/opencv.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="opencv">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision" class="on">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-vision">视觉与自动化</a><span>/</span>
+      <b>OpenCV</b>
+    </nav>
+    <p class="eyebrow">VISION · <b>OPENCV</b> · 计算机视觉第一课</p>
+    <h1>OpenCV：让程序<em>看懂图像</em></h1>
+    <p class="lede">图像在程序眼里只是一个 NumPy 数组。这页带你从读写一张图开始，把滤波、边缘、轮廓这些经典操作跑起来，最后做一个批量加水印的小工具——所有代码都能直接复制运行。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/vision-lab</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">pip install opencv-python</span></div>
+        <div class="term-line"><span class="out">Successfully installed opencv-python-5.0.0 numpy-2.x</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">python edge_demo.py photo.jpg</span></div>
+        <div class="term-line"><span class="out">读入 photo.jpg → shape=(1080, 1920, 3) dtype=uint8</span></div>
+        <div class="term-line"><span class="out">灰度 → Canny 边缘 → 完成</span></div>
+        <div class="term-line"><span class="ok">已保存 photo_edges.png</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装</a>
+        <a href="#s3"><span class="idx">03</span>快速上手</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>函数速查</a>
+        <a href="#s6"><span class="idx">06</span>实战：批量水印</a>
+        <a href="#s7"><span class="idx">07</span>避坑指南</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="selenium.html">Selenium 教程</a>
+        <a href="machine-learning.html">机器学习教程</a>
+        <a href="scikit-learn.html">Scikit-learn 教程</a>
+        <a href="tensorflow.html">TensorFlow 教程</a>
+        <a href="index.html#cat-vision">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装</a>
+          <a href="#s3"><span class="idx">03</span>快速上手</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>函数速查</a>
+          <a href="#s6"><span class="idx">06</span>实战：批量水印</a>
+          <a href="#s7"><span class="idx">07</span>避坑指南</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>OpenCV 是什么：二十多年的视觉瑞士军刀</h2>
+        <p>OpenCV（Open Source Computer Vision Library）1999 年在 Intel 内部启动，2006 年首次对外发布，现由 OpenCV 基金会维护，是计算机视觉领域事实上的基础库。人脸检测、目标跟踪、镜头矫正、二维码识别——你在手机相册和工业相机软件里见到的很多功能，底层都有它。</p>
+        <p>Python 里用它只有一条心智路径：<b>图像就是 NumPy 数组</b>。读进来是数组，切片是数组，滤波、边缘、轮廓处理的还是数组。所以 NumPy 熟练度直接决定你的 OpenCV 上限；反过来，它也是练 NumPy 切片最好的场景。</p>
+        <p>典型战场：把扫描件摆正去噪、给照片批量打标、工业流水线上检测缺陷、扫码识别、给深度模型做预处理。如果你要解决的问题能一句话概括成「让程序看图做事」，OpenCV 通常就是第一行 <code>import cv2</code>。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>起源</dt><dd>Intel，1999 年启动，2006 年首次开源发布</dd></div>
+          <div class="fact"><dt>维护方</dt><dd>OpenCV 基金会（2012 年起）</dd></div>
+          <div class="fact"><dt>核心语言</dt><dd>C++（提供 Python / Java 等绑定）</dd></div>
+          <div class="fact"><dt>协议</dt><dd>Apache 2.0（4.5.0 起，此前为 BSD）</dd></div>
+          <div class="fact"><dt>pip 包</dt><dd>opencv-python（2026-11 查：5.0 系列最新，4.x 仍在维护）</dd></div>
+          <div class="fact"><dt>图像本质</dt><dd>NumPy 数组（高 × 宽 × 通道）</dd></div>
+          <div class="fact"><dt>默认通道顺序</dt><dd class="no">BGR，不是 RGB</dd></div>
+          <div class="fact"><dt>GUI</dt><dd>依赖桌面环境；服务器用 headless 包</dd></div>
+        </dl>
+
+        <div class="note"><b>和深度学习框架的分工：</b>PyTorch、TensorFlow 负责「训练神经网络」，OpenCV 负责「把图像变成好用的输入」和「跑经典视觉算法」。两者不是竞争关系——真实项目里经常是 OpenCV 读图做预处理，再喂给深度模型；OpenCV 自带的 <code>cv2.dnn</code> 模块也能直接加载训练好的模型做推理（见第 04 节）。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：四个包，永远只装一个</h2>
+        <p>pip 上的 OpenCV 有四个包，功能不同但共用同一个 <code>cv2</code> 命名空间。官方明确要求<b>同一环境只装其中一个</b>，装多了会互相覆盖，报一些莫名其妙的错。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">pip（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">contrib 与 headless</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">验证安装</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 主模块包，桌面环境（Windows / macOS / 常见 Linux）装这个</span>
+pip install opencv-python
+
+<span class="c"># 会自动带上 numpy 依赖；想顺手升级 numpy：</span>
+pip install -U opencv-python numpy</pre>
+          </div>
+          <small>新手直接装 <b>opencv-python</b> 即可。它不含 contrib 扩展模块，但本页全部功能都覆盖。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 全量包：主模块 + contrib 扩展（额外的特征匹配、二维码、跟踪算法等）</span>
+pip install opencv-contrib-python
+
+<span class="c"># 无 GUI 包：服务器 / Docker / CI，没有显示器时用这个，体积更小</span>
+pip install opencv-python-headless</pre>
+          </div>
+          <small>判断标准只有一条：要不要 <b>cv2.imshow</b> 弹窗？要就装带 GUI 的，不要就装 headless。四个包里 headless 有两个变体（含 contrib 的叫 opencv-contrib-python-headless）。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 打印出版本号就装好了</span>
+python -c <span class="g">"import cv2; print(cv2.__version__)"</span>
+
+<span class="c"># 顺手确认 numpy 也正常（OpenCV 离不开它）</span>
+python -c <span class="g">"import cv2, numpy; print(cv2.__version__, numpy.__version__)"</span></pre>
+          </div>
+          <small><b>import 的名字是 cv2</b>——历史遗留的 C++ 命名空间，和包名 opencv-python 不一样，别在这里卡住。</small>
+        </div>
+
+        <div class="note warn"><b>装错了解法：</b>如果曾经装过多个包，全部卸干净再装一个：<code>pip uninstall opencv-python opencv-contrib-python opencv-python-headless opencv-contrib-python-headless</code>，然后只装你要的那一个。报错像「cv2 has no attribute」或 DLL 冲突，多半是这个原因。</div>
+      </section>
+
+      <!-- ===== 03 快速上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>快速上手：读图 → 灰度 → 边缘 → 保存</h2>
+        <p>找一张 JPG 放到当前目录（下面假设叫 photo.jpg），八行代码走完视觉处理最经典的流水线：</p>
+
+        <div class="code">
+          <div class="code-head"><span>Python · edge_demo.py</span><button class="copy" type="button">复制</button></div>
+<pre>import cv2
+
+img = cv2.imread(<span class="g">"photo.jpg"</span>)                 <span class="c"># 读图 → NumPy 数组</span>
+print(img.shape)                              <span class="c"># (高, 宽, 3)，BGR 三通道</span>
+
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  <span class="c"># 转 8 位灰度图</span>
+edges = cv2.Canny(gray, 100, 200)             <span class="c"># Canny 边缘检测</span>
+
+cv2.imwrite(<span class="g">"photo_edges.png"</span>, edges)        <span class="c"># 按扩展名自动选编码器</span>
+cv2.imshow(<span class="g">"edges"</span>, edges)                   <span class="c"># 弹窗显示（仅本地桌面）</span>
+cv2.waitKey(0)                                <span class="c"># 等任意按键，0 = 一直等</span>
+cv2.destroyAllWindows()</pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>先确认读到了</h4><p><code>imread</code> 读失败<b>不报错，只返回 None</b>。下一步就报 <code>AttributeError: 'NoneType' object</code>。养成习惯：读图后立刻 <code>assert img is not None</code> 或打印 shape。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>彩色转灰度</h4><p>边缘、阈值、直方图这类算法只要单通道。cvtColor 是通道与色彩空间转换的总入口，第二个参数是转换码，敲 <code>cv2.COLOR_BGR2</code> 会有几十个可选。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>调 Canny 的两个阈值</h4><p>100/200 是常用起点：阈值差越大保留的边缘越连贯。图像发虚就降阈值，噪点多就先 GaussianBlur 再 Canny。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>保存与显示</h4><p>imwrite 按扩展名决定格式（.png / .jpg）。imshow 必须配 waitKey，否则窗口一闪而过或直接无响应；脚本结束前 destroyAllWindows 收尾。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">在服务器、Docker、Jupyter 远程内核上没有桌面环境，<code>cv2.imshow</code> 会直接报错——那是包没装错、环境没显示器。用 imwrite 存文件查看，或装 opencv-python-headless 并改用 matplotlib 显示。</div>
+
+        <p>没有桌面环境时，把上面八行里最后三行（imshow / waitKey / destroyAllWindows）删掉，就是纯文件流程——读图、处理、保存，全程不弹窗，在任何服务器上都能跑：</p>
+        <div class="code">
+          <div class="code-head"><span>Python · headless 变体</span><button class="copy" type="button">复制</button></div>
+<pre>import cv2
+
+img = cv2.imread(<span class="g">"photo.jpg"</span>, cv2.IMREAD_GRAYSCALE)   <span class="c"># 直接按灰度读</span>
+edges = cv2.Canny(img, 100, 200)
+print(<span class="g">"边缘像素数:"</span>, int((edges &gt; 0).sum()))            <span class="c"># 用数字确认处理有效</span>
+cv2.imwrite(<span class="g">"photo_edges.png"</span>, edges)</pre>
+        </div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：数组、BGR、绘制与视频</h2>
+
+        <h3>图像就是 NumPy 数组</h3>
+        <p>彩色图 shape 是 <code>(高, 宽, 3)</code>，每个元素 uint8、取值 0–255。于是所有 NumPy 技巧都能用：切片裁剪、通道拆分、逐像素运算。注意第一维是<b>高（y）</b>不是宽——这是和坐标写法最容易被搞混的地方。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 数组操作</span><button class="copy" type="button">复制</button></div>
+<pre>h, w = img.shape[:2]
+roi = img[100:300, 200:500]          <span class="c"># 裁剪：先行（y）后列（x）</span>
+b, g, r = cv2.split(img)             <span class="c"># 拆通道；cv2.merge([b, g, r]) 合回</span>
+img[50, 80]                          <span class="c"># 第 50 行第 80 列那个像素，返回 [B, G, R]</span>
+img[:] = 0                           <span class="c"># 整图涂黑——数组是引用，改了就是真改</span></pre>
+        </div>
+
+        <h3>BGR：历史遗留的经典坑</h3>
+        <p>OpenCV 出于早年相机厂商字节序的原因，通道顺序是 <b>蓝-绿-红</b>。你自己用 <code>np.zeros</code> 手搓图像没问题，但要把 OpenCV 的图交给其他库（matplotlib、PIL、深度模型）时，必须先 <code>cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</code>，否则红蓝互换，人脸发蓝。</p>
+
+        <h3>缩放、绘制与标注</h3>
+        <p>resize 负责缩放，rectangle / circle / putText 负责把检测结果画出来。关键区别：<b>绘制函数的坐标是 (x, y)</b>，而数组切片是 [y, x]——写反了画到图外去，什么也看不见。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 缩放与绘制</span><button class="copy" type="button">复制</button></div>
+<pre>small = cv2.resize(img, None, fx=0.5, fy=0.5)            <span class="c"># 缩到一半</span>
+small = cv2.resize(img, (640, 480), interpolation=cv2.INTER_AREA)
+
+cv2.rectangle(img, (60, 50), (220, 200), (0, 255, 0), 2) <span class="c"># 绿框，线宽 2；-1 为实心</span>
+cv2.circle(img, (150, 120), 30, (0, 0, 255), -1)         <span class="c"># 红色实心圆</span>
+cv2.putText(img, <span class="g">"cat: 0.98"</span>, (60, 40),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+<span class="c"># putText 只支持 ASCII——中文标注得先画到 PIL/Pillow 再转回 ndarray</span></pre>
+        </div>
+
+        <h3>视频与摄像头：一帧一帧的图像</h3>
+        <p>VideoCapture 把视频和摄像头统一成「循环读帧」：视频是文件路径，摄像头是设备编号（0 通常是默认摄像头）。每一帧就是普通图像，前面所有操作全部适用。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 摄像头灰度预览</span><button class="copy" type="button">复制</button></div>
+<pre>cap = cv2.VideoCapture(0)              <span class="c"># 或 VideoCapture("demo.mp4")</span>
+while cap.isOpened():
+    ok, frame = cap.read()             <span class="c"># ok=False 表示读完了</span>
+    if not ok:
+        break
+    cv2.imshow(<span class="g">"gray"</span>, cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY))
+    if cv2.waitKey(1) &amp; 0xFF == ord(<span class="g">"q"</span>):   <span class="c"># 按 q 退出</span>
+        break
+cap.release()
+cv2.destroyAllWindows()
+<span class="c"># 写视频用 cv2.VideoWriter(路径, fourcc, 帧率, (宽, 高))，注意宽高顺序</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Python · 把摄像头画面录成 MP4</span><button class="copy" type="button">复制</button></div>
+<pre>fourcc = cv2.VideoWriter_fourcc(*<span class="g">"mp4v"</span>)      <span class="c"># 编码器要与扩展名匹配</span>
+writer = cv2.VideoWriter(<span class="g">"out.mp4"</span>, fourcc, 30.0, (1280, 720))
+
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)      <span class="c"># 尺寸要和 Writer 声明一致</span>
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+while cap.isOpened():
+    ok, frame = cap.read()
+    if not ok:
+        break
+    writer.write(frame)
+cap.release()
+writer.release()                              <span class="c"># 不 release 文件会损坏</span></pre>
+        </div>
+
+        <h3>与深度学习结合：cv2.dnn 与人脸检测</h3>
+        <p>OpenCV 不负责训练，但自带 <code>cv2.dnn</code> 推理模块，能加载 ONNX、Caffe、TensorFlow 等格式的预训练模型直接前向推理，适合部署端轻量使用。而<b>人脸检测</b>不用神经网络也有百年老配方：内置的 Haar 级联分类器，一个 XML 文件搞定。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · Haar 人脸检测</span><button class="copy" type="button">复制</button></div>
+<pre>detector = cv2.CascadeClassifier(
+    cv2.data.haarcascades + <span class="g">"haarcascade_frontalface_default.xml"</span>
+)
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+faces = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+for (x, y, w2, h2) in faces:                  <span class="c"># 返回 [(x, y, w, h), ...]</span>
+    cv2.rectangle(img, (x, y), (x + w2, y + h2), (255, 0, 0), 2)</pre>
+        </div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：最常用的 cv2 函数</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了某个函数怎么写，直接搜 <b>缩放</b>、<b>边缘</b>、<b>轮廓</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索函数、用途，比如 灰度 / 边缘 / 轮廓" aria-label="搜索函数">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="函数分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">读写与显示</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">变换与绘制</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">滤波与边缘</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">轮廓与检测</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>函数</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">cv2.imread("a.jpg")</td><td>读图；失败返回 None 不报错，务必检查</td></tr>
+                <tr><td class="k">cv2.imread(path, cv2.IMREAD_GRAYSCALE)</td><td>直接按灰度读，省一次 cvtColor</td></tr>
+                <tr><td class="k">cv2.imwrite("b.png", img)</td><td>按扩展名选编码器保存，返回是否成功</td></tr>
+                <tr><td class="k">cv2.imwrite("a.jpg", img, [cv2.IMWRITE_JPEG_QUALITY, 90])</td><td>带参数保存：控制 JPG 压缩质量</td></tr>
+                <tr><td class="k">cv2.imread(p, cv2.IMREAD_UNCHANGED)</td><td>保留 alpha 通道读 PNG（4 通道）</td></tr>
+                <tr><td class="k">cv2.imshow("w", img) + cv2.waitKey(0)</td><td>弹窗显示；waitKey 必须调，0 表示无限等</td></tr>
+                <tr><td class="k">cv2.destroyAllWindows()</td><td>关掉所有窗口，脚本收尾标配</td></tr>
+                <tr><td class="k">cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)</td><td>色彩空间转换总入口；BGR2RGB 同理</td></tr>
+                <tr><td class="k">cv2.imdecode(np.fromfile(p, np.uint8), 1)</td><td>绕开 imread 的中文路径问题（Windows）</td></tr>
+                <tr><td class="k">cv2.imencode(".png", img)[1].tofile(p)</td><td>中文路径保存的对应写法</td></tr>
+                <tr><td class="k">img.shape / img.dtype</td><td>(高, 宽, 通道)；uint8，取值 0–255</td></tr>
+                <tr><td class="k">cv2.split(img) / cv2.merge([...])</td><td>拆 / 合 BGR 通道</td></tr>
+                <tr><td class="k">cv2.VideoCapture(0)</td><td>开摄像头；传文件路径则读视频</td></tr>
+                <tr><td class="k">cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)</td><td>设置采集宽高、帧率等属性</td></tr>
+                <tr><td class="k">cap.read()</td><td>返回 (是否成功, 帧数组)；失败即读完</td></tr>
+                <tr><td class="k">cv2.VideoWriter(p, fourcc, fps, (w, h))</td><td>写视频；尺寸是 (宽, 高)，与 shape 相反</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>函数</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">cv2.resize(img, (640, 480))</td><td>指定目标 (宽, 高)；缩小用 INTER_AREA 更平滑</td></tr>
+                <tr><td class="k">cv2.resize(img, None, fx=0.5, fy=0.5)</td><td>按比例缩放</td></tr>
+                <tr><td class="k">img[y1:y2, x1:x2]</td><td>裁剪 ROI：先行后列，和绘制坐标相反</td></tr>
+                <tr><td class="k">cv2.flip(img, 1)</td><td>镜像：1 水平、0 垂直、-1 双向</td></tr>
+                <tr><td class="k">cv2.getRotationMatrix2D + cv2.warpAffine</td><td>绕指定点旋转/仿射变换</td></tr>
+                <tr><td class="k">cv2.rectangle(img, (x1,y1), (x2,y2), color, 2)</td><td>画框；坐标是 (x, y)，线宽 -1 为实心</td></tr>
+                <tr><td class="k">cv2.circle(img, (x, y), r, color, -1)</td><td>画圆，-1 实心</td></tr>
+                <tr><td class="k">cv2.putText(img, "txt", (x, y), font, 0.8, color, 2)</td><td>写字，仅 ASCII；中文走 Pillow</td></tr>
+                <tr><td class="k">cv2.add / cv2.subtract</td><td>图像相加相减（饱和截断，与 NumPy 直接加减不同）</td></tr>
+                <tr><td class="k">cv2.addWeighted(a, 0.7, b, 0.3, 0)</td><td>按权重叠加两张图，做半透明水印</td></tr>
+                <tr><td class="k">cv2.cvtColor(img, cv2.COLOR_BGR2HSV)</td><td>转 HSV：按颜色定位物体比 BGR 稳定</td></tr>
+                <tr><td class="k">cv2.inRange(hsv, lower, upper)</td><td>颜色阈值分割，输出掩膜图</td></tr>
+                <tr><td class="k">cv2.getPerspectiveTransform + cv2.warpPerspective</td><td>四点透视校正，把拍歪的文档摆正</td></tr>
+                <tr><td class="k">cv2.copyMakeBorder(img, 20, 20, 20, 20, cv2.BORDER_CONSTANT)</td><td>给图加边框/补边</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>函数</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">cv2.GaussianBlur(img, (5, 5), 0)</td><td>高斯模糊去噪；核必须是正奇数</td></tr>
+                <tr><td class="k">cv2.medianBlur(img, 5)</td><td>中值滤波，专治椒盐噪点</td></tr>
+                <tr><td class="k">cv2.bilateralFilter(img, 9, 75, 75)</td><td>双边滤波：磨皮不糊边，速度慢</td></tr>
+                <tr><td class="k">cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)</td><td>全局二值化；返回 (阈值, 结果图)</td></tr>
+                <tr><td class="k">cv2.threshold(..., cv2.THRESH_OTSU)</td><td>加 Otsu 标志自动选阈值，阈值参数随便填</td></tr>
+                <tr><td class="k">cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)</td><td>局部自适应阈值，光照不均时用</td></tr>
+                <tr><td class="k">cv2.Canny(gray, 100, 200)</td><td>Canny 边缘检测，先模糊效果更稳</td></tr>
+                <tr><td class="k">cv2.Sobel / cv2.Laplacian</td><td>梯度与二阶导算子，Canny 的底层原理</td></tr>
+                <tr><td class="k">cv2.calcHist([img], [0], None, [256], [0, 256])</td><td>直方图统计，看曝光分布</td></tr>
+                <tr><td class="k">cv2.equalizeHist(gray)</td><td>直方图均衡化，提升暗图对比度</td></tr>
+                <tr><td class="k">cv2.morphologyEx(bin, cv2.MORPH_OPEN, kernel)</td><td>开/闭运算：去掉边缘图里的碎点</td></tr>
+                <tr><td class="k">np.getStructuringElement / np.ones((5,5), np.uint8)</td><td>形态学的结构元 kernel</td></tr>
+                <tr><td class="k">np.hstack([...]) / np.vstack([...])</td><td>NumPy 拼接多张图（通道数须一致）</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>函数</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">cv2.findContours(bin, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)</td><td>找轮廓；4.x 起返回 2 个值（3.x 是 3 个）</td></tr>
+                <tr><td class="k">cv2.drawContours(img, cs, -1, (0, 0, 255), 2)</td><td>画轮廓；-1 表示全部</td></tr>
+                <tr><td class="k">cv2.boundingRect(c) / cv2.minAreaRect(c)</td><td>轮廓的外接正矩形 / 最小面积旋转矩形</td></tr>
+                <tr><td class="k">cv2.contourArea(c) / cv2.arcLength(c, True)</td><td>轮廓面积 / 周长</td></tr>
+                <tr><td class="k">cv2.approxPolyDP(c, eps, True)</td><td>多边形逼近，数顶点识别形状</td></tr>
+                <tr><td class="k">cv2.moments(c) / cv2.convexHull(c)</td><td>矩（算质心）/ 凸包</td></tr>
+                <tr><td class="k">cv2.HoughLinesP(edge_img, ...)</td><td>概率霍夫直线检测</td></tr>
+                <tr><td class="k">cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, ...)</td><td>霍夫圆检测</td></tr>
+                <tr><td class="k">cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")</td><td>Haar 级联人脸检测器</td></tr>
+                <tr><td class="k">detector.detectMultiScale(gray, 1.1, 5)</td><td>人脸检测执行；返回 (x, y, w, h) 列表</td></tr>
+                <tr><td class="k">cv2.dnn.readNetFromONNX("model.onnx")</td><td>加载预训练模型做推理（也有 Caffe/TF 变体）</td></tr>
+                <tr><td class="k">cv2.matchTemplate(img, tpl, cv2.TM_CCOEFF_NORMED)</td><td>模板匹配，找小图在大图中的位置</td></tr>
+                <tr><td class="k">cv2.QRCodeDetector()</td><td>二维码检测与解码：detectAndDecode(img)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的函数。换个词试试，比如「缩放」「边缘」「人脸」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：批量水印 + 三联对比图生成器</h2>
+        <p>把前面的操作串成一个能用的命令行小工具：扫一个目录里的所有 JPG，给每张图打上水印，再生成「原图 | 灰度 | 边缘」的三联拼图方便检查。约 30 行，直接可跑：</p>
+
+        <div class="code">
+          <div class="code-head"><span>Python · watermark.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 用法: python watermark.py ./photos ./out</span>
+<span class="c"># 依赖: pip install opencv-python numpy</span>
+import sys
+from pathlib import Path
+
+import cv2
+import numpy as np
+
+src, out = Path(sys.argv[1]), Path(sys.argv[2])
+out.mkdir(parents=True, exist_ok=True)
+
+for path in sorted(src.glob(<span class="g">"*.jpg"</span>)):
+    img = cv2.imread(str(path))
+    if img is None:                       <span class="c"># 坏文件/乱路径：imread 静默返回 None</span>
+        print(f<span class="g">"跳过（读不了）: {path.name}"</span>)
+        continue
+
+    <span class="c"># 1. 右下角水印：先画黑色描边再画白字，任何背景都看得清</span>
+    h, w = img.shape[:2]
+    cv2.putText(img, <span class="g">"AI Code Study"</span>, (w - 262, h - 26),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 3)
+    cv2.putText(img, <span class="g">"AI Code Study"</span>, (w - 262, h - 26),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 1)
+
+    <span class="c"># 2. 灰度 + Canny，统一转回三通道再横向拼接</span>
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray, 100, 200)
+    trio = np.hstack([
+        img,
+        cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR),   <span class="c"># 通道数必须一致才能拼</span>
+        cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR),
+    ])
+    trio = cv2.resize(trio, None, fx=0.4, fy=0.4) <span class="c"># 三张图并排，缩到合理大小</span>
+
+    cv2.imwrite(str(out / f<span class="g">"{path.stem}_wm.jpg"</span>), img)
+    cv2.imwrite(str(out / f<span class="g">"{path.stem}_trio.jpg"</span>), trio)
+    print(f<span class="g">"完成: {path.name} → 水印图 + 三联对比图"</span>)</pre>
+        </div>
+
+        <h3>跑起来看效果</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>$ mkdir -p photos &amp;&amp; cp ~/Desktop/*.jpg photos/
+$ python watermark.py photos out
+完成: cat.jpg → 水印图 + 三联对比图
+完成: street.jpg → 水印图 + 三联对比图
+$ ls out/
+cat_trio.jpg    cat_wm.jpg    street_trio.jpg    street_wm.jpg</pre>
+        </div>
+
+        <div class="note"><b>往里加功能的顺序：</b>换水印文字/位置只动 putText 两行；想做半透明水印就用 <code>cv2.addWeighted</code> 把文字层和原图按权重叠加（见下）；想让 Canny 阈值自适应，可以把 100/200 换成中位数的倍数。改一处跑一次，肉眼对比 out 目录里的三联图。</div>
+
+        <h3>变体：半透明水印</h3>
+        <p>实心文字太重？用 <code>addWeighted</code> 把「画了字的白底层」和原图按权重融合，透明度由权重控制：</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 半透明水印（替换 putText 两行）</span><button class="copy" type="button">复制</button></div>
+<pre>layer = img.copy()
+cv2.putText(layer, <span class="g">"AI Code Study"</span>, (w - 262, h - 26),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 3)
+img = cv2.addWeighted(layer, 0.35, img, 0.65, 0)   <span class="c"># 字 35%，原图 65%</span></pre>
+        </div>
+        <p><small>原理：两张同尺寸图按权重线性混合。想让水印只出现在局部，把 layer 里水印区域之外涂黑（乘一个掩膜）再混合。</small></p>
+
+        <p class="muted" style="font-size:14px">这个项目练到的点，正好是前三节的主线：防御式读图、cvtColor 通道转换、putText 绘制、NumPy 拼接、resize——改任何一个参数跑一遍，比多看三篇教程有用。</p>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个新手必踩的坑</h2>
+
+        <h3>坑一：imread 静默返回 None</h3>
+        <p>路径错了、文件损坏、扩展名骗人（jpg 实际是 webp），imread 都<b>不报错</b>，返回 None，然后下一行才炸出莫名其妙的 <code>NoneType</code> 错误。Windows 上还有中文路径这层：imread 内部用 fopen，遇到非 ASCII 路径可能直接失败，用 <code>cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_COLOR)</code> 绕开。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 防御式读图</span><button class="copy" type="button">复制</button></div>
+<pre>img = cv2.imread(<span class="g">"photo.jpg"</span>)
+if img is None:
+    raise FileNotFoundError(f<span class="g">"读不到: {path}（检查相对路径与工作目录）"</span>)
+print(img.shape)      <span class="c"># 到这里才安全</span></pre>
+        </div>
+
+        <h3>坑二：imshow 窗口一闪而过或卡死</h3>
+        <p>imshow 后不调 <code>cv2.waitKey(0)</code>，窗口立刻消失；waitKey 参数给错（如填 0 又放在循环里），程序假死。规矩就三条：imshow 必配 waitKey；循环读帧用 waitKey(1)；结束前 destroyAllWindows。服务器/Docker 上干脆没有 GUI，imshow 直接报错——装 headless 包并改用 imwrite 输出文件。</p>
+        <div class="note warn"><b>远程 Jupyter 用户：</b>notebook 内核在服务器上，imshow 无法弹窗到你本机。用 <code>matplotlib.pyplot.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))</code> 在单元格内显示，记得先转 RGB。</div>
+
+        <h3>坑三：findContours 解包报错</h3>
+        <p>老教程写 <code>_, contours, _ = cv2.findContours(...)</code>（三个返回值），在 OpenCV 4.x 上直接报 <code>too many values to unpack</code>——4.0 起只返回两个值：</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 4.x 正确写法</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># OpenCV 4.x：返回 (contours, hierarchy)</span>
+contours, _ = cv2.findContours(bin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+<span class="c"># 注意：findContours 会修改输入图，喂给它的二值图要先 copy 或现场生成</span>
+<span class="c"># 入参必须是二值图：先 threshold / Canny，再 findContours</span></pre>
+        </div>
+
+        <h3>坑四：颜色发蓝、坐标画偏</h3>
+        <p>两个「错觉级」bug 都源于坐标系约定：<b>颜色</b>——matplotlib 里直接显示 OpenCV 图像，红蓝互换，转一次 RGB 就好；<b>坐标</b>——绘制函数收 (x, y)，数组切片用 [y, x]，resize 的尺寸参数也是 (宽, 高) 而 shape 是 (高, 宽)。拿不准就在纸上画个小坐标轴，比反复试错快。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · matplotlib 里正确显示 OpenCV 图</span><button class="copy" type="button">复制</button></div>
+<pre>import matplotlib.pyplot as plt
+
+plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))   <span class="c"># 先转 RGB 再显示</span>
+plt.axis(<span class="g">"off"</span>)
+plt.show()</pre>
+        </div>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与资源</h2>
+        <ul>
+          <li><a href="https://docs.opencv.org/4.x/" rel="noopener">OpenCV 官方文档（4.x）</a>——API 参考 + 官方教程，查函数参数的第一站。</li>
+          <li><a href="https://docs.opencv.org/4.x/d9/df8/tutorial_root.html" rel="noopener">官方 Tutorials</a>——从图像处理到深度学习推理的系统教程。</li>
+          <li><a href="https://github.com/opencv/opencv" rel="noopener">opencv/opencv</a>——源码仓库；扩展模块在 opencv_contrib 仓库。</li>
+          <li><a href="https://pypi.org/project/opencv-python/" rel="noopener">opencv-python（PyPI）</a>——四个 pip 包的区别与「只装一个」的官方说明都在这。</li>
+          <li><a href="https://opencv.org/university/" rel="noopener">OpenCV University</a>——官方出品的免费课程（OpenCV Bootcamp 等）。</li>
+          <li><a href="https://learnopencv.com/" rel="noopener">LearnOpenCV</a>——OpenCV 团队成员主理的教学站，进阶案例极多。</li>
+        </ul>
+        <div class="note"><b>学完本页去哪：</b>先把 NumPy 切片练熟（去 machine-learning.html 打底），然后两条路：往经典视觉深入——轮廓分析、相机标定、光流；往深度学习走——用 cv2.dnn 部署 ONNX 模型，或者进 pytorch.html 学训练自己的视觉模型。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>装好 opencv-python（只装了一个包），<b>cv2.__version__</b> 能出版本号</span></label>
+          <label><input type="checkbox" data-key="c2"><span>读过一张图并打印 <b>img.shape</b>，能说出三个数分别是什么</span></label>
+          <label><input type="checkbox" data-key="c3"><span>用过 cvtColor 转灰度，能解释为什么显示发蓝（BGR）</span></label>
+          <label><input type="checkbox" data-key="c4"><span>跑通 Canny 和 findContours，轮廓变量按 4.x 接两个返回值</span></label>
+          <label><input type="checkbox" data-key="c5"><span>跑通第 06 节批量水印脚本，out 目录里有水印图和三联图</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="langchain.html"><span>← 上一篇</span><b>LangChain 教程</b></a>
+        <a class="next" href="selenium.html"><span>下一篇 →</span><b>Selenium 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 OpenCV 官方文档（docs.opencv.org）、opencv-python PyPI 页面与 opencv/opencv GitHub 仓库整理，更新于 2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · OpenCV 版本迭代较快，具体参数以 docs.opencv.org 对应版本文档为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

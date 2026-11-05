@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pi Agent 教程 · AI Code Study</title>
+<meta name="description" content="Pi（pi-mono）上手指南：安装与认证、第一次对话、极简核心与四种运行模式、扩展/技能/模板/主题定制、速查表、实战改造、避坑与自检清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/pi-agent.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pi Agent 教程 · AI Code Study">
+<meta property="og:description" content="Pi（pi-mono）上手指南：安装与认证、第一次对话、极简核心与四种运行模式、扩展/技能/模板/主题定制、速查表、实战改造、避坑与自检清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/pi-agent.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pi Agent 教程 · AI Code Study">
+<meta name="twitter:description" content="Pi（pi-mono）上手指南：安装与认证、第一次对话、极简核心与四种运行模式、扩展/技能/模板/主题定制、速查表、实战改造、避坑与自检清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Pi：小到你能读完源码的编码 Agent",
+  "description": "Pi（pi-mono）上手指南：安装与认证、第一次对话、极简核心与四种运行模式、扩展/技能/模板/主题定制、速查表、实战改造、避坑与自检清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/pi-agent.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="pi-agent">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open" class="on">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-open">开源模型与智能体</a><span>/</span>
+      <b>Pi Agent</b>
+    </nav>
+    <p class="eyebrow">OPEN AGENTS · <b>PI</b> · 极简可改造的编码 Agent</p>
+    <h1>Pi：小到你能<em>读完源码</em>的编码 Agent</h1>
+    <p class="lede">Pi 是 Mario Zechner（badlogic）的极简编码 Agent：四个内置工具、一套可组合的包、四种运行模式。这页带你装上它、接上你的模型、写第一个扩展，并想清楚它和 Claude Code 这类全家桶的取舍。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/your-project</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">npm install -g @mariozechner/pi-coding-agent</span></div>
+        <div class="term-line"><span class="out">added 1 package in 5s</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">export ANTHROPIC_API_KEY=sk-ant-… &amp;&amp; pi</span></div>
+        <div class="term-line"><span class="out">pi · loaded AGENTS.md · tools: <span class="ok">read write edit bash</span></span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">列出 src/ 下所有 .ts 文件，指出哪个是入口</span></div>
+        <div class="term-line"><span class="out"><span class="ok">read</span> src/index.ts · <span class="ok">bash</span> ls src</span></div>
+        <div class="term-line"><span class="ok">14 个文件，入口是 src/index.ts —— 它 import 了其余 6 个模块</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装与认证</a>
+        <a href="#s3"><span class="idx">03</span>第一次对话</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战：改造它</a>
+        <a href="#s7"><span class="idx">07</span>避坑</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="ollama.html">Ollama 教程</a>
+        <a href="hermes-agent.html">Hermes Agent 教程</a>
+        <a href="deepseek-harness.html">DeepSeek Harness 教程</a>
+        <a href="index.html#cat-open">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装与认证</a>
+          <a href="#s3"><span class="idx">03</span>第一次对话</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战：改造它</a>
+          <a href="#s7"><span class="idx">07</span>避坑</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 它是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>它是什么：一个「你能自己养」的编码 Agent</h2>
+        <p>Pi 是 Mario Zechner（网名 badlogic，libGDX 框架作者）维护的开源编码 Agent，住在 <b>pi-mono</b> 这个 TypeScript 单仓库里。官网 pi.dev 的定位一句话：<b>a minimal, extensible agent harness you can make your own</b>——一个极简、可扩展、能改造成「你自己的」agent harness。它不在功能上堆料，而是把「能跑起来」的最小核心做扎实，其余一切交给扩展机制。</p>
+        <p>核心哲学浓缩成一句：默认只给模型四个工具——<code>read</code>、<code>write</code>、<code>edit</code>、<code>bash</code>。作者认为一个编码 agent 有这四样就够了，剩下的能力靠 skills、extensions 长出来。所以你在官方 README 里看不到 plan mode、看不到子智能体、看不到权限弹窗——不是做不了，是不替你做决定（这个取舍值多少分，第 07 节专门讨论）。</p>
+        <p>它适合三类人：<b>想理解 agent 内部机理的人</b>（源码小到能读完，扩展示例里甚至有「等待时玩 Doom」这种）；<b>要把 agent 嵌进自己产品或脚本的人</b>（SDK 与 RPC 模式是一等公民）；<b>被全家桶工具「管太多」的人</b>——想要自己的工作流，而不是工具替你规定的工作流。</p>
+        <p>「小」不是偷工减料，是有意的架构选择：核心小，系统提示词就短，模型行为就可预期；核心小，每个能力都能讲清楚来龙去脉，出问题就知道去哪查；核心小，改造点就清晰——你在自己的扩展里重写一个「子智能体」，成本是百来行 TypeScript，而不是去给一个大项目提 PR 等半年。仓库的 README 本身就是主文档，写得直白，读完它你就读完了产品。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>作者</dt><dd>Mario Zechner（badlogic · libGDX 作者）</dd></div>
+          <div class="fact"><dt>仓库</dt><dd>github.com/badlogic/pi-mono（TypeScript monorepo）</dd></div>
+          <div class="fact"><dt>协议</dt><dd>MIT</dd></div>
+          <div class="fact"><dt>安装包</dt><dd>@mariozechner/pi-coding-agent（命令名 pi）</dd></div>
+          <div class="fact"><dt>内置工具</dt><dd>read · write · edit · bash（+ grep · find · ls）</dd></div>
+          <div class="fact"><dt>运行模式</dt><dd>交互 TUI · print/JSON · RPC · SDK</dd></div>
+          <div class="fact"><dt>平台</dt><dd>macOS · Linux · Windows · Android（Termux）</dd></div>
+          <div class="fact"><dt>官网</dt><dd>pi.dev（域名由 exe.dev 捐赠）</dd></div>
+        </dl>
+
+        <div class="note"><b>monorepo 里还有什么：</b>除了编码 agent 本体，pi-mono 还包含 <b>@mariozechner/pi-ai</b>（统一多 provider 的 LLM API）、<b>pi-agent-core</b>（agent 运行时与状态管理）、<b>pi-tui</b>（差分渲染的终端 UI 库）、<b>pi-web-ui</b>（AI 聊天界面的 Web 组件）。每个包都小到可以单独读懂——这正是「单仓库拆包」的意义：你想抄哪层，就读哪层。</div>
+      </section>
+
+      <!-- ===== 02 安装与认证 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装与认证：npm 一条命令，认证两条路</h2>
+        <p>Pi 是模型无关的——它自己不带模型，接哪家就用哪家。所以安装之后还差一步「认证」：给 API key，或者用你已有的订阅登录。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">npm 全局安装（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">用现有订阅登录</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">从源码运行</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 安装（需要 Node.js 环境）</span>
+npm install -g @mariozechner/pi-coding-agent
+
+<span class="c"># 认证方式一：API key 环境变量</span>
+export ANTHROPIC_API_KEY=sk-ant-…
+
+pi --version</pre>
+          </div>
+          <small>API key 给哪家就用哪家。支持列表很长：Anthropic、OpenAI、Azure OpenAI、DeepSeek、Google Gemini、Google Vertex、Amazon Bedrock、Mistral、Groq、Cerebras、Cloudflare、xAI、OpenRouter、ZAI、Hugging Face、Fireworks、Kimi For Coding、MiniMax、Xiaomi MiMo 等——完整配置见仓库 <b>docs/providers.md</b>。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal · OAuth 订阅</span><button class="copy" type="button">复制</button></div>
+<pre>pi
+
+<span class="prompt">&gt; </span>/login      <span class="c"># 选择 provider，走 OAuth 授权</span>
+<span class="prompt">&gt; </span>/model      <span class="c"># 选具体模型（快捷键 Ctrl+L）</span></pre>
+          </div>
+          <small>支持订阅登录的 provider：<b>Anthropic Claude Pro/Max</b>、<b>OpenAI ChatGPT Plus/Pro（Codex）</b>、<b>GitHub Copilot</b>。不想手办 API key 的话，这条最省事。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal · 源码路径</span><button class="copy" type="button">复制</button></div>
+<pre>git clone https://github.com/badlogic/pi-mono.git
+cd pi-mono
+npm install
+npm run build
+./pi-test.sh      <span class="c"># 直接从源码跑 pi，任意目录可用</span></pre>
+          </div>
+          <small>配套脚本：<code>npm run check</code> 做 lint、格式与类型检查（要先 build），<code>./test.sh</code> 跑测试（没有 API key 时自动跳过依赖 LLM 的用例）。</small>
+        </div>
+
+        <div class="note warn"><b>平台与隐私两件事：</b>① Windows、Android Termux、tmux 各有专门说明（仓库 docs 的 platform notes）——Termux 能跑意味着手机上也有真 agent，装好 Node 环境后同样一条 npm 命令；② pi 启动时会做版本检查（请求 pi.dev）与匿名安装遥测，介意的话 <b>PI_OFFLINE=1</b> 全部关闭，或分别用 PI_SKIP_VERSION_CHECK=1 / settings.json 里的 enableInstallTelemetry 精细控制。</div>
+        <p>两条安装路径的取舍：npm 全局装最省心，跟着 npm 升级走；源码路径适合想读代码、改代码、贡献 PR 的人——整个仓库 <code>npm install &amp;&amp; npm run build</code> 就绪，没有私有构建工具链，这也是「读完源码」承诺的一部分。另外记两个常规维护命令：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 日常维护</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 升级到最新版（pi 自己也有更新命令，见第 05 节）</span>
+npm install -g @mariozechner/pi-coding-agent
+
+<span class="c"># 卸载</span>
+npm uninstall -g @mariozechner/pi-coding-agent
+
+<span class="c"># 看当前版本与完整帮助</span>
+pi --version
+pi --help</pre>
+        </div>
+      </section>
+
+      <!-- ===== 03 第一次对话 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>第一次对话：进仓库，开口就行</h2>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>cd ~/your-project
+pi
+
+<span class="c"># 带初始消息启动，省一次输入</span>
+pi <span class="g">"List all .ts files in src/"</span>
+
+<span class="c"># 单次执行，不进交互界面</span>
+pi -p <span class="g">"Summarize this codebase"</span>
+
+<span class="c"># 管道输入也能接</span>
+cat README.md | pi -p <span class="g">"Summarize this text"</span></pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>选好模型</h4><p>Ctrl+L（或 <b>/model</b>）打开模型选择器；<code>--models "claude-*,gpt-4o"</code> 可以预设一组，之后 Ctrl+P / Shift+Ctrl+P 在组里前后轮换。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>把项目规矩写进 AGENTS.md</h4><p>启动时它会从 <code>~/.pi/agent/AGENTS.md</code>（全局）、父目录、当前目录逐级加载 AGENTS.md（或 CLAUDE.md），全部拼接生效。项目约定、常用命令写在这里，等于每次开工前自动交底。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>让它干活</h4><p>读文件、改文件、跑命令，每一步都显示在界面上；Ctrl+O 折叠/展开工具输出，Escape 随时打断。任务要具体：「给 src/utils 加一个 toKebabCase 并补单测」远好过「优化一下代码」。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>学会排队说话</h4><p>它在干活时你也可以继续输入：Enter 是「指挥」——这轮工具跑完就插话；Alt+Enter 是「补充」——等它全部干完再送达。误发了按 Escape 收回编辑器。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">上下文快满时 pi 会自动压缩（compaction：总结旧消息、保留近期消息），也可以 <b>/compact</b> 手动来，还能附加一句要保留什么（比如 <b>/compact 保留架构结论</b>）。压缩是有损的，但完整历史都在会话 JSONL 文件里，<b>/tree</b> 随时能翻回去。</div>
+
+        <h3>输入框里能做的事</h3>
+        <p>pi 的编辑器看似朴素，官方面板里实际支持这些操作（全列在 <b>/hotkeys</b>）：</p>
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>@ 引用文件</dt><dd style="color:var(--ink-2)">输入 @ 模糊搜索项目文件，选中即作为附件进入上下文。</dd></div>
+          <div class="fact"><dt>Tab 补全路径</dt><dd style="color:var(--ink-2)">输入路径时按 Tab 补全。</dd></div>
+          <div class="fact"><dt>Shift+Enter 换行</dt><dd style="color:var(--ink-2)">多行输入（Windows Terminal 用 Ctrl+Enter）。</dd></div>
+          <div class="fact"><dt>Ctrl+V 粘图片</dt><dd style="color:var(--ink-2)">粘贴截图到上下文（Windows 用 Alt+V），也可以直接拖进终端。</dd></div>
+          <div class="fact"><dt>!command</dt><dd style="color:var(--ink-2)">自己跑一条 shell 命令，输出送给模型看。</dd></div>
+          <div class="fact"><dt>!!command</dt><dd style="color:var(--ink-2)">只跑不喂——输出不进上下文，适合噪音大的命令。</dd></div>
+        </dl>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 文件引用与图片（README File Arguments 一节）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># @ 前缀把文件带进消息</span>
+pi @prompt.md <span class="g">"Answer this"</span>
+pi @code.ts @test.ts <span class="g">"Review these files"</span>
+
+<span class="c"># 图片直接当参数</span>
+pi -p @screenshot.png <span class="g">"What's in this image?"</span></pre>
+        </div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：四个工具、四种模式、四件套</h2>
+
+        <h3>4.1 极简核心：默认只给四个工具</h3>
+        <p><code>read</code>、<code>write</code>、<code>edit</code>、<code>bash</code> 是默认四件套；内置工具全集还有 <code>grep</code>、<code>find</code>、<code>ls</code>。为什么少即是多：工具越少，系统提示词越短，模型行为越可预期，你越容易判断「它为什么这么做」。工具集还是可调的——一条命令就能进入只读模式：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 只读审阅模式</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 只放行 read/grep/find/ls —— 审阅别人的代码时用</span>
+pi --tools read,grep,find,ls -p <span class="g">"Review the code"</span>
+
+<span class="c"># 其他控制粒度</span>
+--no-builtin-tools   <span class="c"># 关内置工具，保留扩展工具</span>
+--no-tools           <span class="c"># 全关（纯对话）</span></pre>
+        </div>
+
+        <h3>4.2 四种运行模式：它是个「组件」，不只是个「程序」</h3>
+        <p>默认是交互 TUI；<code>-p</code> 是 print 模式（出答案就退出）；<code>--mode json</code> 把全部事件以 JSON lines 输出，适合脚本消费；<code>--mode rpc</code> 在 stdin/stdout 上跑 LF 分隔的 JSONL 协议，给非 Node.js 的进程集成用；最彻底的是 <b>SDK</b>——直接 import 进你的应用。官方 README 里给的 SDK 起步代码：</p>
+        <div class="code">
+          <div class="code-head"><span>TypeScript · SDK 嵌入（README 示例）</span><button class="copy" type="button">复制</button></div>
+<pre>import { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from <span class="g">"@mariozechner/pi-coding-agent"</span>;
+
+const authStorage = AuthStorage.create();
+const modelRegistry = ModelRegistry.create(authStorage);
+const { session } = await createAgentSession({
+  sessionManager: SessionManager.inMemory(),
+  authStorage,
+  modelRegistry,
+});
+
+await session.prompt(<span class="g">"What files are in the current directory?"</span>);</pre>
+        </div>
+        <p><small>真实世界的 SDK 集成案例，README 指了 openclaw/openclaw 这个项目；RPC 协议细节在 docs/rpc.md——注意它严格要求按 <code>\n</code> 分帧，别用会拆 Unicode 分隔符的通用行读取器。</small></p>
+
+        <p>README 的 Examples 一节给了一组可直接抄的启动姿势，覆盖日常九成场景：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 官方示例集（README 节选）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 交互 + 初始消息</span>
+pi <span class="g">"List all .ts files in src/"</span>
+
+<span class="c"># 非交互；管道输入会并进首条提示</span>
+pi -p <span class="g">"Summarize this codebase"</span>
+cat README.md | pi -p <span class="g">"Summarize this text"</span>
+
+<span class="c"># 指定模型：provider 前缀、思考档位、模型组</span>
+pi --provider openai --model gpt-4o <span class="g">"Help me refactor"</span>
+pi --model openai/gpt-4o <span class="g">"Help me refactor"</span>
+pi --model sonnet:high <span class="g">"Solve this complex problem"</span>
+pi --models <span class="g">"claude-*,gpt-4o"</span>
+
+<span class="c"># 只读审阅 / 高强度思考</span>
+pi --tools read,grep,find,ls -p <span class="g">"Review the code"</span>
+pi --thinking high <span class="g">"Solve this complex problem"</span></pre>
+        </div>
+
+        <h3>4.3 定制四件套与 pi packages</h3>
+        <p><b>Extensions</b>（TypeScript 模块：注册工具、命令、快捷键、事件处理器甚至 UI）、<b>Skills</b>（Agent Skills 标准的能力包，SKILL.md 文件，<code>/skill:name</code> 调用或让模型自动加载）、<b>Prompt templates</b>（Markdown 模板，输入 <code>/名字</code> 展开，支持 <code>{{变量}}</code> 占位）、<b>Themes</b>（dark/light 内置，主题文件支持热重载）。这四样都可以打进 <b>pi packages</b>，用 npm 或 git 分享给别人：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 包管理</span><button class="copy" type="button">复制</button></div>
+<pre>pi install npm:@foo/pi-tools              <span class="c"># 装 npm 包</span>
+pi install git:github.com/user/repo@v1    <span class="c"># 装 git 包，钉在 tag 上</span>
+pi install npm:@foo/pi-tools -l           <span class="c"># 项目本地安装（.pi/ 下）</span>
+pi list                                   <span class="c"># 看装了什么</span>
+pi config                                 <span class="c"># 启用/停用包里的扩展、技能、模板、主题</span></pre>
+        </div>
+        <p>四件套加包，落盘后长这样——记住这张目录地图，后面排障全靠它：</p>
+        <div class="code">
+          <div class="code-head"><span>文件系统 · pi 的目录地图（README 汇总）</span><button class="copy" type="button">复制</button></div>
+<pre>~/.pi/agent/                  <span class="c"># 全局配置根（可用 PI_CODING_AGENT_DIR 改址）</span>
+├── settings.json             <span class="c"># 全局设置；项目级放 .pi/settings.json</span>
+├── keybindings.json          <span class="c"># 自定义快捷键</span>
+├── models.json               <span class="c"># 自定义 provider / 模型</span>
+├── AGENTS.md                 <span class="c"># 全局上下文文件</span>
+├── SYSTEM.md                 <span class="c"># 全局系统提示词替换；APPEND_SYSTEM.md 追加</span>
+├── sessions/                 <span class="c"># 会话 JSONL（按工作目录归档）</span>
+├── prompts/ · skills/        <span class="c"># 全局模板与技能</span>
+├── extensions/ · themes/     <span class="c"># 全局扩展与主题</span>
+└── git/                      <span class="c"># git 来源的 pi 包安装位置</span></pre>
+        </div>
+
+        <h3>4.4 模型无关：统一 LLM API</h3>
+        <p>各家 provider 的差异被 <b>@mariozechner/pi-ai</b> 这一层统一 API 抹平——上面速查表里那串 provider 名单（从 Anthropic 到 DeepSeek、ZAI 到 Xiaomi MiMo）都走同一套接口。订阅类 provider 走 <code>/login</code> OAuth；API key 类用环境变量；公司网关或 OpenAI 兼容端点，在 <code>~/.pi/agent/models.json</code> 里加自定义 provider；更怪的需求（自定义 OAuth 流程等）用扩展的 <code>registerProvider()</code> 解决。会话里 Shift+Tab 循环思考档位（off → minimal → low → medium → high → xhigh），也可以 <code>--model sonnet:high</code> 这样直接带档位启动。</p>
+        <p>最后记一组环境变量——迁移机器、写 CI、关遥测都用得上（完整列表见 README）：</p>
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>PI_CODING_AGENT_DIR</dt><dd style="color:var(--ink-2)">改全局配置目录（默认 ~/.pi/agent）。</dd></div>
+          <div class="fact"><dt>PI_CODING_AGENT_SESSION_DIR</dt><dd style="color:var(--ink-2)">改会话存储目录（--session-dir 可覆盖）。</dd></div>
+          <div class="fact"><dt>PI_PACKAGE_DIR</dt><dd style="color:var(--ink-2)">改包目录（Nix/Guix 等场景用）。</dd></div>
+          <div class="fact"><dt>PI_OFFLINE=1</dt><dd style="color:var(--ink-2)">关闭全部启动联网：版本检查、包更新检查、遥测。</dd></div>
+          <div class="fact"><dt>PI_SKIP_VERSION_CHECK=1</dt><dd style="color:var(--ink-2)">只关版本检查，不动遥测开关。</dd></div>
+          <div class="fact"><dt>PI_TELEMETRY=0</dt><dd style="color:var(--ink-2)">只关安装/更新遥测，不动版本检查。</dd></div>
+          <div class="fact"><dt>PI_CACHE_RETENTION=long</dt><dd style="color:var(--ink-2)">延长 prompt 缓存（Anthropic 1h / OpenAI 24h）。</dd></div>
+          <div class="fact"><dt>VISUAL / EDITOR</dt><dd style="color:var(--ink-2)">Ctrl+G 调外部编辑器写长输入时使用。</dd></div>
+        </dl>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：包、模式、扩展机制与命令</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜，内容整理自 coding-agent 包的 README 与 CLI Reference。记不住命令名就搜 <b>会话</b>、<b>压缩</b>、<b>模型</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索包、命令、机制，比如 会话 / model / 扩展" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">包与模式</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">扩展机制</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">技能与模板</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">常用命令</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>包 / 模式</th><th>是什么</th></tr></thead>
+              <tbody>
+                <tr><td class="k">@mariozechner/pi-coding-agent</td><td>编码 agent 本体，npm 安装，命令名 pi</td></tr>
+                <tr><td class="k">@mariozechner/pi-ai</td><td>统一多 provider LLM API（OpenAI/Anthropic/Google 等）</td></tr>
+                <tr><td class="k">@mariozechner/pi-agent-core</td><td>agent 运行时：工具调用与状态管理</td></tr>
+                <tr><td class="k">@mariozechner/pi-tui</td><td>终端 UI 库，差分渲染</td></tr>
+                <tr><td class="k">@mariozechner/pi-web-ui</td><td>AI 聊天界面的 Web 组件</td></tr>
+                <tr><td class="k">pi（默认）</td><td>交互模式（TUI），页脚实时显示 token、费用、上下文占用</td></tr>
+                <tr><td class="k">pi -p / --print</td><td>print 模式：输出答案就退出，可接管道输入</td></tr>
+                <tr><td class="k">--mode json</td><td>全部事件以 JSON lines 输出（协议见 docs/json.md）</td></tr>
+                <tr><td class="k">--mode rpc</td><td>RPC 模式：stdin/stdout 上的 LF 分隔 JSONL，供进程集成</td></tr>
+                <tr><td class="k">SDK</td><td>import createAgentSession 等直接嵌进自己的应用</td></tr>
+                <tr><td class="k">pi --export &lt;in&gt; [out]</td><td>把会话导出成 HTML 文件</td></tr>
+                <tr><td class="k">--list-models [搜索]</td><td>列出可用模型，支持过滤</td></tr>
+                <tr><td class="k">--thinking &lt;level&gt;</td><td>思考档位：off/minimal/low/medium/high/xhigh</td></tr>
+                <tr><td class="k">--api-key &lt;key&gt;</td><td>临时指定 API key，优先于环境变量</td></tr>
+                <tr><td class="k">--session-dir &lt;dir&gt;</td><td>自定义会话存储目录</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>机制 / 入口</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">pi.registerTool({...})</td><td>扩展里注册自定义工具（或整体替换内置工具）</td></tr>
+                <tr><td class="k">pi.registerCommand("name", …)</td><td>注册自定义斜杠命令</td></tr>
+                <tr><td class="k">pi.on("tool_call", …)</td><td>监听工具调用事件（做审计、权限门、路径保护等）</td></tr>
+                <tr><td class="k">~/.pi/agent/extensions/</td><td>全局扩展目录</td></tr>
+                <tr><td class="k">.pi/extensions/</td><td>项目级扩展目录</td></tr>
+                <tr><td class="k">-e / --extension &lt;src&gt;</td><td>临时加载扩展（可重复）；--no-extensions 关掉自动发现</td></tr>
+                <tr><td class="k">pi install npm:@foo/pi-tools</td><td>安装第三方 pi 包（npm 源）</td></tr>
+                <tr><td class="k">pi install git:github.com/user/repo</td><td>从 git 安装，@tag/@commit 钉版本，也支持 https/ssh 地址</td></tr>
+                <tr><td class="k">pi install … -l</td><td>项目本地安装（装到 .pi/git/、.pi/npm/）</td></tr>
+                <tr><td class="k">pi remove / pi uninstall</td><td>移除包（后者是前者的别名）</td></tr>
+                <tr><td class="k">pi update</td><td>更新 pi 与包（跳过钉版本的）；--self 只更新 pi，--force 重装</td></tr>
+                <tr><td class="k">pi config</td><td>启用/停用包里的扩展、技能、模板、主题</td></tr>
+                <tr><td class="k">pi update --extensions</td><td>只更新包，不动 pi 本体；--self 则相反</td></tr>
+                <tr><td class="k">async 工厂函数</td><td>扩展默认导出可以是 async——pi 等它完成再继续启动</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>技能 / 模板</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">/skill:name</td><td>手动调用已装技能；模型也会按需自动加载</td></tr>
+                <tr><td class="k">~/.pi/agent/skills/&lt;名&gt;/SKILL.md</td><td>全局技能目录；遵循 Agent Skills 标准</td></tr>
+                <tr><td class="k">.pi/skills/ · .agents/skills/</td><td>项目级技能目录（从 cwd 向上逐级查找）</td></tr>
+                <tr><td class="k">~/.pi/agent/prompts/&lt;名&gt;.md</td><td>全局提示词模板目录</td></tr>
+                <tr><td class="k">/templatename</td><td>输入框里敲模板名即展开（扩展可注册自定义命令同理）</td></tr>
+                <tr><td class="k">{{focus}}</td><td>模板占位变量，写在模板正文里</td></tr>
+                <tr><td class="k">~/.pi/agent/themes/ · .pi/themes/</td><td>主题目录；主题文件改了立即热重载</td></tr>
+                <tr><td class="k">~/.pi/agent/AGENTS.md</td><td>全局上下文文件，启动时加载</td></tr>
+                <tr><td class="k">AGENTS.md / CLAUDE.md</td><td>项目上下文：从父目录到 cwd 逐级加载并拼接</td></tr>
+                <tr><td class="k">.pi/SYSTEM.md</td><td>替换默认系统提示词（全局版在 ~/.pi/agent/SYSTEM.md）</td></tr>
+                <tr><td class="k">APPEND_SYSTEM.md</td><td>追加而不替换系统提示词</td></tr>
+                <tr><td class="k">--no-context-files / -nc</td><td>关闭上下文文件发现</td></tr>
+                <tr><td class="k">.pi/prompts/</td><td>项目级提示词模板目录（与全局 ~/.pi/agent/prompts/ 并存）</td></tr>
+                <tr><td class="k">技能自动加载</td><td>模型按 SKILL.md 里的描述自行判断何时使用，不必显式 /skill:</td></tr>
+                <tr><td class="k">进包分享</td><td>模板、技能、主题都能放进 pi package 随 npm/git 分发</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令 / 快捷键</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">pi -c</td><td>继续最近一次会话</td></tr>
+                <tr><td class="k">pi -r</td><td>浏览历史会话，挑一个恢复</td></tr>
+                <tr><td class="k">pi --session &lt;id&gt;</td><td>指定会话（文件路径或部分 UUID）；--no-session 则不存</td></tr>
+                <tr><td class="k">pi --fork &lt;id&gt;</td><td>从既有会话分叉出新会话</td></tr>
+                <tr><td class="k">/model · Ctrl+L</td><td>切换模型；/scoped-models 管理 Ctrl+P 轮换的模型组</td></tr>
+                <tr><td class="k">/compact [提示]</td><td>手动压缩上下文，可指定保留什么；默认也有自动压缩</td></tr>
+                <tr><td class="k">/tree · Escape×2</td><td>会话树：跳回任意节点继续、切分支（JSONL 单文件内原地分支）</td></tr>
+                <tr><td class="k">/fork · /clone</td><td>从旧消息分叉新会话 / 复制当前分支为新会话</td></tr>
+                <tr><td class="k">/share</td><td>上传为私有 GitHub gist，生成可分享的 HTML 链接</td></tr>
+                <tr><td class="k">/export [file]</td><td>把会话导出成 HTML 文件</td></tr>
+                <tr><td class="k">/reload</td><td>重载快捷键、扩展、技能、模板与上下文文件（主题自动热重载）</td></tr>
+                <tr><td class="k">/hotkeys</td><td>全部快捷键面板；快捷键可改 ~/.pi/agent/keybindings.json</td></tr>
+                <tr><td class="k">Shift+Tab</td><td>循环思考档位（off → … → xhigh）</td></tr>
+                <tr><td class="k">!cmd · !!cmd</td><td>跑 shell 命令并把输出喂给模型 / 只跑不喂</td></tr>
+                <tr><td class="k">@file · Ctrl+V</td><td>引用文件附件（@ 模糊搜索）/ 粘贴图片（Windows 用 Alt+V）</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「会话」「压缩」「模型」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：四步把 pi 改造成你的专属工具</h2>
+        <p>pi 的正确打开方式不是「用它的功能」，而是「给它长功能」。下面四步全部来自官方 README 的机制说明，做完你就有了三件自己的定制件。</p>
+
+        <h3>步骤一：写一个提示词模板</h3>
+        <div class="code">
+          <div class="code-head"><span>~/.pi/agent/prompts/review.md</span><button class="copy" type="button">复制</button></div>
+<pre>Review this code for bugs, security issues, and performance problems.
+Focus on: {{focus}}</pre>
+        </div>
+        <p>保存后回到会话敲 <b>/reload</b>（或直接重开 pi），之后在输入框里输入 <code>/review</code> 即展开。模板支持 <code>{{focus}}</code> 这样的占位变量；放在 <code>.pi/prompts/</code> 里就是项目级，放进 pi package 就能分享给同事。</p>
+
+        <h3>步骤二：写一个技能</h3>
+        <div class="code">
+          <div class="code-head"><span>~/.pi/agent/skills/commit/SKILL.md</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># Commit Skill</span>
+当用户请你提交代码时使用这个技能。
+
+## 步骤
+1. 先跑 git status 与 git diff 审查全部改动
+2. 按约定式提交（Conventional Commits）格式写提交信息
+3. 提交前把测试跑一遍，失败则先修复</pre>
+        </div>
+        <p>会话里 <code>/skill:commit</code> 手动调用，或让模型判断场景自动加载。技能的威力在「把团队的隐性流程写成显性指令」——新人 clone 仓库就能继承老手的工作方式。</p>
+
+        <h3>步骤三：写一个 TypeScript 扩展</h3>
+        <p>扩展是 pi 定制能力的上限：注册工具、命令、事件处理器、UI 组件，官方示例里从 git 自动提交到「等待时玩 Doom」都有。README 给的骨架长这样：</p>
+        <div class="code">
+          <div class="code-head"><span>~/.pi/agent/extensions/my-ext.ts（骨架，README 示例）</span><button class="copy" type="button">复制</button></div>
+<pre>export default function (pi) {
+  pi.registerTool({ name: <span class="g">"deploy"</span>, /* 参数与执行逻辑，见 docs/extensions.md */ });
+
+  pi.registerCommand(<span class="g">"stats"</span>, { /* … */ });
+
+  pi.on(<span class="g">"tool_call"</span>, async (event, ctx) => { /* 审计日志 / 权限门 */ });
+}</pre>
+        </div>
+        <p>默认导出也可以是 async——工厂函数完成前 pi 会等它，适合启动前先拉一次远端模型列表之类的初始化。存好文件，<b>/reload</b> 生效。</p>
+
+        <h3>步骤四：装别人的包，或把四件套打包</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 分享你的定制</span><button class="copy" type="button">复制</button></div>
+<pre>pi install npm:@foo/pi-tools        <span class="c"># 装第三方的</span>
+pi list                             <span class="c"># 看装了什么</span>
+
+<span class="c"># 把自己的扩展+技能+模板+主题打成一个包</span>
+<span class="c"># package.json 里加：</span>
+{
+  "name": "my-pi-package",
+  "keywords": [<span class="g">"pi-package"</span>],
+  "pi": { <span class="g">"extensions"</span>: [<span class="g">"./extensions"</span>], <span class="g">"skills"</span>: [<span class="g">"./skills"</span>] }
+}</pre>
+        </div>
+        <p><small>没有 pi 清单的包，pi 会按约定目录（extensions/、skills/、prompts/、themes/）自动发现。发布到 npm 或 git 仓库，团队里 <code>pi install</code> 一条命令共享。</small></p>
+
+        <h3>验证：确认改造都生效了</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 验证清单</span><button class="copy" type="button">复制</button></div>
+<pre>pi
+<span class="prompt">&gt; </span>/reload        <span class="c"># 重载模板、技能、扩展与上下文文件</span>
+<span class="prompt">&gt; </span>/review        <span class="c"># 模板应立即展开</span>
+<span class="prompt">&gt; </span>/skill:commit  <span class="c"># 技能应可调用（启动头也会列出已加载项）</span>
+
+<span class="c"># 退出后在终端确认包就位</span>
+pi list</pre>
+        </div>
+        <p><small>启动时的 startup header 会列出已加载的 AGENTS.md、模板、技能与扩展——改造有没有生效，看头几行就知道。</small></p>
+
+        <div class="note"><b>回顾这条改造链路：</b>模板管「说什么」，技能管「怎么做」，扩展管「能做什么」，包管「怎么分享」。四层各司其职，pi 核心始终很小——这就是官网那句「adapt pi to your workflows, not the other way around」的落地方式。</div>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：极简派的四个取舍</h2>
+
+        <h3>坑一：别拿极简 Agent 当全家桶用</h3>
+        <p>pi 的官方哲学清单值得背下来——每一项「没有」，官方都给了替代路径：</p>
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>没有 MCP</dt><dd style="color:var(--ink-2)">作者的答案是「写带 README 的 CLI 工具」（即 Skills），或用扩展接 MCP。理由见 README 的 Philosophy 一节。</dd></div>
+          <div class="fact"><dt>没有子智能体</dt><dd style="color:var(--ink-2)">做法不止一种：tmux 里开多个 pi 实例、扩展自己写、装现成的包。</dd></div>
+          <div class="fact"><dt>没有权限弹窗</dt><dd style="color:var(--ink-2)">跑在容器里，或用扩展做贴合你安全要求的确认流。</dd></div>
+          <div class="fact"><dt>没有 plan mode</dt><dd style="color:var(--ink-2)">把计划写进文件（模型读文件本身就是执行的一部分）。</dd></div>
+          <div class="fact"><dt>没有内置 TODO</dt><dd style="color:var(--ink-2)">用 TODO.md 文件——作者认为内置待办列表会干扰模型。</dd></div>
+          <div class="fact"><dt>没有后台 bash</dt><dd style="color:var(--ink-2)">用 tmux：完全可观测、可直接交互。</dd></div>
+        </dl>
+        <p>这些不是缺陷清单，是设计立场——但如果你现在就需要这些功能且不想自己动手，pi 会让你觉得「缺胳膊少腿」。装包前记得先看它用哪些机制补的，质量参差。</p>
+        <div class="note warn"><b>一句话判断：</b>需要开箱即用的规划、审批、多 agent 编排，选全家桶；需要最小核心加完全控制权，选 pi。强行拿 pi 当全家桶用，然后抱怨它「功能少」，是这个工具最大的用法错误。</div>
+
+        <h3>坑二：扩展 API 与文档在动</h3>
+        <p>pi 迭代很快，扩展 API、会话格式、settings 字段都可能调整。三个「文档可能过时了」的信号：命令报未知参数、启动头不再列出你装的扩展、行为和 docs 描述对不上——出现任何一个，回仓库看当前 README。对策：升级 pi 后先 <b>/reload</b> 或重启验证扩展；写扩展时对照仓库 <b>docs/extensions.md</b> 与 <b>examples/extensions/</b> 的当前版本——这两个目录就是官方文档，别抄半年前的博客代码。另注意这个仓库对社区贡献的规则（新贡献者的 issue/PR 默认自动关闭，维护者每日复核），提 PR 前先读 CONTRIBUTING.md。</p>
+
+        <h3>坑三：provider 配置踩空</h3>
+        <p>三类坑各有对策：环境变量名各家不同（<code>ANTHROPIC_API_KEY</code> 只是其中之一，别拿 OpenAI 的 key 配给 Anthropic 的变量名）；订阅走 <code>/login</code> OAuth 而不是环境变量；公司自建网关用 <code>~/.pi/agent/models.json</code> 注册自定义 provider（要求对方说 OpenAI/Anthropic/Google 三种 API 之一）。全列出可用模型用 <code>--list-models</code>，能省很多猜。内网环境记得 <code>PI_OFFLINE=1</code>——pi 启动会联网做版本检查与遥测。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 排查 provider</span><button class="copy" type="button">复制</button></div>
+<pre>pi --list-models            <span class="c"># 当前能用的模型都有哪些</span>
+pi --model openai/gpt-4o <span class="g">"Help me refactor"</span>   <span class="c"># provider 前缀直接选</span>
+pi --model sonnet:high <span class="g">"Solve this"</span>           <span class="c"># 模型+思考档位连写</span></pre>
+        </div>
+
+        <h3>坑四：和 Claude Code / OpenCode 怎么选</h3>
+        <p>三问定取舍。<b>一问工作流</b>：团队已经用惯 Claude Code / OpenCode 的权限审批、plan mode、子 agent，那就别换——迁移成本大于收益。<b>二问控制权</b>：要把 agent 行为拧到自己手里（最小上下文、自定义工具、嵌入产品），pi 的扩展模型上限更高。<b>三问中间态</b>：其实没有中间态——但 pi 官方 README 留了一扇门：「Make pi look like Claude Code」被明确列在扩展能做到的事情里。也就是说，全家桶的「形」在 pi 上是可重建的，而 pi 的「骨」在全家桶上是不可拆的。想清楚哪边不可妥协，选择就自动成立了。</p>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与资源</h2>
+        <ul>
+          <li><b>官方仓库</b>：<a href="https://github.com/badlogic/pi-mono">github.com/badlogic/pi-mono</a> —— coding-agent 的 README 就是主文档，docs/ 分册覆盖 providers、extensions、skills、packages、sdk、rpc 等主题。</li>
+          <li><b>官网</b>：<a href="https://pi.dev">pi.dev</a> —— 极简哲学的官方陈述，以及它对「上下文工程」的态度。</li>
+          <li><b>扩展示例</b>：仓库 <b>packages/coding-agent/examples/extensions/</b> —— 从注册工具到自定义 UI，拿一个改改就是你的第一个扩展。</li>
+          <li><b>SDK 集成案例</b>：<a href="https://github.com/openclaw/openclaw">openclaw/openclaw</a> —— README 点名的真实 SDK 集成项目。</li>
+          <li><b>会话数据共享</b>：<a href="https://github.com/badlogic/pi-share-hf">badlogic/pi-share-hf</a> —— 把 OSS 工作会话发布到 Hugging Face，用真实任务数据帮模型与工具进化。</li>
+          <li><b>Discord 社区</b>：README 徽章入口，第三方 pi 包的集散地之一。</li>
+          <li><b>分册文档</b>：docs/providers.md（各家 provider 配置）、docs/extensions.md（扩展 API）、docs/packages.md（打包发布）、docs/session-format.md（会话 JSONL 格式）——按需深入。</li>
+          <li><b>会话树原理</b>：docs/compaction.md 讲压缩内部机制——想搞懂「上下文管理」这个课题，这是难得的公开实现。</li>
+        </ul>
+        <div class="note"><b>下一步去哪：</b>读完这页，你已经理解了一个 harness 的最小构成——工具循环、会话树、扩展机制。想看「插件化全家桶」的另一种架构取向，去 <a href="deepseek-harness.html">DeepSeek Harness 教程</a>；想在本地跑开源模型给 pi 当 provider，去 <a href="ollama.html">Ollama 教程</a>。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span><b>npm install -g @mariozechner/pi-coding-agent</b> 完成，<b>pi --version</b> 有输出</span></label>
+          <label><input type="checkbox" data-key="c2"><span><b>/login</b> 或 API key 至少配通一家 provider，<b>/model</b> 能切换模型</span></label>
+          <label><input type="checkbox" data-key="c3"><span>在真实仓库跑过一次只读任务（<b>--tools read,grep,find,ls</b>）</span></label>
+          <label><input type="checkbox" data-key="c4"><span>写过一个 prompt template 或 skill，<b>/reload</b> 后能调用</span></label>
+          <label><input type="checkbox" data-key="c5"><span>能说出 pi 没有 plan mode / 子智能体 / 权限弹窗，以及你打算用什么补</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="deepseek-harness.html"><span>← 上一篇</span><b>DeepSeek Harness 教程</b></a>
+        <a class="next" href="machine-learning.html"><span>下一篇 →</span><b>机器学习教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 badlogic/pi-mono 官方仓库（github.com/badlogic/pi-mono，packages/coding-agent 的 README 与 docs/）与官网 pi.dev 整理，2026-11 核对；项目迭代较快，具体命令、配置与扩展 API 以仓库文档与 pi --help 的当前输出为准。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 版本迭代较快，具体参数以官方文档为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

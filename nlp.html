@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>自然语言处理 NLP 教程 · AI Code Study</title>
+<meta name="description" content="自然语言处理 NLP 入门教程：分词、TF-IDF、词向量、Transformer 与大模型演化，配 jieba + sklearn 中文情感分类实战，2026-11 更新。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/nlp.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自然语言处理 NLP 教程 · AI Code Study">
+<meta property="og:description" content="自然语言处理 NLP 入门教程：分词、TF-IDF、词向量、Transformer 与大模型演化，配 jieba + sklearn 中文情感分类实战，2026-11 更新。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/nlp.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="自然语言处理 NLP 教程 · AI Code Study">
+<meta name="twitter:description" content="自然语言处理 NLP 入门教程：分词、TF-IDF、词向量、Transformer 与大模型演化，配 jieba + sklearn 中文情感分类实战，2026-11 更新。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "自然语言处理：机器怎么读懂人话",
+  "description": "自然语言处理 NLP 入门教程：分词、TF-IDF、词向量、Transformer 与大模型演化，配 jieba + sklearn 中文情感分类实战，2026-11 更新。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/nlp.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="nlp">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics" class="on">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-basics">入门基础</a><span>/</span>
+      <b>NLP</b>
+    </nav>
+    <p class="eyebrow">BASICS · <b>NLP</b> · 从分词到大模型</p>
+    <h1>自然语言处理：机器怎么<em>读懂人话</em></h1>
+    <p class="lede">从分词、TF-IDF 到词向量与 Transformer，一条线讲清机器处理文本的完整流水线。读完你能亲手搭一个中文情感分类器，并且明白今天的大模型踩在哪几块积木之上。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">python3 — jieba</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">import jieba</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">words = jieba.lcut("这手机性能不错，电池耐用")</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">words</span></div>
+        <div class="term-line"><span class="out">['这', '手机', '性能', '不错', '，', '电池', '耐用']</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">score = sum({"不错": 0.6, "耐用": 0.5}.get(w, 0) for w in words)</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">"好评" if score &gt; 0 else "差评"</span></div>
+        <div class="term-line"><span class="ok">'好评' — 分词 + 词典打分，就是最朴素的情感分类器</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>任务地图</a>
+        <a href="#s2"><span class="idx">02</span>环境准备</a>
+        <a href="#s3"><span class="idx">03</span>快速上手 jieba</a>
+        <a href="#s4"><span class="idx">04</span>从词到模型</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战：情感分类</a>
+        <a href="#s7"><span class="idx">07</span>避坑</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="ai.html">AI 人工智能</a>
+        <a href="ai-agent.html">AI Agent</a>
+        <a href="ai-math.html">AI 数学基础</a>
+        <a href="index.html#cat-basics">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>任务地图</a>
+          <a href="#s2"><span class="idx">02</span>环境准备</a>
+          <a href="#s3"><span class="idx">03</span>快速上手 jieba</a>
+          <a href="#s4"><span class="idx">04</span>从词到模型</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战：情感分类</a>
+          <a href="#s7"><span class="idx">07</span>避坑</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>NLP 是什么：把人话变成机器能算的东西</h2>
+        <p>自然语言处理（NLP）研究怎么让机器处理人类语言——听懂、读懂、生成。它从规则时代一路走到统计时代再到深度学习时代，而今天所有大模型（ChatGPT、Kimi 这些对话产品）本质上就是一个超大规模的语言模型。所以理解 NLP 的基本概念，等于理解了大模型的每一块积木从哪来。</p>
+        <p>按技术手段看，这门学科走过三个时代：<b>规则时代</b>（词表 + 正则 + 语法树，人力堆出来的精确但脆弱）、<b>统计时代</b>（n-gram、HMM、CRF，从数据里学概率）、<b>神经网络时代</b>（词向量、RNN、Transformer，直到今天的大模型）。每个时代的工具都还在服役：正则依然在清洗文本，jieba 依然在分词，大模型则把后面的所有环节一肩挑。</p>
+        <p>不管任务怎么变，数据流万变不离其宗：<b>原始文本 → 切成单元（token）→ 变成数字（表示）→ 模型处理 → 输出标签或新文本</b>。差别只在于每一环用什么技术。下面的任务地图是这门学科的「目录页」：</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>分词 / 分句</dt><dd>把字符串切成词或子词（token），一切的第一步</dd></div>
+          <div class="fact"><dt>词性标注</dt><dd>标出名词 / 动词 / 形容词，后续规则的抓手</dd></div>
+          <div class="fact"><dt>命名实体识别 NER</dt><dd>找出人名、地名、机构名、时间</dd></div>
+          <div class="fact"><dt>情感分析</dt><dd>判断好评还是差评、正面还是负面</dd></div>
+          <div class="fact"><dt>文本分类</dt><dd>垃圾邮件识别、新闻归类、意图识别</dd></div>
+          <div class="fact"><dt>机器翻译</dt><dd>跨语言生成，seq2seq 架构的诞生地</dd></div>
+          <div class="fact"><dt>自动摘要</dt><dd>长文变短文：抽取式摘句 / 生成式重写</dd></div>
+          <div class="fact"><dt>问答与对话</dt><dd>阅读理解、检索问答、客服机器人</dd></div>
+        </dl>
+
+        <p class="muted" style="font-size:14px">本页代码环境：Python 3.12、jieba 0.42.1、scikit-learn 1.9；文中代码输出均为实际运行结果。</p>
+
+        <p>这一页的用法建议：</p>
+        <ul>
+          <li><b>按顺序读</b>：第 04 节「表示方法的四级台阶」是全页主轴，前面都是它的铺垫。</li>
+          <li><b>边读边跑</b>：所有代码在 jieba + scikit-learn 环境即可复现，逐行对照输出。</li>
+          <li><b>速查表当词典</b>：忘了指标、库名、术语，回这里搜。</li>
+          <li><b>第 06 节两条路都要跑</b>：跑完你就知道「手搓流水线」与「预训练模型」各自意味着什么。</li>
+        </ul>
+
+        <div class="note"><b>大模型时代的分工：</b>很多任务如今被「提示词」统一了，上面这张表看似过时——但恰恰相反，分词与文本表示这两层依然是理解一切的地基：大模型读你的输入时做的第一件事，仍是切 token、查向量表。指标因任务而异（准确率 / F1 / BLEU / ROUGE / 困惑度），第 05 节速查表有完整对照。</div>
+        <div class="note"><b>那还需要学经典方法吗：</b>需要。真实项目里文本清洗、分词、规则兜底永远少不了；而且不懂 TF-IDF 和朴素贝叶斯，你连大模型检索增强（RAG）里的「相关性排序」都看不懂。经典方法是地基，不是古董。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>环境准备：三步装齐经典 NLP 工具箱</h2>
+        <p>推荐用虚拟环境。经典路线（jieba + scikit-learn）轻到几十 MB，深度学习路线（transformers）需要 torch 作底座、首次运行还要下载模型。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">经典三件套（推荐先装）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">transformers</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">spaCy</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>python3 -m venv .venv
+source .venv/bin/activate      <span class="c"># Windows 是 .venv\Scripts\activate</span>
+
+<span class="c"># 分词 + 传统机器学习，本页第 03、06 节只需要这两个</span>
+pip install jieba scikit-learn
+python -c <span class="g">"import jieba, sklearn; print('ok')"</span></pre>
+          </div>
+          <small>jieba + scikit-learn 加起来不到 50MB，纯 CPU 即可，没有任何版本坑；jieba 0.42.1 已多年未大更新，胜在稳定。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># torch 是运行底座，CPU 版即可起步</span>
+pip install torch transformers
+
+<span class="c"># 第一次调用 pipeline 时会自动下载所选模型（数百 MB）</span></pre>
+          </div>
+          <small>下载慢的话，可设置环境变量 <b>HF_ENDPOINT=https://hf-mirror.com</b> 走社区镜像（非官方服务，稳定性以实际情况为准）。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>pip install spacy
+<span class="c"># 中文小模型单独下载：分词、词性、NER 一条龙</span>
+python -m spacy download zh_core_web_sm</pre>
+          </div>
+          <small>spaCy 的模型和库是分开装的；中文还有 <b>zh_core_web_md / lg</b> 等更大的模型，按需选择，模型名以 spaCy 官方模型页为准。jieba 分不了的复杂场景，可以拿 spaCy 做对照。</small>
+        </div>
+
+        <p>验证装好的标志：终端里 <code>python -c "import jieba, sklearn; print('ok')"</code> 能打印 ok；transformers 路线则是 <code>python -c "import transformers; print(transformers.__version__)"</code> 能出版本号。</p>
+        <div class="note warn"><b>先装哪条路线：</b>先装经典三件套把第 03、06 节跑通，再按需装 transformers——直接从大模型开始学 NLP，容易把「调 API」误当成「懂原理」。各库对 Python 版本的要求以官方文档为准。</div>
+      </section>
+
+      <!-- ===== 03 快速上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>快速上手：五分钟用 jieba 切好第一段中文</h2>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · jieba_warmup.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> jieba
+<span class="g">import</span> jieba.posseg <span class="g">as</span> pseg
+
+<span class="c"># 精确模式：默认，最常用</span>
+print(jieba.lcut(<span class="g">"自然语言处理让机器读懂人话"</span>))
+<span class="c"># ['自然语言', '处理', '让', '机器', '读懂', '人', '话']</span>
+
+<span class="c"># 搜索引擎模式：长词再切细，提高召回</span>
+print(jieba.lcut_for_search(<span class="g">"小明硕士毕业于中国科学院计算所"</span>))
+<span class="c"># ['小明', '硕士', '毕业', '于', '中国', '科学', '学院',</span>
+<span class="c">#  '科学院', '中国科学院', '计算', '计算所']</span>
+
+<span class="c"># 领域词保护：先 add_word，再切</span>
+jieba.add_word(<span class="g">"计算所"</span>)
+print(jieba.lcut(<span class="g">"他在中国科学院计算所实习"</span>))
+<span class="c"># ['他', '在', '中国科学院', '计算所', '实习']</span>
+
+<span class="c"># 词性标注：n 名词 / v 动词 / a 形容词 / r 代词</span>
+print([(w.word, w.flag) <span class="g">for</span> w <span class="g">in</span> pseg.lcut(<span class="g">"这个手机性能不错"</span>)][:4])
+<span class="c"># [('这个', 'r'), ('手机', 'n'), ('性能', 'n'), ('不错', 'a')]</span></pre>
+          </div>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · 三种模式一句话记住</span><button class="copy" type="button">复制</button></div>
+<pre>s = <span class="g">"小明硕士毕业于中国科学院计算所"</span>
+jieba.lcut(s)                   <span class="c"># 精确模式：默认，句子级分析用这个</span>
+jieba.lcut(s, cut_all=<span class="g">True</span>)    <span class="c"># 全模式：穷举所有成词可能，宁可错切不漏切</span>
+jieba.lcut_for_search(s)        <span class="c"># 搜索模式：长词再切细，检索召回用</span></pre>
+          </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>精确模式起步</h4><p><code>jieba.lcut</code> 返回列表（<code>jieba.cut</code> 返回生成器），一次切完，句子级别够用。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>长文本换搜索引擎模式</h4><p>搜索引擎模式把「中国科学院」这种长词再切出「科学院」「计算所」，检索场景召回率更高。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>专有名词先喂词典</h4><p>单次用 <code>jieba.add_word</code>，成批用 <code>jieba.load_userdict("user_dict.txt")</code>（一行一个词）。领域文本这一步几乎必做。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>词性标注做过滤</h4><p><code>pseg</code> 给每个词带词性标签——只保留名词和动词当关键词、找形容词判断情感，都靠它。</p></div>
+          </li>
+        </ul>
+
+        <div class="note"><b>常见词性标记：</b>n 名词、nr 人名、ns 地名、nt 机构名、v 动词、a 形容词、d 副词、r 代词——与北大词性标记体系一致，日常过滤够用，完整对照表见 jieba 仓库说明。</div>
+        <div class="note">首次分词时 jieba 会在终端打印 <b>Building prefix dict…</b>——那是在构建词典缓存（打印到 stderr），不是报错，第二次起就快了。</div>
+
+        <h3>顺手做个词频统计</h3>
+        <p>分词最常见的下游用途——数词。配合 Python 自带的 <code>collections.Counter</code>，三行就是一个词频工具：</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · wordfreq.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">from</span> collections <span class="g">import</span> Counter
+
+words = jieba.lcut(<span class="g">"自然语言处理让机器读懂人话，自然语言处理很难"</span>)
+print(Counter(words).most_common(3))
+<span class="c"># [('自然语言', 2), ('处理', 2), ('让', 1)]</span></pre>
+          </div>
+
+        <h3>再抽一下关键词</h3>
+        <p>jieba 自带基于 TF-IDF 思想的关键词抽取，从一段话里挑最有信息量的几个词——第 04 节讲完原理，这里先看看它能多省事：</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · keywords.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> jieba.analyse
+
+tags = jieba.analyse.extract_tags(
+    <span class="g">"自然语言处理是人工智能的核心问题，机器学习与深度学习推动了它"</span>,
+    topK=5,
+)
+print(tags)
+<span class="c"># ['学习', '自然语言', '人工智能', '深度', '机器']</span></pre>
+          </div>
+          <small>打分逻辑：本文档常见 × 全局稀有的词得分高——正是 TF-IDF 的思想，第 04 节展开。</small>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>从字符串到语义：表示方法的四级台阶</h2>
+
+        <h3>预处理：分词、停用词与词干化</h3>
+        <p>中英文第一处分水岭就在<b>分词</b>：英文天然有空格，按空格切就有七八成正确率，剩下的是 <code>don't</code>、<code>New York</code> 这类边界情况；中文没有任何分隔符，同一串字可以有多种切法，必须靠词典 + 统计模型。第二处分水岭是<b>词干化 / 词形还原</b>：英文有形态变化（running → run、better → good），切完要归一；中文没有形态变化，这步通常省掉。<b>停用词</b>（的、了、a、the）几乎不带信息量，做文本分类前通常过滤掉。</p>
+        <p><small>英文侧用 NLTK 时注意：首次使用要先 <code>nltk.download("punkt")</code> 下载数据，新版本可能提示还需要 punkt_tab，照提示补装即可。</small></p>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · preprocess.py</span><button class="copy" type="button">复制</button></div>
+<pre>stops = {<span class="g">"的"</span>, <span class="g">"了"</span>, <span class="g">"，"</span>, <span class="g">"、"</span>}
+words = jieba.lcut(<span class="g">"这个手机性能不错的，体验很流畅了"</span>)
+print([w <span class="g">for</span> w <span class="g">in</span> words <span class="g">if</span> w <span class="g">not</span> <span class="g">in</span> stops])
+<span class="c"># ['这个', '手机', '性能', '不错', '体验', '很', '流畅']</span>
+
+<span class="g">from</span> nltk.stem <span class="g">import</span> PorterStemmer      <span class="c"># 英文侧：词干化</span>
+print(PorterStemmer().stem(<span class="g">"running"</span>))   <span class="c"># run</span></pre>
+          </div>
+
+        <div class="note"><b>停用词表从哪来：</b>不要手写。哈工大、百度都有公开的中文停用词表可下载。但要小心任务适配——「不」在很多停用词表里，情感分析把它删了，「不好用」就变成「好用」了。对任务敏感的词，宁可留下。</div>
+
+        <p>spaCy 是另一条预处理路线：<code>zh_core_web_sm</code> 模型把分词、词性、命名实体识别装进同一条流水线，<code>nlp(text)</code> 一次返回全部结果，适合做成服务长期跑。jieba 胜在轻量好嵌入，spaCy 胜在工程化，两者不冲突——很多项目的组合是正则粗洗 + jieba 细切 + 重活交给模型。</p>
+
+        <h3>表示：one-hot → TF-IDF → 词向量 → 上下文相关</h3>
+        <p><b>one-hot</b>：每个词一根「独热」向量，维度等于词表大小，任意两个词都互相垂直——「猫」和「狗」的相似度是 0，语义完全丢失。<b>TF-IDF</b> 给出文档级表示：TF（这个词在本文档出现得多不多）× IDF（这个词在全体文档里稀不稀罕），越「本文专属、全局稀有」的词权重越高。它常配朴素贝叶斯、逻辑回归做分类，几十年不过时。<b>词向量（word2vec，Mikolov 等，2013）</b>把词映射成稠密低维向量，语义相近的词距离就近，经典类比 <code>king − man + woman ≈ queen</code>；用 gensim 可以训练或加载现成词向量。但它一词一向量——「苹果手机」和「吃苹果」里的「苹果」没法区分。</p>
+        <p><b>上下文相关表示</b>由预训练模型给出：同一个词在不同句子里向量不同，多义词的歧义就此解决。今天任何大模型的第一层，都是把 token 查表映射成这样的稠密向量——这四级台阶不是进化史上的化石，而是层层叠加着用。</p>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · tfidf_demo.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">from</span> sklearn.feature_extraction.text <span class="g">import</span> TfidfVectorizer
+vec = TfidfVectorizer()
+X = vec.fit_transform([<span class="g">"I love NLP"</span>, <span class="g">"NLP is fun and love is great"</span>])
+print(sorted(vec.vocabulary_))   <span class="c"># 6 个词各占一列</span>
+print(X.shape)                   <span class="c"># (2, 6)：2 篇文档 × 6 维</span></pre>
+          </div>
+
+        <p>one-hot 的缺陷一行代码就能看到：任意两个词的内积都是 0，「猫」和「狗」跟「猫」和「汽车」一样不像——语义完全丢失，这就是要学向量表示的理由：</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · onehot_demo.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> numpy <span class="g">as</span> np
+
+cat, dog, car = np.eye(3)[0], np.eye(3)[1], np.eye(3)[2]   <span class="c"># 三根独热向量</span>
+print(cat @ dog, cat @ car)
+<span class="c"># 0.0 0.0：猫和狗、猫和汽车，一样「不像」</span></pre>
+          </div>
+
+        <p>词向量用 gensim 就能训一个玩具版（真实词向量要大语料，通常直接加载现成的）：</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · word2vec_toy.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">from</span> gensim.models <span class="g">import</span> Word2Vec
+
+sents = [[<span class="g">"我"</span>, <span class="g">"爱"</span>, <span class="g">"自然语言"</span>, <span class="g">"处理"</span>],
+         [<span class="g">"词"</span>, <span class="g">"向量"</span>, <span class="g">"很"</span>, <span class="g">"有用"</span>],
+         [<span class="g">"自然语言"</span>, <span class="g">"处理"</span>, <span class="g">"很"</span>, <span class="g">"有趣"</span>]]
+model = Word2Vec(sents, vector_size=16, min_count=1, epochs=10, seed=1)
+print(len(model.wv))                 <span class="c"># 9：词表共 9 个词</span>
+print(model.wv[<span class="g">"自然语言"</span>].shape)     <span class="c"># (16,)：每个词变成 16 维向量</span></pre>
+          </div>
+          <small>玩具语料训不出语义，这里只看机制：词真的进了低维稠密空间。真实场景用 gensim 加载预训练词向量，或直接用大模型的 embedding 层。</small>
+
+        <h3>语言模型演化：n-gram → RNN → Transformer → 预训练 + 大模型</h3>
+        <p>语言模型回答一个的问题：「给定前文，下一个词的概率分布是什么」。<b>n-gram</b>（上世纪八九十年代）用马尔可夫假设只看前 n−1 个词，简单高效，但词组合爆炸、见过的才认识，泛化差。<b>RNN / LSTM</b>（2010 年代前期）按顺序逐词读入、用一个隐状态记住上文，LSTM 的门控机制缓解了长距离依赖，但依然是串行计算，难以并行、难以上规模。</p>
+        <p>n-gram 的意思很直白：bigram 只看前 1 个词，trigram 看前 2 个——「今天 天气」之后接「不错」的概率，直接从语料里数出来。数不出来的组合概率为零，这就是它泛化差的原因，也是「让神经网络学语言」要解决的第一件事。</p>
+        <p>把 RNN 的困境说透：第 100 个词想「看到」第 1 个词，信息要在隐状态里传递 99 步，一路上被不断改写——距离一长就忘。n-gram 是「看不远」，RNN 是「看得远但记不住还跑不快」，三个毛病各占其半。</p>
+        <p>2017 年《Attention Is All You Need》提出 <b>Transformer</b>，换了打法：<b>自注意力</b>让序列中任意两个 token 直接互相打分、按分数加权取信息（打分用的就是 AI 数学页讲的点积），<b>位置编码</b>补回「谁在谁前面」的顺序信息，<b>多头</b>机制让模型同时关注几种不同关系——而且整个计算天然并行，这才打开了「把模型做大」的大门。随后 BERT（2018，双向掩码预训练，擅长理解）与 GPT 系列（逐词预测预训练，擅长生成）把自注意力推成绝对主流。</p>
+
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>自注意力</dt><dd style="color:var(--ink-2)">每个 token 对所有 token 打点积打分、按分加权取信息——任意距离一步直达</dd></div>
+          <div class="fact"><dt>多头</dt><dd style="color:var(--ink-2)">多组注意力并行，各自关注不同关系（语法、指代、语义……）</dd></div>
+          <div class="fact"><dt>位置编码</dt><dd style="color:var(--ink-2)">注意力本身不感知顺序，必须显式注入 token 的位置信息</dd></div>
+          <div class="fact"><dt>前馈层 + 残差</dt><dd style="color:var(--ink-2)">注意力之后逐位置做非线性变换；残差连接让上百层的网络训得动</dd></div>
+        </dl>
+
+        <p>2018–2020 年的主流范式是<b>预训练 + 微调</b>：先在无标注的海量文本上学会「语言本身」，再用少量标注数据微调到具体任务。2020 年后模型规模继续上台阶，出现了<b>提示（prompt）与上下文学习</b>：不再微调参数，把任务写进提示词就能用。今天的大模型，就是这条演化线的最新一环——但它读文本的每个环节，依然能对应到本节的四级台阶。</p>
+        <p>「提示」之所以可行，是因为预训练把任务逼成了「续写」：把「评论：…… 情感：」拼给模型，它自然往「好评 / 差评」上续。few-shot、思维链这些技巧，本质都是「怎么把任务写成一道好的续写题」——底层数据流，仍是本节开头那条「切 token → 查向量 → 模型处理」。</p>
+
+        <h3>中文特有问题：歧义切分与未登录词</h3>
+        <p>中文分词有两大经典难题。<b>歧义切分</b>：同一串字存在多种「合法」切法，例子已经写进教科书——「南京市长江大桥」，正确读法是 南京市 / 长江大桥，但也能读成 南京 / 市长 / 江大桥。jieba 的全模式会把各种切法都列出来给你看。<b>未登录词（OOV）</b>：新词、人名、产品名不在词典里，比如「计算所」常被切碎。对策组合拳：自定义词典兜底、统计模型（HMM）猜新词；大模型则用子词切分（BPE）把词拆成更小的稳定单元，从机制上大幅缓解了 OOV。</p>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · ambiguity.py</span><button class="copy" type="button">复制</button></div>
+<pre>print(jieba.lcut(<span class="g">"南京市长江大桥"</span>))
+<span class="c"># ['南京市', '长江大桥']</span>
+
+print(jieba.lcut(<span class="g">"南京市长江大桥"</span>, cut_all=<span class="g">True</span>))   <span class="c"># 全模式：歧义全列出</span>
+<span class="c"># ['南京', '南京市', '京市', '市长', '长江', '长江大桥', '大桥']</span></pre>
+          </div>
+
+        <p>自定义词典的文件格式一行一个词，词频和词性可省略：</p>
+        <div class="code">
+          <div class="code-head"><span>user_dict.txt · 搭配 jieba.load_userdict 使用</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 词        词频(可省)  词性(可省)</span>
+计算所        3        nz
+哔哩哔哩      2        nz</pre>
+          </div>
+
+        <p>词典之外，jieba 还有最后一道保险：基于 <b>HMM</b>（隐马尔可夫模型）猜新词——对没见过的组合按字的出现规律「估」一个切法。经典演示是人名、机构名这类组合：</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · hmm_demo.py</span><button class="copy" type="button">复制</button></div>
+<pre>print(jieba.lcut(<span class="g">"他来到了网易杭研大厦"</span>))
+<span class="c"># ['他', '来到', '了', '网易', '杭研', '大厦']：杭研这类新词也认出来了</span></pre>
+          </div>
+
+        <p>还有一条工程经验：<b>分词粒度会一路影响下游</b>。切太细丢语义（「计算」「所」），切太粗泛化差（新组合认不出）；文本分类常取「词」粒度，检索场景偏爱「字 / 子词」粒度。没有绝对正确的粒度，只有匹配下游任务的粒度。</p>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：任务、模型、库与术语</h2>
+        <p class="muted" style="font-size:14px">这一节当词典用。忘了某任务用什么指标、某个库怎么装、Transformer 术语什么意思，直接搜——中英文关键词都支持。四张表分别覆盖：做什么（任务）、用什么（模型与库）、什么意思（术语）。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索任务、库、术语，比如 分词 / F1 / 注意力" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="NLP 速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">任务与指标</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">经典模型</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">常用库（pip 名）</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">Transformer 术语</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>任务</th><th>常用指标</th></tr></thead>
+              <tbody>
+                <tr><td class="k">分词</td><td>词级 Precision / Recall / F1（SIGHAN 评测）</td></tr>
+                <tr><td class="k">词性标注</td><td>词级准确率</td></tr>
+                <tr><td class="k">命名实体识别</td><td>实体级 F1：边界和类型都对才算对</td></tr>
+                <tr><td class="k">文本分类 / 情感分析</td><td>Accuracy；类别不均衡时看 Macro-F1</td></tr>
+                <tr><td class="k">机器翻译</td><td>BLEU：与参考译文的 n-gram 重合度</td></tr>
+                <tr><td class="k">自动摘要</td><td>ROUGE：n-gram / 最长公共子序列重合</td></tr>
+                <tr><td class="k">抽取式问答</td><td>EM（完全匹配）+ F1</td></tr>
+                <tr><td class="k">语言模型</td><td>困惑度 PPL：越低说明模型对文本越「不意外」</td></tr>
+                <tr><td class="k">词向量</td><td>词类比 / 相似度评测集</td></tr>
+                <tr><td class="k">开放对话生成</td><td>人工评测为主，自动指标只作参考</td></tr>
+                <tr><td class="k">信息检索 / 排序</td><td>MRR、NDCG：正确的文档排得越靠前分越高</td></tr>
+                <tr><td class="k">文本蕴含</td><td>准确率：前提能否推出假设（三分类）</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>模型 / 方法</th><th>一句话定位</th></tr></thead>
+              <tbody>
+                <tr><td class="k">n-gram 语言模型</td><td>马尔可夫假设只看前 n−1 个词，简单但泛化差</td></tr>
+                <tr><td class="k">HMM 隐马尔可夫</td><td>分词 / 词性的经典统计模型（jieba 猜新词用它）</td></tr>
+                <tr><td class="k">CRF 条件随机场</td><td>序列标注利器，常接在特征或表示之上</td></tr>
+                <tr><td class="k">word2vec（2013）</td><td>CBOW / Skip-gram 两种训练方式，词向量开山之作</td></tr>
+                <tr><td class="k">GloVe（2014）</td><td>全局共现统计 + 词向量，与 word2vec 互补</td></tr>
+                <tr><td class="k">LSTM / GRU</td><td>门控 RNN，缓解长距离依赖，串行计算</td></tr>
+                <tr><td class="k">seq2seq + attention</td><td>编码器-解码器，机器翻译的经典架构</td></tr>
+                <tr><td class="k">Transformer（2017）</td><td>《Attention Is All You Need》：自注意力 + 并行</td></tr>
+                <tr><td class="k">BERT（2018）</td><td>双向掩码预训练，理解类任务王者</td></tr>
+                <tr><td class="k">GPT 系列</td><td>逐词预测预训练，生成式，大模型路线</td></tr>
+                <tr><td class="k">ELMo（2018）</td><td>上下文相关词向量的先驱：一词多向量</td></tr>
+                <tr><td class="k">T5 / BART</td><td>把任务统一成「文本进、文本出」的编码-解码模型</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>库（pip 安装名）</th><th>定位</th></tr></thead>
+              <tbody>
+                <tr><td class="k">jieba</td><td>pip install jieba；中文分词事实标准，轻量无依赖</td></tr>
+                <tr><td class="k">nltk</td><td>pip install nltk；英文教学与研究的经典工具箱</td></tr>
+                <tr><td class="k">spacy</td><td>pip install spacy；工业级流水线，中文模型另装（zh_core_web_sm）</td></tr>
+                <tr><td class="k">scikit-learn</td><td>pip install scikit-learn；TF-IDF、朴素贝叶斯、逻辑回归</td></tr>
+                <tr><td class="k">gensim</td><td>pip install gensim；训练 / 加载 word2vec 词向量</td></tr>
+                <tr><td class="k">transformers</td><td>pip install transformers；预训练模型统一接口（pipeline 一行调用）</td></tr>
+                <tr><td class="k">torch</td><td>transformers 的运行底座，CPU 版即可入门</td></tr>
+                <tr><td class="k">datasets</td><td>pip install datasets；Hugging Face 数据集加载与预处理</td></tr>
+                <tr><td class="k">hanlp</td><td>pip install hanlp；中文 NLP 工业级套件（复旦邱锡鹏团队）</td></tr>
+                <tr><td class="k">pkuseg</td><td>pip install pkuseg；北大中文分词，支持领域模型</td></tr>
+                <tr><td class="k">snownlp</td><td>pip install snownlp；简易中文情感分析，适合原型验证</td></tr>
+                <tr><td class="k">sentencepiece</td><td>pip install sentencepiece；BPE/子词切分，大模型 tokenizer 的常用底座</td></tr>
+                <tr><td class="k">fasttext</td><td>pip install fasttext；快速文本分类 + 词向量，CPU 上极快</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>术语</th><th>含义</th></tr></thead>
+              <tbody>
+                <tr><td class="k">token</td><td>文本切分后的最小单元：词、子词或字</td></tr>
+                <tr><td class="k">embedding</td><td>token → 向量的映射表，模型的第一层</td></tr>
+                <tr><td class="k">self-attention</td><td>自注意力：每个 token 对所有 token 打分、按分加权取信息</td></tr>
+                <tr><td class="k">multi-head</td><td>多头：多组注意力并行，各自关注不同的关系</td></tr>
+                <tr><td class="k">位置编码</td><td>给注意力补上「谁在谁前面」的顺序信息</td></tr>
+                <tr><td class="k">encoder / decoder</td><td>理解侧与生成侧两半；GPT 类只用 decoder</td></tr>
+                <tr><td class="k">mask 掩码</td><td>解码时遮住「未来」token；padding 位置也要遮蔽</td></tr>
+                <tr><td class="k">[CLS]</td><td>BERT 里代表整句的特殊 token，句向量从它取</td></tr>
+                <tr><td class="k">预训练</td><td>海量无标注文本上学语言规律，与具体任务无关</td></tr>
+                <tr><td class="k">微调 fine-tune</td><td>用标注数据把预训练模型调到具体任务</td></tr>
+                <tr><td class="k">BPE 子词切分</td><td>高频词整存、低频词拆开，缓解未登录词</td></tr>
+                <tr><td class="k">PPL 困惑度</td><td>语言模型好坏的经典指标，越低越好</td></tr>
+                <tr><td class="k">MLM / CLM</td><td>两类预训练目标：掩码语言模型（BERT）与因果语言模型（GPT）</td></tr>
+                <tr><td class="k">few-shot</td><td>把少量示例写进提示词，靠上下文学习完成任务</td></tr>
+                <tr><td class="k">KV cache</td><td>推理时缓存注意力的键值，生成逐词加速的关键手段</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「分词」「F1」「注意力」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：中文情感分类，经典与预训练两条路</h2>
+        <p>同一个任务走两条路：先用 jieba + TF-IDF + 朴素贝叶斯亲手搭一条经典流水线，再用 transformers 一行调用预训练模型对照——两条路的差距，就是「机器学习」与「预训练」的差距。全部代码真实可跑，输出为实际运行结果。</p>
+
+        <h3>第 1 步：8 条语料，把问题定死</h3>
+        <p>标签 1 = 好评、0 = 差评。真实任务需要成百上千条标注，这里 8 条只为跑通流程——别拿它评估真实效果。</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · sentiment_nb.py 完整可跑</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> jieba
+<span class="g">from</span> sklearn.feature_extraction.text <span class="g">import</span> TfidfVectorizer
+<span class="g">from</span> sklearn.naive_bayes <span class="g">import</span> MultinomialNB
+<span class="g">from</span> sklearn.pipeline <span class="g">import</span> make_pipeline
+
+<span class="c"># 8 条带标签语料：1=好评，0=差评</span>
+texts = [
+    <span class="g">"界面漂亮，操作流畅，体验很好"</span>,
+    <span class="g">"性能强悍，电池耐用，值得购买"</span>,
+    <span class="g">"拍照清晰，系统稳定，非常满意"</span>,
+    <span class="g">"性价比高，推荐给朋友了"</span>,
+    <span class="g">"用了一周就卡顿，质量太差"</span>,
+    <span class="g">"电池不耐用，售后态度也差"</span>,
+    <span class="g">"屏幕发黄，做工粗糙，后悔了"</span>,
+    <span class="g">"价格贵还不好用，非常失望"</span>,
+]
+labels = [1, 1, 1, 1, 0, 0, 0, 0]
+
+<span class="c"># 一条流水线：jieba 分词 → TF-IDF 加权 → 朴素贝叶斯</span>
+model = make_pipeline(
+    TfidfVectorizer(tokenizer=jieba.lcut, token_pattern=<span class="g">None</span>),
+    MultinomialNB(),
+)
+model.fit(texts, labels)
+
+<span class="c"># 试几条没见过的句子</span>
+tests = [<span class="g">"手感不错，系统流畅"</span>, <span class="g">"用了两天就坏了，太差劲"</span>,
+         <span class="g">"包装很好，很喜欢"</span>, <span class="g">"卡成幻灯片，后悔"</span>]
+<span class="g">for</span> t, p <span class="g">in</span> zip(tests, model.predict(tests)):
+    print(t, <span class="g">"=&gt;"</span>, <span class="g">"好评"</span> <span class="g">if</span> p == 1 <span class="g">else</span> <span class="g">"差评"</span>)</pre>
+          </div>
+
+        <div class="code">
+          <div class="code-head"><span>实际运行输出</span><button class="copy" type="button">复制</button></div>
+<pre>手感不错，系统流畅 =&gt; 好评
+用了两天就坏了，太差劲 =&gt; 差评
+包装很好，很喜欢 =&gt; 好评
+卡成幻灯片，后悔 =&gt; 差评</pre>
+          </div>
+        <p><small>注意：两条测试句里的「手感」「坏」「差劲」大多没在训练语料里出现过——分类靠的是「流畅」「太」「差」这些共享词的统计信号。样本这么少还能对，是因为任务太简单；语料扩到几千条、任务贴近真实，经典流水线的上限立刻显现。</small></p>
+
+        <h3>第 2 步：切分训练 / 测试集，正经评估一次</h3>
+        <p>刚才只看了预测结果，评估要按规矩来：留出一部分数据当测试集，指标才算数。</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · 追加到 sentiment_nb.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">from</span> sklearn.model_selection <span class="g">import</span> train_test_split
+<span class="g">from</span> sklearn.metrics <span class="g">import</span> accuracy_score
+
+Xtr, Xte, ytr, yte = train_test_split(
+    texts, labels, test_size=0.25, stratify=labels, random_state=0)
+model.fit(Xtr, ytr)                       <span class="c"># 只用 6 条训练</span>
+print([t <span class="g">for</span> t <span class="g">in</span> Xte])                   <span class="c"># 留出的两条测试句</span>
+print(accuracy_score(yte, model.predict(Xte)))
+<span class="c"># 0.5：两条件对一条</span></pre>
+          </div>
+          <p><small>0.5 不是 bug——8 条语料只留 2 条做测试，单条对错就让指标跳 50%。它的真实含义是：<b>样本太少时，评估本身就是噪音</b>。真实任务几千条起步，这个坑自然消失。</small></p>
+
+        <h3>第 3 步：看看模型学到了哪些词</h3>
+        <p>朴素贝叶斯给每个词存了好评 / 差评两套对数概率，作差就知道哪些词最「偏袒」好评：</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · 追加</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> numpy <span class="g">as</span> np
+
+tfidf = model.named_steps[<span class="g">"tfidfvectorizer"</span>]
+nb = model.named_steps[<span class="g">"multinomialnb"</span>]
+names = tfidf.get_feature_names_out()
+diff = nb.feature_log_prob_[1] - nb.feature_log_prob_[0]   <span class="c"># 好评 − 差评</span>
+top = np.argsort(diff)[::-1][:5]
+print([(names[i], round(float(diff[i]), 2)) <span class="g">for</span> i <span class="g">in</span> top])
+<span class="c"># [('性能', 0.34), ('值得', 0.34), ('购买', 0.34), ('强悍', 0.34), ('系统', 0.33)]</span></pre>
+          </div>
+          <p><small>tokenizer 参数接受任何可调用对象——想顺带过滤停用词，直接传 <code>lambda s: [w for w in jieba.lcut(s) if w not in stops]</code>，把预处理挂进流水线。</small></p>
+          <p><small>模型自己「说」出了判断依据：性能、值得、购买这些词把天平拨向好评。传统机器学习的好处就在这——每个决策都能打开看。</small></p>
+
+        <h3>第 4 步：对照——预训练模型一行调用</h3>
+        <p>同一个任务，用 transformers 加载一个在大众点评语料上微调过的中文 RoBERTa。它读过几十万条真实评论，「语言知识」是预训练带来的，不靠这 8 条。</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · sentiment_dl.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">from</span> transformers <span class="g">import</span> pipeline
+
+pipe = pipeline(
+    <span class="g">"sentiment-analysis"</span>,
+    model=<span class="g">"uer/roberta-base-finetuned-dianping-chinese"</span>,
+)
+print(pipe(<span class="g">"手感不错，系统流畅"</span>))
+<span class="c"># [{'label': 'LABEL_1', 'score': 0.99…}]</span>
+<span class="c"># LABEL_1 = 好评，LABEL_0 = 差评；score 以实际运行为准</span></pre>
+          </div>
+        <div class="note"><b>怎么解读差距：</b>经典路线每一步你都能打开看（词表、权重、概率），是理解原理的最好教具；预训练路线开箱即用、泛化强，但需要 torch + 数百 MB 下载，且「它为什么懂」藏在几亿参数里。两条路不是替代关系——第 05 节速查表里的库，恰好各管一边。</div>
+
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>要可控、可解释、部署轻</dt><dd style="color:var(--ink-2)">经典路线：TF-IDF + 线性模型，每一步能打开看，模型文件只有几 MB</dd></div>
+          <div class="fact"><dt>要泛化、语义复杂、标注少</dt><dd style="color:var(--ink-2)">预训练路线：pipeline 或微调，模型自带「读过的书」</dd></div>
+          <div class="fact"><dt>真实项目的常见搭配</dt><dd style="color:var(--ink-2)">预处理用经典工具，理解 / 生成用预训练模型——两条线各干各的活</dd></div>
+        </dl>
+        <p><small>预训练中文分类模型不止一个：上面用的是 UER-py 模型库的大众点评版，同一系列还有在电商、微博等不同语料上微调的版本，按业务场景选。</small></p>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：中文文本最常见的四个坑</h2>
+
+        <h3>坑一：TfidfVectorizer 直接喂中文</h3>
+        <p>sklearn 的向量化器默认<b>按空格切词</b>，中文没空格，整句会被当成一个「词」——特征只剩一列，模型等于瞎的。</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · 对比</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">from</span> sklearn.feature_extraction.text <span class="g">import</span> TfidfVectorizer
+vec = TfidfVectorizer()                        <span class="c"># 默认按空格切</span>
+X = vec.fit_transform([<span class="g">"界面漂亮操作流畅"</span>])
+print(X.shape)                                 <span class="c"># (1, 1)：整句一个词！</span>
+
+vec = TfidfVectorizer(tokenizer=jieba.lcut, token_pattern=<span class="g">None</span>)</pre>
+          </div>
+          <small>传了 tokenizer 就顺手把 <b>token_pattern=None</b> 一起传，否则 sklearn 会警告该参数被忽略。另外 <b>lowercase=True</b> 是默认值——中文无所谓，中英混排时会顺带把英文转小写，别在下游重复处理。</small>
+
+        <h3>坑二：专有名词被切碎</h3>
+        <p>「计算所」「团建」这类领域词、新词不在默认词典里。上线前务必用真实业务语料抽查分词结果。</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · 词典兜底</span><button class="copy" type="button">复制</button></div>
+<pre>jieba.add_word(<span class="g">"计算所"</span>)               <span class="c"># 运行时加一个词</span>
+
+<span class="c"># 成批加载：先造词典文件（UTF-8），再一行加载</span>
+<span class="g">with</span> open(<span class="g">"user_dict.txt"</span>, <span class="g">"w"</span>, encoding=<span class="g">"utf-8"</span>) <span class="g">as</span> f:
+    f.write(<span class="g">"计算所 3 nz\n哔哩哔哩 2 nz\n"</span>)
+jieba.load_userdict(<span class="g">"user_dict.txt"</span>)</pre>
+          </div>
+        <p><small>词典文件务必存成 UTF-8 编码——Windows 记事本默认的 GBK 会让 load_userdict 静默加载失败，一词不报错但全部不生效。</small></p>
+        <div class="note warn"><b>边界要清楚：</b>用户词典只保证「这个词不被切开」，不改变其余词的切法，也不会让分类器变聪明——它救的是分词，不是语义。</div>
+
+        <h3>坑三：数据没分层就切分</h3>
+        <p>类别不均衡（差评远多于好评）时直接随机切，测试集可能清一色一类，指标虚高或虚低。用 stratify 按类别分层：</p>
+        <div class="code">
+          <div class="code-head"><span>python3</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">from</span> sklearn.model_selection <span class="g">import</span> train_test_split
+Xtr, Xte, ytr, yte = train_test_split(
+    texts, labels,
+    test_size=0.25,
+    stratify=labels,      <span class="c"># 两边的好坏评比例一致</span>
+    random_state=0,
+)</pre>
+          </div>
+        <p><small><b>random_state 也建议固定</b>：测试集一变，前后指标就不可比。团队协作时，把切分方式和随机种子写进代码评审清单。</small></p>
+
+        <h3>坑四：transformers 第一次跑「卡住」</h3>
+        <div class="note warn"><b>两个原因：</b>多半不是卡死，而是在<b>下载模型</b>（数百 MB，取决于网速，终端里通常有进度条）。另外 <code>pipeline("sentiment-analysis")</code> 不指定 model 时加载的是<b>英文</b>模型——中文任务必须显式指定中文模型，否则输出无意义。</div>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 看看模型下到哪了</span><button class="copy" type="button">复制</button></div>
+<pre>du -sh ~/.cache/huggingface      <span class="c"># 缓存目录的体积；在涨就说明还在下载</span></pre>
+          </div>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶：把 NLP 的地图接回大模型</h2>
+        <p>按「先动手、后体系」排序，前三个是动手文档，后三个是体系教材：</p>
+        <p>读的顺序建议：先用 jieba / sklearn 的文档把本页跑通的部分吃透，再上 Hugging Face 课程学预训练模型的操作，Jurafsky 教材当词典查理论——三条线并行，别单线硬啃教材。</p>
+        <ul>
+          <li><a href="https://github.com/fxsjy/jieba">jieba GitHub 仓库</a>：README 里有全部功能（关键词提取、自定义词典格式）。</li>
+          <li><a href="https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html">scikit-learn 文本处理教程</a>：官方教程，本页第 06 节的完整版背景。</li>
+          <li><a href="https://huggingface.co/learn">Hugging Face 官方课程</a>：从 pipeline 到微调，配可运行 notebook。</li>
+          <li><a href="https://spacy.io/usage">spaCy 使用文档</a>：工业级流水线的标准用法，中文模型支持分词 / 词性 / NER。</li>
+          <li><a href="https://www.nltk.org/book/">NLTK Book</a>：《用 Python 进行自然语言处理》免费在线版，体系化入门经典。</li>
+          <li><a href="https://web.stanford.edu/~jurafsky/slp3/">Jurafsky &amp; Martin《Speech and Language Processing》</a>：斯坦福教材（第 3 版草稿免费），从 n-gram 讲到大模型，查细节的权威书。</li>
+        </ul>
+        <div class="note"><b>下一步去哪：</b>大模型时代的工具都以本页概念为地基——接着看 <a href="kimi-code.html">Kimi Code CLI 教程</a> 上手一个真实的模型工具，或去 <a href="ai-agent.html">AI Agent（智能体）教程</a> 看模型怎么从「会说」进化到「会做」。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：合上页面前，勾一遍</h2>
+        <p>全勾上，你就具备了读大模型相关文章的词汇量——token、embedding、预训练这些词不再是黑话，而是你亲手用过、跑过的东西。</p>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>能说出中英文预处理的三个差异：<b>分词 / 词干化 / 停用词</b></span></label>
+          <label><input type="checkbox" data-key="c2"><span>能解释 <b>TF-IDF</b> 为什么比单纯数词数更能代表一篇文档</span></label>
+          <label><input type="checkbox" data-key="c3"><span>能画出 <b>n-gram → RNN → Transformer → 大模型</b>的演化主线，并各说一个局限</span></label>
+          <label><input type="checkbox" data-key="c4"><span>跑通了第 06 节两条路线，并能说出<b>预训练模型强在哪</b></span></label>
+          <label><input type="checkbox" data-key="c5"><span>知道 <b>TfidfVectorizer</b> 处理中文必须配 jieba（或等价分词器），并会加自定义词典</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="ai-math.html"><span>← 上一篇</span><b>AI 数学基础教程</b></a>
+        <a class="next" href="kimi-code.html"><span>下一篇 →</span><b>Kimi Code CLI 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 jieba（github.com/fxsjy/jieba）、scikit-learn、Hugging Face Transformers 官方文档整理；第 03、06 节代码与输出为 Python 3.12 + jieba 0.42.1 + scikit-learn 1.9 实际运行结果，整理于 2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 版本迭代较快，具体 API 与模型以官方文档为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

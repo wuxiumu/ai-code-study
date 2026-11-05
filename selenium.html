@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selenium 教程 · AI Code Study</title>
+<meta name="description" content="Selenium 4.x 上手指南：安装与 Selenium Manager、八大定位器、显式等待、页面操作与无头模式，附完整搜索自动化脚本、速查表与避坑清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/selenium.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Selenium 教程 · AI Code Study">
+<meta property="og:description" content="Selenium 4.x 上手指南：安装与 Selenium Manager、八大定位器、显式等待、页面操作与无头模式，附完整搜索自动化脚本、速查表与避坑清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/selenium.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Selenium 教程 · AI Code Study">
+<meta name="twitter:description" content="Selenium 4.x 上手指南：安装与 Selenium Manager、八大定位器、显式等待、页面操作与无头模式，附完整搜索自动化脚本、速查表与避坑清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Selenium：让浏览器替你干活",
+  "description": "Selenium 4.x 上手指南：安装与 Selenium Manager、八大定位器、显式等待、页面操作与无头模式，附完整搜索自动化脚本、速查表与避坑清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/selenium.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="selenium">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision" class="on">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-vision">视觉与自动化</a><span>/</span>
+      <b>Selenium</b>
+    </nav>
+    <p class="eyebrow">AUTOMATION · <b>SELENIUM</b> · 浏览器自动化与测试</p>
+    <h1>Selenium：让浏览器<em>替你干活</em></h1>
+    <p class="lede">重复点按钮、填表单、截图验证，都该交给脚本。这页用 Selenium 4.x 现行写法，从装包到跑通一个「打开页面 → 搜索 → 断言 → 截图」的完整脚本——Selenium Manager 已经替你管驱动，新手最大的坑没有了。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/autolab</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">pip install selenium</span></div>
+        <div class="term-line"><span class="out">Successfully installed selenium-4.52.0</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">python search_test.py</span></div>
+        <div class="term-line"><span class="out">启动 Chrome（驱动由 Selenium Manager 自动下载）→ 打开搜索页</span></div>
+        <div class="term-line"><span class="out">输入关键词 → 等待结果加载…</span></div>
+        <div class="term-line"><span class="ok">断言通过：结果数 12 &gt; 0，截图已保存 result.png</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装</a>
+        <a href="#s3"><span class="idx">03</span>快速上手</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战脚本</a>
+        <a href="#s7"><span class="idx">07</span>避坑指南</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="opencv.html">OpenCV 教程</a>
+        <a href="machine-learning.html">机器学习教程</a>
+        <a href="scikit-learn.html">Scikit-learn 教程</a>
+        <a href="tensorflow.html">TensorFlow 教程</a>
+        <a href="index.html#cat-vision">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装</a>
+          <a href="#s3"><span class="idx">03</span>快速上手</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战脚本</a>
+          <a href="#s7"><span class="idx">07</span>避坑指南</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>Selenium 是什么：浏览器自动化的事实标准</h2>
+        <p>Selenium 是驱动真实浏览器的自动化框架，也是 W3C WebDriver 协议的参考实现。它启动一个货真价实的 Chrome/Firefox/Edge——能执行 JavaScript、渲染 CSS、弹 Cookie——然后替你点击、输入、滚动、截图。两个典型用途：<b>UI 自动化测试</b>（回归测试的主力）和<b>网页抓取</b>（对付需要执行 JS 才能出内容的页面）。</p>
+        <p>它比 requests 慢得多，但看到的就是用户看到的。什么时候用它：目标页面靠 JS 渲染、需要登录交互、或者你写的本来就是测试。什么时候不用：静态页面用 requests + 解析库就够，快一个数量级。</p>
+        <p>两句话记住它的位置：<b>测试眼里它是回归测试的执行器</b>——每次发版前把关键流程点一遍；<b>数据眼里它是「能交互的抓取器」</b>——滚动加载、点击展开、登录后才可见的内容它都能拿。代价是快不起来，所以能不用则不用。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>定位</dt><dd>W3C WebDriver 协议参考实现，浏览器自动化事实标准</dd></div>
+          <div class="fact"><dt>当前版本</dt><dd>4.52（2026-11 查 PyPI，主线 4.x）</dd></div>
+          <div class="fact"><dt>Python 要求</dt><dd>≥ 3.10</dd></div>
+          <div class="fact"><dt>协议</dt><dd>Apache 2.0</dd></div>
+          <div class="fact"><dt>驱动管理</dt><dd>Selenium Manager 内置（4.6+），不再手配 chromedriver</dd></div>
+          <div class="fact"><dt>支持浏览器</dt><dd>Chrome / Firefox / Edge / Safari</dd></div>
+          <div class="fact"><dt>语言绑定</dt><dd>Python / Java / C# / Ruby / JavaScript</dd></div>
+          <div class="fact"><dt>老教程写法</dt><dd class="no">find_element_by_* 已在 4.3 移除，勿用</dd></div>
+        </dl>
+
+        <div class="note"><b>为什么 4.6 是分水岭：</b>以前新手要手动下载 chromedriver，还必须和浏览器版本严格对齐——版本差一位就报错，这是 Selenium 学不下去的头号原因。4.6 起 <b>Selenium Manager</b> 内置在绑定里：你写 <code>webdriver.Chrome()</code>，它自动检测/下载匹配的驱动（必要时连浏览器都能帮你装）。2022 年之后的教程如果还教你「先去官网下 chromedriver」，直接跳过那段。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：一个包 + 一个本机浏览器</h2>
+        <p>Selenium 本体很小，真正的「环境」是你的浏览器。本机装有 Chrome、Firefox、Edge 任意一个即可，驱动交给 Selenium Manager。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">pip（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">浏览器与驱动</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">验证安装</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 装包，一行搞定；建议先建虚拟环境</span>
+pip install selenium
+
+<span class="c"># 不需要装 webdriver-manager！4.6+ 的 Selenium Manager 已内置接管</span></pre>
+          </div>
+          <small>网上大量教程让你 <b>pip install webdriver-manager</b>——那是 Selenium Manager 出现前的方案。现在仅在离线环境、特殊浏览器版本等边缘场景才需要它。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 确认本机有浏览器（macOS 示例）</span>
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
+
+<span class="c"># Linux 服务器一般没有浏览器，装一个：</span>
+<span class="c"># Debian/Ubuntu: apt install chromium-browser 或 google-chrome-stable</span></pre>
+          </div>
+          <small>首次 <b>webdriver.Chrome()</b> 时 Selenium Manager 会联网下载对应驱动，缓存在用户目录。公司内网下载失败时，配置代理或手动下载驱动放进 PATH。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Python · 验证脚本</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># verify.py —— 能打印标题并退出，就是全通了</span>
+from selenium import webdriver
+
+driver = webdriver.Chrome()          <span class="c"># 第一次跑会自动下载驱动，稍等</span>
+driver.get(<span class="g">"https://example.com"</span>)
+print(driver.title)                  <span class="c"># Example Domain</span>
+driver.quit()</pre>
+          </div>
+          <small>会弹出浏览器窗口又自动关闭——看到了，说明浏览器、驱动、绑定三层都通了。</small>
+        </div>
+
+        <div class="note warn"><b>浏览器要留着自己升级：</b>Selenium Manager 按你当前的浏览器版本找驱动，浏览器本身太旧反而容易出兼容问题。保持 Chrome/Edge 自动更新即可，<b>不要</b>手动去网上下载来历不明的 chromedriver——老习惯，现在有害无益。</div>
+      </section>
+
+      <!-- ===== 03 快速上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>快速上手：十行代码自动搜索一次</h2>
+
+        <div class="code">
+          <div class="code-head"><span>Python · first_run.py</span><button class="copy" type="button">复制</button></div>
+<pre>from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+
+driver = webdriver.Chrome()                <span class="c"># Selenium Manager 自动管驱动</span>
+driver.get(<span class="g">"https://www.bing.com"</span>)
+
+box = driver.find_element(By.NAME, <span class="g">"q"</span>)   <span class="c"># 定位搜索框（name 属性是 q）</span>
+box.send_keys(<span class="g">"Selenium WebDriver"</span>, Keys.RETURN)   <span class="c"># 输入并回车</span>
+
+print(driver.title)                        <span class="c"># 现在已是结果页的标题</span>
+driver.save_screenshot(<span class="g">"result.png"</span>)      <span class="c"># 截一张图存档</span>
+driver.quit()                              <span class="c"># 关浏览器、结束会话</span></pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>启动会话</h4><p><code>webdriver.Chrome()</code> 返回 driver 对象，它是你接下来所有操作的入口。Firefox/Edge 换成 <code>webdriver.Firefox()</code> / <code>webdriver.Edge()</code>，用法完全一样。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>打开页面</h4><p><code>driver.get(url)</code> 会等页面基本加载完成才返回（与 requests 不同，它真的渲染 JS）。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>定位 + 操作</h4><p>所有交互都是两步：find_element 找到元素，再 click() / send_keys()。Keys.RETURN 模拟回车，Keys.CONTROL + "a" 这类组合键也在 Keys 里。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>断言 + 收尾</h4><p>测试的本质是断言：title 对不对、元素在不在、文本有没有。最后一定 quit()——不 quit 会留下一堆残留的 chrome 进程。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">第一次运行会明显停顿几秒——那是 Selenium Manager 在下载驱动，之后有缓存就快了。想看它到底用了哪个驱动，把 driver 启动包在 try/except 里打印异常即可，报错信息会写明原因。</div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：定位、等待、页面操作与无头模式</h2>
+
+        <h3>WebDriver 与 Selenium Manager：手配驱动已成历史</h3>
+        <p>3.x 时代的入门流程是「查浏览器版本 → 官网下载对应 chromedriver → 放进 PATH → 版本不匹配再重来」。Selenium 4.6 把这套流程收进 <b>Selenium Manager</b>：一个用 Rust 写的内置工具，绑定启动时自动检测浏览器、下载/缓存匹配的驱动。你要做的只有 <code>webdriver.Chrome()</code>。只有在驱动下载不通（内网）或要固定驱动版本时才需要人工介入。</p>
+
+        <h3>八大定位器：find_element 与 find_elements</h3>
+        <p>定位是 Selenium 的基本功。统一入口是 <code>find_element(By.X, "值")</code>——注意 4.3 起老写法 <code>find_element_by_id()</code> 已<b>彻底删除</b>。单数版返回第一个匹配（找不到抛 NoSuchElementException），复数版 find_elements 返回列表（找不到给空列表，不报错）。优先级经验：<b>CSS_SELECTOR 为主，XPATH 兜底</b>——CSS 快且直观，XPATH 能向上找父节点、按文本定位。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 定位示例</span><button class="copy" type="button">复制</button></div>
+<pre>driver.find_element(By.ID, <span class="g">"username"</span>)
+driver.find_element(By.CSS_SELECTOR, <span class="g">"#login input[name='password']"</span>)
+driver.find_element(By.XPATH, <span class="g">"//button[contains(text(), '登录')]"</span>)
+
+items = driver.find_elements(By.CSS_SELECTOR, <span class="g">".search-result li"</span>)
+print(len(items))        <span class="c"># find_elements 找不到返回 []，适合计数与遍历</span></pre>
+        </div>
+
+        <h3>等待机制：不懂这个必踩坑</h3>
+        <p>页面是异步的：你 get 之后，内容可能还没渲染出来，find_element 立刻就找不到——九成的「No such element」都是这个。<b>time.sleep 硬等是下策</b>：等短了还是炸，等长了白浪费。正确姿势是显式等待：给一个最长期限，条件一满足立刻往下走。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 显式等待（标准写法）</span><button class="copy" type="button">复制</button></div>
+<pre>from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+<span class="c"># 最多等 10 秒，元素「可见且可点」就立刻返回</span>
+btn = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, <span class="g">"#submit"</span>))
+)
+btn.click()
+
+<span class="c"># 隐式等待是另一条路：全局设置一次，所有 find_element 自动轮询</span>
+driver.implicitly_wait(5)
+<span class="c"># 注意：隐式与显式不要混用，会造成难以理解的叠加等待</span></pre>
+        </div>
+        <div class="note"><b>怎么选：</b>全站统一隐式等待（5 秒左右）打底，关键步骤用显式等待精确控制——等的是「某个条件成立」而不是「碰运气的时间」。EC 里最常用的几个见第 05 节速查表。</div>
+
+        <h3>页面操作、无头模式与 Options</h3>
+        <p>常用操作三板斧：点击 click()、输入 send_keys()、清空 clear()；下拉框要包一层 Select；多窗口和 iframe 用 switch_to 切换；特殊操作（滚动、改属性）直接执行 JS。跑在服务器上没有显示器？<b>headless 无头模式</b>让浏览器在内存里渲染，过程一样、不弹窗口。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · Options 与无头模式</span><button class="copy" type="button">复制</button></div>
+<pre>options = webdriver.ChromeOptions()
+options.add_argument(<span class="g">"--headless=new"</span>)        <span class="c"># 新版无头模式</span>
+options.add_argument(<span class="g">"--window-size=1920,1080"</span>)  <span class="c"># 无头下也要给尺寸</span>
+options.add_argument(<span class="g">"--disable-gpu"</span>)
+
+driver = webdriver.Chrome(options=options)
+
+<span class="c"># 切换窗口 / iframe / 执行 JS 的常用姿势</span>
+driver.switch_to.window(driver.window_handles[-1])   <span class="c"># 切到新开的窗口</span>
+driver.switch_to.frame(<span class="g">"login-iframe"</span>)              <span class="c"># 进 iframe</span>
+driver.switch_to.default_content()                   <span class="c"># 出来，回主文档</span>
+driver.execute_script(<span class="g">"window.scrollTo(0, document.body.scrollHeight);"</span>)</pre>
+        </div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：定位、等待与常用操作</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了某个定位器或条件怎么写，直接搜 <b>点击</b>、<b>等待</b>、<b>iframe</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索定位器、操作，比如 等待 / 截图 / 无头" aria-label="搜索 Selenium 用法">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="用法分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">定位器</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">等待条件</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">常用操作</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">Options 配置</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>定位器</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">By.ID</td><td>按 id 属性定位，页内唯一，优先用</td></tr>
+                <tr><td class="k">By.NAME</td><td>按 name 属性，常见于表单控件</td></tr>
+                <tr><td class="k">By.CSS_SELECTOR</td><td>CSS 选择器，如 "#main .item a"；首选方案</td></tr>
+                <tr><td class="k">By.XPATH</td><td>XML 路径，如 //input[@name='q']；能向上找、按文本找</td></tr>
+                <tr><td class="k">By.CLASS_NAME</td><td>单个 class 名（不能写多个空格分隔）</td></tr>
+                <tr><td class="k">By.TAG_NAME</td><td>按标签名，如 button、tr</td></tr>
+                <tr><td class="k">By.LINK_TEXT</td><td>链接的完整文字精确匹配</td></tr>
+                <tr><td class="k">By.PARTIAL_LINK_TEXT</td><td>链接文字的部分匹配</td></tr>
+                <tr><td class="k">find_element(By.X, "v")</td><td>返回第一个匹配；找不到抛 NoSuchElementException</td></tr>
+                <tr><td class="k">find_elements(By.X, "v")</td><td>返回列表；找不到是空列表，不报错</td></tr>
+                <tr><td class="k">el.find_element(By.X, "v")</td><td>在元素内部继续找，缩小范围</td></tr>
+                <tr><td class="k">locate_with(By.TAG_NAME, "input").below(el)</td><td>Selenium 4 相对定位器：按方位找（above/below/near）</td></tr>
+                <tr><td class="k">顺序建议</td><td>先 ID/NAME，再 CSS_SELECTOR，动态结构才上 XPATH</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>expected_conditions</th><th>等什么</th></tr></thead>
+              <tbody>
+                <tr><td class="k">presence_of_element_located</td><td>元素已在 DOM（可能还不可见）</td></tr>
+                <tr><td class="k">visibility_of_element_located</td><td>元素可见：有尺寸且非 display:none</td></tr>
+                <tr><td class="k">element_to_be_clickable</td><td>可见且可点击，点按钮前用它</td></tr>
+                <tr><td class="k">presence_of_all_elements_located</td><td>一组元素都出现（结果列表加载完）</td></tr>
+                <tr><td class="k">text_to_be_present_in_element</td><td>元素内出现指定文字</td></tr>
+                <tr><td class="k">title_is / title_contains</td><td>标题等于 / 包含某文本</td></tr>
+                <tr><td class="k">invisibility_of_element_located</td><td>元素消失，等 loading 遮罩关闭</td></tr>
+                <tr><td class="k">staleness_of(el)</td><td>元素已过期离开 DOM（确认页面刷新）</td></tr>
+                <tr><td class="k">new_window_is_opened(n)</td><td>打开了新窗口</td></tr>
+                <tr><td class="k">alert_is_present</td><td>JS 弹窗出现，配 driver.switch_to.alert</td></tr>
+                <tr><td class="k">url_changes("…")</td><td>URL 发生变化（提交表单后等跳转）</td></tr>
+                <tr><td class="k">element_selection_state_to_be</td><td>复选框/单选的选中状态符合预期</td></tr>
+                <tr><td class="k">WebDriverWait(driver, 10).until(EC.…)</td><td>标准组合：超时抛 TimeoutException</td></tr>
+                <tr><td class="k">driver.implicitly_wait(5)</td><td>隐式等待：全局兜底，别与显式等待混用</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>操作</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">driver.get(url)</td><td>打开页面，等待基本加载完成</td></tr>
+                <tr><td class="k">el.click() / el.send_keys("…")</td><td>点击 / 输入；send_keys 也接收 Keys 组合键</td></tr>
+                <tr><td class="k">el.clear()</td><td>清空输入框，重填前先调</td></tr>
+                <tr><td class="k">el.text / el.get_attribute("href")</td><td>读可见文本 / 读属性值</td></tr>
+                <tr><td class="k">Select(el).select_by_visible_text("…")</td><td>下拉框操作（from selenium.webdriver.support.ui import Select）</td></tr>
+                <tr><td class="k">driver.switch_to.window(driver.window_handles[-1])</td><td>切到最新窗口，句柄顺序即打开顺序</td></tr>
+                <tr><td class="k">driver.switch_to.frame("id") / default_content()</td><td>进入 iframe / 回主文档</td></tr>
+                <tr><td class="k">driver.execute_script("js代码")</td><td>执行 JavaScript：滚动、改样式都行</td></tr>
+                <tr><td class="k">driver.save_screenshot("a.png")</td><td>整页截图；el.screenshot("b.png") 截单个元素</td></tr>
+                <tr><td class="k">driver.back() / refresh() / current_url</td><td>后退 / 刷新 / 取当前地址</td></tr>
+                <tr><td class="k">driver.get_cookies() / delete_all_cookies()</td><td>Cookie 读写，登录态处理常用</td></tr>
+                <tr><td class="k">driver.quit()</td><td>关浏览器并结束会话，务必放 finally</td></tr>
+                <tr><td class="k">el.is_displayed() / is_enabled()</td><td>断言元素可见/可用，写测试常配对使用</td></tr>
+                <tr><td class="k">from selenium.webdriver.common.keys import Keys</td><td>组合键：Keys.RETURN、Keys.CONTROL + "a"</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>Options 配置</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">webdriver.ChromeOptions()</td><td>创建配置对象，启动时传入 webdriver.Chrome(options=o)</td></tr>
+                <tr><td class="k">--headless=new</td><td>无头模式：不弹窗口，服务器/CI 必备</td></tr>
+                <tr><td class="k">--window-size=1920,1080</td><td>窗口尺寸；无头模式也建议显式设置</td></tr>
+                <tr><td class="k">--disable-gpu</td><td>禁 GPU 加速，兼容性兜底</td></tr>
+                <tr><td class="k">--no-sandbox</td><td>Docker / root 环境常配，否则可能启动失败</td></tr>
+                <tr><td class="k">--start-maximized</td><td>窗口最大化，可见元素更全</td></tr>
+                <tr><td class="k">user-agent=Mozilla/…</td><td>自定义 UA 字符串</td></tr>
+                <tr><td class="k">--user-data-dir=/path</td><td>使用已有用户配置目录（带登录态启动）</td></tr>
+                <tr><td class="k">options.page_load_strategy = "eager"</td><td>页面加载策略：eager 不等全部资源</td></tr>
+                <tr><td class="k">driver.set_page_load_timeout(30)</td><td>页面加载超时，防卡死</td></tr>
+                <tr><td class="k">driver.implicitly_wait(5)</td><td>全局隐式等待（放 Options 表是因为常一起配）</td></tr>
+                <tr><td class="k">--proxy-server=http://127.0.0.1:7890</td><td>给浏览器配代理</td></tr>
+                <tr><td class="k">--incognito</td><td>无痕模式启动，不带历史 Cookie</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的用法。换个词试试，比如「等待」「截图」「无头」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：搜索自动化完整脚本</h2>
+        <p>把概念串成一个能跑的测试脚本：打开搜索引擎 → 等输入框可点 → 输入关键词回车 → 显式等结果列表 → 断言结果非空 → 截图存档。约 35 行，本机装有 Chrome 即可跑：</p>
+
+        <div class="code">
+          <div class="code-head"><span>Python · search_test.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 运行前：pip install selenium（本机装有 Chrome，驱动自动管理）</span>
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+KEYWORD = <span class="g">"Selenium WebDriver"</span>
+
+def main():
+    options = webdriver.ChromeOptions()
+    options.add_argument(<span class="g">"--window-size=1280,900"</span>)
+
+    driver = webdriver.Chrome(options=options)
+    try:
+        driver.get(<span class="g">"https://www.bing.com"</span>)
+
+        <span class="c"># 1. 等搜索框「可点」再输入，不用 time.sleep 硬等</span>
+        box = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.NAME, <span class="g">"q"</span>))
+        )
+        box.send_keys(KEYWORD + <span class="g">"\n"</span>)          <span class="c"># 回车即搜索</span>
+
+        <span class="c"># 2. 显式等待结果列表出现（页面异步渲染，必须等）</span>
+        results = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located(
+                (By.CSS_SELECTOR, <span class="g">"#b_results &gt; li"</span>)
+            )
+        )
+
+        <span class="c"># 3. 断言：这就是自动化测试与裸跑的区别</span>
+        assert len(results) &gt; 0, <span class="g">"结果列表为空，搜索可能失败"</span>
+        first = results[0].text.replace(<span class="g">"\n"</span>, <span class="g">" "</span>)
+        print(f<span class="g">"共 {len(results)} 条结果，第一条：{first[:60]}"</span>)
+
+        <span class="c"># 4. 截图存档，方便回看与写报告</span>
+        driver.save_screenshot(<span class="g">"result.png"</span>)
+        print(<span class="g">"截图已保存 result.png"</span>)
+    finally:
+        driver.quit()                        <span class="c"># 无论成败都关浏览器</span>
+
+if __name__ == <span class="g">"__main__"</span>:
+    main()</pre>
+        </div>
+
+        <h3>运行效果</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>$ python search_test.py
+共 12 条结果，第一条：Selenium automates browsers...
+截图已保存 result.png</pre>
+        </div>
+
+        <div class="note"><b>改造成你自己的用例：</b>把 get 的网址、定位器、断言换成你的业务页面即可。选择器会随页面改版失效——报 NoSuchElementException 时先人工打开页面，右键检查元素，更新选择器。脚本一旦多起来，就按下面两步升级工程结构。</div>
+
+        <h3>升级一：用 pytest 组织用例（点名）</h3>
+        <p>真实项目不会一个脚本跑到底，而是用 <b>pytest</b>：fixture 负责开关浏览器（每个用例一份全新会话），用例就是一个个断言函数，失败自动记录。上面的脚本拆进去大概是这个样子：</p>
+        <div class="code">
+          <div class="code-head"><span>Python · test_search.py（pip install pytest 后运行 pytest）</span><button class="copy" type="button">复制</button></div>
+<pre>import pytest
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+@pytest.fixture
+def driver():
+    driver = webdriver.Chrome()
+    yield driver          <span class="c"># 用例在这里运行</span>
+    driver.quit()         <span class="c"># 无论成败都会执行</span>
+
+def test_bing_search(driver):
+    driver.get(<span class="g">"https://www.bing.com"</span>)
+    box = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.NAME, <span class="g">"q"</span>))
+    )
+    box.send_keys(<span class="g">"Selenium WebDriver\n"</span>)
+    results = WebDriverWait(driver, 10).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, <span class="g">"#b_results &gt; li"</span>))
+    )
+    assert len(results) &gt; 0</pre>
+        </div>
+
+        <h3>升级二：Page Object 模式简介</h3>
+        <p>用例一多，「选择器散落在每个测试里」就是灾难——页面一改版要改几十处。<b>Page Object</b> 的解法：每个页面封装成一个类，定位器和操作只写在类里，用例只调用方法。改版时只改 Page 类一处：</p>
+        <div class="code">
+          <div class="code-head"><span>Python · pages.py 与用例的分工</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># pages.py —— 页面长什么样，只有这个文件知道</span>
+from selenium.webdriver.common.by import By
+
+class SearchPage:
+    BOX = (By.NAME, <span class="g">"q"</span>)
+    RESULTS = (By.CSS_SELECTOR, <span class="g">"#b_results &gt; li"</span>)
+
+    def __init__(self, driver):
+        self.driver = driver
+
+    def search(self, keyword):
+        self.driver.find_element(*self.BOX).send_keys(keyword + <span class="g">"\n"</span>)
+
+    def result_count(self) -&gt; int:
+        return len(self.driver.find_elements(*self.RESULTS))
+
+<span class="c"># test_search.py —— 用例里只出现业务语言，不出现选择器</span>
+def test_bing_search(driver):
+    page = SearchPage(driver)
+    driver.get(<span class="g">"https://www.bing.com"</span>)
+    page.search(<span class="g">"Selenium WebDriver"</span>)
+    assert page.result_count() &gt; 0</pre>
+        </div>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个最常见的坑</h2>
+
+        <h3>坑一：照老教程写 find_element_by_id，报 AttributeError</h3>
+        <p>Selenium 4.3 起，<code>find_element_by_* / find_elements_by_*</code> 系列方法<b>全部移除</b>，2022 年前的教程和 Stack Overflow 高票答案里到处都是。统一改成新写法：</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 新旧对照</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 旧（4.3 起已删除，直接报错）</span>
+driver.find_element_by_id(<span class="g">"username"</span>)
+
+<span class="c"># 新（唯一写法）</span>
+from selenium.webdriver.common.by import By
+driver.find_element(By.ID, <span class="g">"username"</span>)</pre>
+        </div>
+        <div class="note warn"><b>自查方法：</b>代码里出现 <b>find_element_by</b> 这个前缀，就是老写法。同理，看到「先下载 chromedriver 放 PATH」的教程段落，也可以跳过——那是 4.6 之前的世界。</div>
+
+        <h3>坑二：NoSuchElementException——九成是没等待</h3>
+        <p>页面 JS 渲染需要时间，get 返回 ≠ 内容就绪。解决顺序：先用显式等待包住关键定位；等待后仍失败，再人工检查选择器写没写对（id 是不是动态生成的）；最后才怀疑页面结构变了。把 <code>time.sleep(3)</code> 全文搜一遍，每处都换成 WebDriverWait。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 坏写法与好写法对照</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 坏：猜时间，猜错了就炸</span>
+time.sleep(3)
+driver.find_element(By.ID, <span class="g">"result"</span>)
+
+<span class="c"># 好：等条件成立，最快 0.1 秒、最慢 10 秒</span>
+el = WebDriverWait(driver, 10).until(
+    EC.visibility_of_element_located((By.ID, <span class="g">"result"</span>))
+)</pre>
+        </div>
+
+        <h3>坑三：SessionNotCreatedException / 驱动相关报错</h3>
+        <p>Selenium Manager 需要联网下载驱动：公司内网可能被拦——配代理或手动下载驱动放进 PATH。Docker 里跑还要注意：容器里没有浏览器，要装 chromium 类镜像包，并加 <code>--headless=new --no-sandbox --disable-gpu</code> 三件套。本机报错时，先升级浏览器到最新版再重试，多数情况自愈。</p>
+
+        <h3>坑四：合规红线——自动化不等于可以乱来</h3>
+        <p>用它做<b>自己系统的测试</b>天经地义；抓第三方站点前，看两样东西：目标站的 <b>robots.txt</b> 与<b>服务条款</b>是否允许。控制频率（加延时、别并发轰炸）、别碰验证码与登录态倒卖这类灰产场景、数据只做个人研究不商用转卖。脚本身份是浏览器，但责任主体是你。</p>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与资源</h2>
+        <ul>
+          <li><a href="https://www.selenium.dev/documentation/" rel="noopener">Selenium 官方文档</a>——浏览器、驱动、等待、定位的系统教程都在这。</li>
+          <li><a href="https://www.selenium.dev/documentation/selenium_manager/" rel="noopener">Selenium Manager 文档</a>——驱动自动管理的细节与手动配置方案。</li>
+          <li><a href="https://github.com/SeleniumHQ/selenium" rel="noopener">SeleniumHQ/selenium</a>——源码与 issue 区，查报错先例的好地方。</li>
+          <li><a href="https://pypi.org/project/selenium/" rel="noopener">selenium（PyPI）</a>——版本号与 Python 版本要求以此为准。</li>
+          <li><a href="https://www.w3.org/TR/webdriver/" rel="noopener">W3C WebDriver 标准</a>——想理解底层协议（会话、命令、响应）再读。</li>
+          <li><a href="https://www.selenium.dev/documentation/test_practices/encouraged/page_object_models/" rel="noopener">官方 Test Practices：Page Object Models</a>——官方推荐的工程化组织方式。</li>
+        </ul>
+        <div class="note"><b>学完本页去哪：</b>把第 06 节的脚本挂进 <b>pytest</b>（fixture 管理 driver，一个页面一个类）；再学 <b>Page Object 模式</b>——把每个页面的定位器和操作封装成类，用例里只调方法不碰选择器，改版时只改一处。这两步走完，你就有了正经 UI 自动化工程的骨架。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>装好 selenium，<b>webdriver.Chrome()</b> 能拉起浏览器并访问网页</span></label>
+          <label><input type="checkbox" data-key="c2"><span>没有手配 chromedriver——知道这是 Selenium Manager 的活</span></label>
+          <label><input type="checkbox" data-key="c3"><span>用 CSS_SELECTOR 定位过元素，分得清 find_element 与 find_elements</span></label>
+          <label><input type="checkbox" data-key="c4"><span>用过 WebDriverWait + expected_conditions，代码里没有裸的 time.sleep</span></label>
+          <label><input type="checkbox" data-key="c5"><span>跑通第 06 节搜索脚本，断言通过且桌面有 result.png</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="opencv.html"><span>← 上一篇</span><b>OpenCV 教程</b></a>
+        <a class="next" href="index.html"><span>下一篇 →</span><b>返回首页 · 21 门教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 Selenium 官方文档（selenium.dev/documentation）、selenium PyPI 页面与 SeleniumHQ/selenium 仓库整理，更新于 2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · Selenium 迭代较快，具体 API 以 selenium.dev 当前文档为准；抓取第三方站点请遵守 robots 与服务条款。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

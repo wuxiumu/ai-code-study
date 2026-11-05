@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ollama 教程 · AI Code Study</title>
+<meta name="description" content="Ollama 上手指南：一条命令把开源大模型装进自己的电脑——安装、常用命令、模型选择、REST 与 OpenAI 兼容 API、Modelfile 自定义、配合编码 Agent 使用。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/ollama.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ollama 教程 · AI Code Study">
+<meta property="og:description" content="Ollama 上手指南：一条命令把开源大模型装进自己的电脑——安装、常用命令、模型选择、REST 与 OpenAI 兼容 API、Modelfile 自定义、配合编码 Agent 使用。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/ollama.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ollama 教程 · AI Code Study">
+<meta name="twitter:description" content="Ollama 上手指南：一条命令把开源大模型装进自己的电脑——安装、常用命令、模型选择、REST 与 OpenAI 兼容 API、Modelfile 自定义、配合编码 Agent 使用。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Ollama：一条命令把大模型装进你的电脑",
+  "description": "Ollama 上手指南：一条命令把开源大模型装进自己的电脑——安装、常用命令、模型选择、REST 与 OpenAI 兼容 API、Modelfile 自定义、配合编码 Agent 使用。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/ollama.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="ollama">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open" class="on">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-open">开源模型与智能体</a><span>/</span>
+      <b>Ollama</b>
+    </nav>
+    <p class="eyebrow">OPEN MODELS · <b>OLLAMA</b> · 自己电脑上的大模型</p>
+    <h1>Ollama：一条命令把大模型<em>装进</em>你的电脑</h1>
+    <p class="lede">不用租 GPU、不用懂 Python，装好 Ollama 之后，<code>ollama run</code> 加一个模型名，你就在本地跑起了一个大语言模型。这篇覆盖安装、命令、模型怎么选、API 怎么调、以及怎么接进编码 Agent。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">ollama pull gemma4:e2b</span></div>
+        <div class="term-line"><span class="out">pulling manifest … 100% ▕████████████████████▏ 7.2 GB</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">ollama run gemma4:e2b</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">用一句话解释什么是模型量化</span></div>
+        <div class="term-line"><span class="out">量化就是把 16 位浮点的模型权重压成更少比特来存，换一点精度，省一大半内存。</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">/bye</span></div>
+        <div class="term-line"><span class="ok">模型已留在本机，数据没出过这台电脑</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装</a>
+        <a href="#s3"><span class="idx">03</span>十分钟上手</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战：接入 Agent</a>
+        <a href="#s7"><span class="idx">07</span>避坑</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="hermes-agent.html">Hermes Agent</a>
+        <a href="deepseek-harness.html">DeepSeek Harness</a>
+        <a href="pi-agent.html">Pi Agent</a>
+        <a href="index.html#cat-open">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装</a>
+          <a href="#s3"><span class="idx">03</span>十分钟上手</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战：接入 Agent</a>
+          <a href="#s7"><span class="idx">07</span>避坑</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 它是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>Ollama 是什么：本机的模型运行器 + 模型管理器</h2>
+        <p>Ollama 是一个跑在你自己电脑上的大模型运行与管理工具，底层是 llama.cpp 推理引擎。它解决一个很具体的问题：<b>想用开源模型，但既不想配环境，也不想把代码和文件发到别人的服务器上。</b>装好之后，模型库里几千个模型都是一条 <code>ollama pull</code> 的事，拉下来就能在终端对话，也能通过本地 HTTP API 给别的程序用。</p>
+        <p>它对个人开发者最现实的三个用法：一是<b>隐私敏感场景</b>——代码、日志、私人文档不出本机；二是<b>离线与省钱</b>——下载一次反复用，不按 token 计费；三是<b>给编码 Agent 当本地引擎</b>——OpenCode、Claude Code、Codex 等工具都能把 Ollama 当模型后端（官方文档专门列了集成页）。</p>
+        <p>从工程视角看，Ollama 做的是「打包」的活：llama.cpp 本身是个需要自己编译、自己喂模型文件、自己调参数的推理库；Ollama 把编译产物、GPU 加速、量化加载、模型格式解析、API 服务全部封装好，再配上一个像 npm 一样的模型库。它不训练模型，只负责三件事：<b>拉下来、跑起来、管起来</b>。你不需要读 GGUF 文档，也不需要知道 CUDA 版本怎么匹配——除非你想，那是第 08 节的事。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>出品方 / 仓库</dt><dd>GitHub: ollama/ollama</dd></div>
+          <div class="fact"><dt>开源协议</dt><dd>MIT</dd></div>
+          <div class="fact"><dt>推理底座</dt><dd>llama.cpp</dd></div>
+          <div class="fact"><dt>平台</dt><dd>macOS（Sonoma 14+）/ Windows / Linux / Docker</dd></div>
+          <div class="fact"><dt>默认服务地址</dt><dd>127.0.0.1:11434</dd></div>
+          <div class="fact"><dt>模型存放（macOS）</dt><dd>~/.ollama/models</dd></div>
+          <div class="fact"><dt>默认上下文长度</dt><dd>4096 token（可改）</dd></div>
+          <div class="fact"><dt>单个模型体积</dt><dd class="no">数 GB～数十 GB，先看磁盘空间</dd></div>
+        </dl>
+
+        <div class="note"><b>本地之外还有云端：</b>Ollama 也提供 ollama.com 上的云端大模型（用 <b>OLLAMA_API_KEY</b> 或 <code>ollama signin</code> 访问），适合本机跑不动的旗舰模型。本页主线是<b>本地模式</b>——不联网、不要密钥、数据不出机器。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：三条路，选你系统对应的那条</h2>
+        <p>macOS 和 Windows 推荐官网安装包，Linux 推荐官方脚本（会顺手把 systemd 服务配好）。装完的东西都一样：一个 <code>ollama</code> CLI + 一个后台服务。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">macOS</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">Linux</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">Windows</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal · macOS</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 方式一：Homebrew</span>
+brew install ollama
+
+<span class="c"># 方式二：去 ollama.com/download 下载 Ollama.dmg，拖进 Applications</span>
+<span class="c"># 首次启动时它会问是否把 ollama 命令链接到 /usr/local/bin，点允许</span>
+
+<span class="c"># 验证</span>
+ollama -v</pre>
+          </div>
+          <small>要求 macOS Sonoma（v14）或更新版本；Apple Silicon 用 CPU+GPU，Intel 机型仅 CPU。桌面版常驻菜单栏，服务随它自动启动；模型与日志都在 <b>~/.ollama/</b>。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal · Linux</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 官方安装脚本：自动装二进制、建 ollama 用户与 systemd 服务</span>
+curl -fsSL https://ollama.com/install.sh | sh
+
+<span class="c"># 想锁定某个版本（版本号见 GitHub Releases）</span>
+curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION=0.5.7 sh
+
+<span class="c"># 验证：服务状态 + 版本</span>
+sudo systemctl status ollama
+ollama -v</pre>
+          </div>
+          <small>手动安装、AMD ROCm、ARM64 包等进阶姿势见官方文档 <b>docs.ollama.com/linux</b>。升级就是重跑一遍安装脚本。日志用 <code>journalctl -e -u ollama</code> 看。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Windows</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 去 ollama.com/download 下载安装包，双击安装</span>
+<span class="c"># 装完后在 PowerShell / 终端里：</span>
+ollama -v
+ollama run gemma4:e2b</pre>
+          </div>
+          <small>模型默认存到 <b>C:\Users\你\.ollama\models</b>，盘不够用可用 <b>OLLAMA_MODELS</b> 环境变量挪位置。也支持 Docker 方式跑（镜像 ollama/ollama），但 GPU 加速需要 nvidia-container-toolkit，macOS 上的 Docker 没有 GPU 支持。</small>
+        </div>
+
+        <div class="note warn"><b>装完先做两件事：</b>① <code>ollama -v</code> 能出版本号；② 浏览器开 <code>http://localhost:11434</code>，应显示「Ollama is running」。如果新终端找不到 <b>ollama</b> 命令，先重开一个终端窗口再试——多数情况只是 PATH 没刷新。</div>
+
+        <h3>装完之后，东西都在哪</h3>
+        <dl class="facts">
+          <div class="fact"><dt>模型存放（macOS）</dt><dd>~/.ollama/models</dd></div>
+          <div class="fact"><dt>模型存放（Linux）</dt><dd>/usr/share/ollama/.ollama/models</dd></div>
+          <div class="fact"><dt>模型存放（Windows）</dt><dd>C:\Users\你\.ollama\models</dd></div>
+          <div class="fact"><dt>日志（macOS 桌面版）</dt><dd>~/.ollama/logs（app.log / server.log）</dd></div>
+          <div class="fact"><dt>挪模型到别的盘</dt><dd>OLLAMA_MODELS 环境变量指定新目录</dd></div>
+          <div class="fact"><dt>改服务地址</dt><dd>OLLAMA_HOST，如 0.0.0.0:11434（慎用）</dd></div>
+        </dl>
+      </section>
+
+      <!-- ===== 03 十分钟上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>十分钟上手：拉一个模型，聊一次天</h2>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 第一次对话</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 只下载不对话</span>
+ollama pull gemma4:e2b
+
+<span class="c"># 直接开聊（没下载过会自动先拉取）</span>
+ollama run gemma4:e2b
+
+<span class="c"># 对话里：三引号包多行输入，/bye 退出</span>
+<span class="prompt">&gt;&gt;&gt; </span>"""把这段 Python 重构成列表推导式，
+<span class="g">for x in xs:
+    if x &gt; 0:
+        ys.append(x * 2)</span>
+<span class="prompt">&gt;&gt;&gt; </span>/bye</pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>选个和内存匹配的模型</h4><p>模型页会标参数规模（2b、9b、27b…）。官方对上面这个模型的建议是 8 GB 显存/统一内存。拿不准就先从小模型开始，跑顺了再上大的。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>run 之后就是普通聊天</h4><p>提示符变成 <code>&gt;&gt;&gt;</code>，你输入、它回答，流式输出；<code>/bye</code> 退出。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>验证它真的在本地跑</h4><p>另开一个终端敲 <code>ollama ps</code>：能看到正在运行的模型、占用多少内存、在 GPU 还是 CPU 上。断网再问一句，它照样回答——这就是本地。</p></div>
+          </li>
+        </ul>
+
+        <h3>日常维护三板斧</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 磁盘与内存管理</span><button class="copy" type="button">复制</button></div>
+<pre>ollama ls                 <span class="c"># 本地都有什么模型，各占多少磁盘</span>
+ollama stop gemma4:e2b    <span class="c"># 立刻卸载正在运行的模型，释放显存/内存</span>
+ollama rm 旧模型名         <span class="c"># 不要了就删，模型动辄几个 GB</span>
+
+<span class="c"># 装多了想批量清理？先 ls 看列表，再逐个 rm —— 没有按住 Shift 全选这种好事</span></pre>
+        </div>
+
+        <div class="note">对话退出了模型不会立刻卸载：<b>默认在内存里保留约 5 分钟</b>，期间再次 <code>ollama run</code> 是秒开。想立即释放就用 <code>ollama stop 模型名</code>，或调 <code>OLLAMA_KEEP_ALIVE</code>。</div>
+
+        <h3>进对话之后还能干嘛</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 三种典型输入</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 三引号之间写多行输入</span>
+<span class="prompt">&gt;&gt;&gt; </span>"""把下面三段话各自缩写成一句，再合成一段总结……"""
+
+<span class="c"># 视觉模型：直接给本地文件路径，让它看图</span>
+ollama run &lt;视觉模型&gt; ./报错截图.png <span class="g">"这张图里的报错是什么"</span>
+
+<span class="c"># 嵌入模型：一句话输出向量，喂给 RAG / 语义搜索</span>
+ollama run embeddinggemma <span class="g">"Hello world"</span></pre>
+        </div>
+        <p><small>能看图的模型在模型库用 <b>vision</b> 筛、嵌入模型用 <b>embedding</b> 筛；每个模型支持哪些能力，以模型页标注为准。</small></p>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：模型、规模、量化、Modelfile</h2>
+
+        <h3>模型名与标签</h3>
+        <p>Ollama 的模型名是「名字:标签」形式，标签通常就是参数规模，比如 <code>gemma4:e2b</code>、<code>qwen3.5:9b</code>。同一个名字下往往挂着多个规模的版本——小模型快、大模型聪明。完整目录在 <b>ollama.com/search</b>（支持按 coding / vision / embedding / reasoning 筛选），模型更迭很快，<b>一切以模型库页面为准</b>。</p>
+        <dl class="facts">
+          <div class="fact"><dt>llama</dt><dd>Meta 的 Llama 家族，社区生态最全</dd></div>
+          <div class="fact"><dt>qwen</dt><dd>阿里通义千问，中文与代码任务口碑好</dd></div>
+          <div class="fact"><dt>deepseek</dt><dd>DeepSeek 家族，推理与代码见长</dd></div>
+          <div class="fact"><dt>gemma</dt><dd>Google 家族，小尺寸模型多、门槛低</dd></div>
+          <div class="fact"><dt>glm</dt><dd>智谱 GLM，旗舰版多走云端（cloud）</dd></div>
+          <div class="fact"><dt>embeddinggemma 等</dt><dd>嵌入与多模态模型，做 RAG / 看图用</dd></div>
+        </dl>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 常见的拉取姿势</span><button class="copy" type="button">复制</button></div>
+<pre>ollama pull qwen3.5:9b      <span class="c"># 指定参数规模</span>
+ollama pull deepseek-v4.1-flash   <span class="c"># 不带标签时用模型页的默认版本</span>
+ollama ls                   <span class="c"># 看本地已有模型和体积</span></pre>
+        </div>
+        <p><small>注意：库里部分旗舰模型标了 <b>cloud</b>（如 glm-5.3、deepseek-v4.1-flash 的旗舰版），它们只在 ollama.com 云端跑，需要账号密钥，下载不到本地；本地能跑的版本以模型页标注为准。</small></p>
+
+        <h3>参数规模与内存对照</h3>
+        <p>跑多大模型要多少内存，取决于参数量和量化格式，无法一概而论。两个有用的锚点：官方对入门模型（下载约 7.2 GB）的建议是 <b>8 GB 显存/统一内存</b>；官方 FAQ 里 <code>ollama ps</code> 的示例显示 <b>llama3:70b 加载后占约 42 GB、100% GPU</b>。中间档（9B、14B、27B、32B）大致逐级往上翻，具体以模型页与你自己 <code>ollama ps</code> 的实测为准。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 看清它吃在哪</span><button class="copy" type="button">复制</button></div>
+<pre>ollama ps
+<span class="c"># NAME          ID            SIZE      PROCESSOR</span>
+<span class="c"># llama3:70b    bcfb190ca3a7  42 GB     100% GPU</span>
+<span class="c"># PROCESSOR 列出现 CPU/GPU 混合，说明显存装不下、溢到了内存，速度会掉</span></pre>
+        </div>
+
+        <h3>量化：用一点精度换一大半内存</h3>
+        <p>量化指用更少的比特存模型权重——常见的是把 16 位浮点压到 4 比特级，内存占用大幅下降，代价是质量略降。Ollama 的模型页默认就提供量化好的版本，你下载即用，不用自己处理。你能动手的是 <b>KV 缓存</b>的量化：<code>f16</code>（默认）→ <code>q8_0</code>（约省一半）→ <code>q4_0</code>（约省四分之三）：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · KV 缓存量化</span><button class="copy" type="button">复制</button></div>
+<pre>OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 ollama serve</pre>
+        </div>
+
+        <h3>Modelfile：给模型定人设与参数</h3>
+        <p>Modelfile 类似 Dockerfile：从一个基础模型出发，写死系统提示词和运行参数，<code>ollama create</code> 一下就得到你自己的模型。指令不区分大小写，常用的有 <b>FROM</b>（基础模型，必填）、<b>PARAMETER</b>（运行参数）、<b>SYSTEM</b>（系统提示词）、<b>MESSAGE</b>（示例对话）。</p>
+        <div class="code">
+          <div class="code-head"><span>Modelfile</span><button class="copy" type="button">复制</button></div>
+<pre>FROM llama3.2
+PARAMETER temperature 1
+PARAMETER num_ctx 4096
+SYSTEM <span class="g">"""你是一个只说中文的代码评审助手，回答尽量简短。"""</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 创建并使用</span><button class="copy" type="button">复制</button></div>
+<pre>ollama create my-reviewer -f ./Modelfile
+ollama run my-reviewer
+ollama show --modelfile llama3.2   <span class="c"># 反推任意模型的 Modelfile</span></pre>
+        </div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：命令、API、Modelfile 一张表</h2>
+        <p class="muted" style="font-size:14px">这块能搜。忘了命令名直接搜 <b>pull</b>、<b>chat</b>、<b>上下文</b> 这样的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索命令 / 接口 / 指令，比如 ps / embed / temperature" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">CLI 命令</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">REST API</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">Modelfile 指令</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">常见问题</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">ollama pull &lt;模型&gt;</td><td>下载模型（体积以模型页为准）</td></tr>
+                <tr><td class="k">ollama run &lt;模型&gt;</td><td>进入对话；未下载会自动先拉取；/bye 退出</td></tr>
+                <tr><td class="k">ollama stop &lt;模型&gt;</td><td>立即卸载正在运行的模型</td></tr>
+                <tr><td class="k">ollama ps</td><td>看运行中的模型、占用内存、GPU/CPU 分布</td></tr>
+                <tr><td class="k">ollama ls / list</td><td>列出本地已下载的模型</td></tr>
+                <tr><td class="k">ollama rm &lt;模型&gt;</td><td>删除本地模型，释放磁盘</td></tr>
+                <tr><td class="k">ollama cp &lt;源&gt; &lt;新名&gt;</td><td>复制模型，如 <code>cp llama3.2 gpt-3.5-turbo</code> 喂给只认 OpenAI 名字的工具</td></tr>
+                <tr><td class="k">ollama show &lt;模型&gt;</td><td>看模型信息；<code>--modelfile</code> 导出它的 Modelfile</td></tr>
+                <tr><td class="k">ollama create &lt;名&gt; -f ./Modelfile</td><td>从 Modelfile 创建自定义模型</td></tr>
+                <tr><td class="k">ollama serve</td><td>手动启动 API 服务（桌面版/脚本安装已自动托管）</td></tr>
+                <tr><td class="k">ollama signin / signout</td><td>登录 / 登出 Ollama 账号（用云端模型需要）</td></tr>
+                <tr><td class="k">ollama launch &lt;应用&gt;</td><td>把外部 AI 应用接到 Ollama：opencode、claude、codex、vscode、droid；<code>--model qwen3.5</code> 指定模型，<code>--config</code> 只配置不启动</td></tr>
+                <tr><td class="k">ollama -v</td><td>查看版本</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>接口</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">POST /api/chat</td><td>多轮对话，请求体 {"model", "messages", "stream"}；答案在 message.content</td></tr>
+                <tr><td class="k">POST /api/generate</td><td>单轮补全，传 {"model", "prompt"}</td></tr>
+                <tr><td class="k">POST /api/embed</td><td>文本转向量（嵌入），配 RAG / 语义搜索</td></tr>
+                <tr><td class="k">GET /api/tags</td><td>列出本地已下载模型</td></tr>
+                <tr><td class="k">GET /api/ps</td><td>列出正在运行的模型</td></tr>
+                <tr><td class="k">GET /api/version</td><td>查询服务端 Ollama 版本</td></tr>
+                <tr><td class="k">POST /api/pull</td><td>API 方式拉取模型（支持流式进度）</td></tr>
+                <tr><td class="k">POST /api/push</td><td>推送模型到registry</td></tr>
+                <tr><td class="k">POST /api/copy</td><td>复制模型</td></tr>
+                <tr><td class="k">DELETE /api/delete</td><td>删除模型（创建/删除仅本地服务器支持）</td></tr>
+                <tr><td class="k">POST /v1/chat/completions</td><td>OpenAI 兼容端点，另支持 /v1/completions、/v1/models、/v1/embeddings、/v1/responses 等</td></tr>
+                <tr><td class="k">本地地址</td><td>http://localhost:11434（不带鉴权，别暴露公网）</td></tr>
+                <tr><td class="k">云端地址</td><td>https://ollama.com + 请求头 Authorization: Bearer $OLLAMA_API_KEY</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>指令 / 参数</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">FROM &lt;模型|文件&gt;</td><td>必填。基础模型、GGUF 文件（分片用 ./model-*.gguf 通配）或 Safetensors 目录</td></tr>
+                <tr><td class="k">PARAMETER &lt;名&gt; &lt;值&gt;</td><td>设置运行参数，可写多行；指令不区分大小写、顺序任意</td></tr>
+                <tr><td class="k">SYSTEM """…"""</td><td>系统提示词</td></tr>
+                <tr><td class="k">MESSAGE &lt;角色&gt; &lt;内容&gt;</td><td>预置示例对话，角色 system / user / assistant</td></tr>
+                <tr><td class="k">TEMPLATE</td><td>完整提示词模板（Go 语法：{{ .System }}、{{ .Prompt }}、{{ .Response }}）</td></tr>
+                <tr><td class="k">LICENSE</td><td>声明模型的分发许可</td></tr>
+                <tr><td class="k">CAPABILITY</td><td>给模型追加能力标记（如 decision）</td></tr>
+                <tr><td class="k">REQUIRES &lt;版本&gt;</td><td>声明最低 Ollama 版本</td></tr>
+                <tr><td class="k">temperature</td><td>随机度，默认 0.8；写作调高、代码调低</td></tr>
+                <tr><td class="k">num_ctx</td><td>上下文窗口，默认 2048；调大吃内存</td></tr>
+                <tr><td class="k">seed</td><td>固定随机种子，输出可复现</td></tr>
+                <tr><td class="k">stop</td><td>停止序列，可写多条</td></tr>
+                <tr><td class="k">num_predict</td><td>最多生成多少 token，-1 不限</td></tr>
+                <tr><td class="k">top_p / top_k</td><td>采样范围，默认 0.9 / 40，越大越多样</td></tr>
+                <tr><td class="k">min_p</td><td>相对最小概率过滤，默认 0（不启用）</td></tr>
+                <tr><td class="k">repeat_penalty</td><td>重复惩罚，默认 1.0，调高更不容易复读</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>问题</th><th>答案</th></tr></thead>
+              <tbody>
+                <tr><td class="k">模型下到哪了</td><td>macOS ~/.ollama/models；Windows C:\Users\你\.ollama\models；Linux /usr/share/ollama/.ollama/models；OLLAMA_MODELS 可改</td></tr>
+                <tr><td class="k">模型在内存待多久</td><td>默认约 5 分钟；OLLAMA_KEEP_ALIVE 或 keep_alive 参数控制，ollama stop 立即卸载</td></tr>
+                <tr><td class="k">默认上下文多大</td><td>4096 token；API 传 num_ctx、对话里 /set parameter num_ctx、或 OLLAMA_CONTEXT_LENGTH 改</td></tr>
+                <tr><td class="k">局域网能访问吗</td><td>默认只绑 127.0.0.1；OLLAMA_HOST=0.0.0.0:11434 放开——但没有鉴权，务必只在内网用</td></tr>
+                <tr><td class="k">怎么升级</td><td>Linux 重跑 install.sh（可 OLLAMA_VERSION 锁版本）；macOS/Windows 官网下载新版覆盖</td></tr>
+                <tr><td class="k">怎么排障</td><td>macOS 看 ~/.ollama/logs（app.log / server.log）；Linux 看 journalctl -e -u ollama</td></tr>
+                <tr><td class="k">并发/多模型</td><td>OLLAMA_NUM_PARALLEL 并发数、OLLAMA_MAX_LOADED_MODELS 同时加载数——注意内存按乘法增长</td></tr>
+                <tr><td class="k">有官方 SDK 吗</td><td>Python（ollama-python）与 JavaScript（ollama-js），GitHub 上都有</td></tr>
+                <tr><td class="k">想离线调用怎么办</td><td>本地模式完全离线可用；只有 ollama.com 云端模型需要联网和 API Key</td></tr>
+                <tr><td class="k">能导入自己的 GGUF 吗</td><td>能：写个 Modelfile，FROM 指向 GGUF 文件（分片用 ./model-*.gguf 通配），ollama create 即成</td></tr>
+                <tr><td class="k">对话里能改参数吗</td><td>能：/set parameter num_ctx 8192（本会话生效）；长期生效写进 Modelfile 的 PARAMETER</td></tr>
+                <tr><td class="k">常用环境变量</td><td>OLLAMA_HOST（绑定地址）、OLLAMA_MODELS（模型存放）、OLLAMA_CONTEXT_LENGTH、OLLAMA_KEEP_ALIVE、OLLAMA_NUM_PARALLEL</td></tr>
+                <tr><td class="k">怎么让多个请求并行</td><td>OLLAMA_NUM_PARALLEL 调并发——注意内存按「并发数 × 上下文长度」放大</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「上下文」「embed」「内存」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：把 Ollama 变成编码 Agent 的本地引擎</h2>
+        <p>这条流水线是 Ollama 最常见的进阶用法：先让它在本地起一个 API 服务，再用 OpenAI 兼容协议接进你顺手的工具。四步，每步都能单独验证。</p>
+
+        <h3>第一步：确认服务在跑</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 服务自检</span><button class="copy" type="button">复制</button></div>
+<pre>curl http://localhost:11434
+<span class="c"># 输出：Ollama is running</span>
+
+<span class="c"># 没在跑就手动起一个（Linux 手动安装场景）</span>
+ollama serve</pre>
+        </div>
+
+        <h3>第二步：用 REST 直接调</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · /api/chat</span><button class="copy" type="button">复制</button></div>
+<pre>curl http://localhost:11434/api/chat -d <span class="g">'{
+  "model": "gemma4:e2b",
+  "messages": [
+    {"role": "user", "content": "Why is the sky blue?"}
+  ],
+  "stream": false
+}'</span></pre>
+        </div>
+        <p><small>stream 设为 true（默认）会逐 token 流式返回；调试时设 false 更好读。响应的正文取 <code>message.content</code>。</small></p>
+
+        <h3>第三步：当 OpenAI 兼容端点用</h3>
+        <div class="code">
+          <div class="code-head"><span>Python · openai SDK 直连本地</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># pip install openai</span>
+from openai import OpenAI
+
+client = OpenAI(
+    base_url=<span class="g">"http://localhost:11434/v1/"</span>,
+    api_key=<span class="g">"ollama"</span>,  <span class="c"># 必填，但本地服务不校验</span>
+)
+resp = client.chat.completions.create(
+    model=<span class="g">"gemma4:e2b"</span>,
+    messages=[{<span class="g">"role"</span>: <span class="g">"user"</span>, <span class="g">"content"</span>: <span class="g">"一句话解释 REST 是什么"</span>}],
+)
+print(resp.choices[0].message.content)</pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Terminal · curl 打 /v1/chat/completions</span><button class="copy" type="button">复制</button></div>
+<pre>curl -X POST http://localhost:11434/v1/chat/completions \
+  -H <span class="g">"Content-Type: application/json"</span> \
+  -d <span class="g">'{"model": "gemma4:e2b",
+       "messages": [{"role": "user", "content": "Say this is a test"}]}'</span></pre>
+        </div>
+        <p><small>所有按 OpenAI 协议写的工具都能这样接。如果某工具写死了要 <code>gpt-3.5-turbo</code> 这个名字，<code>ollama cp gemma4:e2b gpt-3.5-turbo</code> 就地解决。</small></p>
+
+        <h3>彩蛋：同一套 API 也能调云端大模型</h3>
+        <p>本机跑不动的旗舰模型可以走 ollama.com 的云端 API——请求格式不变，换地址、加密钥：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 云端 /api/chat</span><button class="copy" type="button">复制</button></div>
+<pre>export OLLAMA_API_KEY=<span class="g">"你的密钥"</span>   <span class="c"># Windows PowerShell: $env:OLLAMA_API_KEY = "..."</span>
+
+curl https://ollama.com/api/chat \
+  -H <span class="g">"Authorization: Bearer $OLLAMA_API_KEY"</span> \
+  -H <span class="g">"Content-Type: application/json"</span> \
+  -d <span class="g">'{"model": "gemma4:31b",
+       "messages": [{"role": "user", "content": "Why is the sky blue?"}],
+       "stream": false}'</span></pre>
+        </div>
+        <p><small>哪些模型只在云端提供、计费方式如何，以 ollama.com 当前页面为准。日常不想管密钥的话，<code>ollama signin</code> 登录后经本地服务转发也可以。</small></p>
+
+        <h3>第四步：一条命令接进编码 Agent</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 官方 launch 集成</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 让 OpenCode / Claude Code / Codex / VS Code / Droid 用 Ollama 模型</span>
+ollama launch opencode
+ollama launch claude --model qwen3.5
+
+<span class="c"># 只写配置、不立刻启动</span>
+ollama launch claude --config</pre>
+        </div>
+
+        <div class="note"><b>预期管理：</b>本地小模型适合补全、解释、改写、简单脚本这类任务；上百个文件的重构、复杂推理仍建议换云模型。官方集成文档（docs.ollama.com/integrations）还覆盖 OpenClaw、Hermes、Cline、Goose、n8n 等工具的接法。</div>
+
+        <h3>第五步（可选）：自定义模型走同一条链路</h3>
+        <p>把第 04 节的 Modelfile 知识用起来：造一个只干活的「评审专用模型」，让 Agent 调它时行为更稳定。</p>
+        <div class="code">
+          <div class="code-head"><span>Modelfile · 评审专用模型</span><button class="copy" type="button">复制</button></div>
+<pre>FROM qwen3.5:9b
+PARAMETER temperature 0.3
+PARAMETER num_ctx 8192
+SYSTEM <span class="g">"""你是代码评审助手：只列问题与修改建议，每条不超过两行，不说客套话。"""</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 创建并验证</span><button class="copy" type="button">复制</button></div>
+<pre>ollama create reviewer -f ./Modelfile
+ollama run reviewer
+
+<span class="prompt">&gt;&gt;&gt; </span>评审：def add(a, b): return a + b
+<span class="c"># 退出后，同一个名字立刻能从 API 调：</span>
+curl http://localhost:11434/v1/chat/completions \
+  -H <span class="g">"Content-Type: application/json"</span> \
+  -d <span class="g">'{"model": "reviewer",
+       "messages": [{"role": "user", "content": "评审 def add(a, b): return a + b"}]}'</span></pre>
+        </div>
+        <p><small>自定义模型只是「基础模型 + 你的配置」的一层封装，不占额外磁盘（权重与基础模型共享）。想看某个内置模型的完整配置，<code>ollama show --modelfile 模型名</code> 直接抄作业。</small></p>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个最常见的问题</h2>
+
+        <h3>坑一：ollama: command not found</h3>
+        <p>十有八九是 PATH 没刷新或服务没起。先重开终端——macOS 桌面版首次启动时询问「是否把 ollama 链接到 /usr/local/bin」，如果当时点了拒绝，命令就一直不在。再确认安装方式对应的路径。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 逐层排查</span><button class="copy" type="button">复制</button></div>
+<pre>which ollama                       <span class="c"># 找不到 → PATH 问题</span>
+<span class="c"># macOS 桌面版：CLI 在 Ollama.app/Contents/Resources/ollama，可自行链到 /usr/local/bin</span>
+<span class="c"># Linux：sudo systemctl status ollama 看服务；journalctl -e -u ollama 看日志</span>
+curl http://localhost:11434        <span class="c"># 服务本身活着吗</span></pre>
+        </div>
+
+        <h3>坑二：模型拉得下、跑不动</h3>
+        <p>下载成功不等于跑得动。先用 <code>ollama ps</code> 看 PROCESSOR 列：出现 CPU/GPU 混合就是显存溢出，速度明显下降。解法按顺序试：换更小参数规模的标签、确认没有同时加载多个模型（<code>OLLAMA_MAX_LOADED_MODELS</code>）、开 KV 缓存量化。给 Linux 用户的额外提醒：<code>OLLAMA_NUM_PARALLEL</code> 与上下文长度相乘才是真实内存需求，调并发前先算这笔账。</p>
+        <p>还有一类「假跑不动」：第一次 <code>ollama run</code> 卡在加载很久——那是模型在往内存里搬，8 GB 内存搬 7 GB 模型本来就要一会儿。第二次运行就快了（默认保留 5 分钟）。判断标准看 <code>ollama ps</code> 有没有 SIZE 在涨，而不是看终端有没有输出。</p>
+
+        <h3>坑三：长文档喂进去，答案答非所问</h3>
+        <p>默认上下文只有 <b>4096 token</b>，超出的部分模型根本看不到。长文场景记得显式调大：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 三种调法</span><button class="copy" type="button">复制</button></div>
+<pre>OLLAMA_CONTEXT_LENGTH=8192 ollama serve    <span class="c"># 全局</span>
+<span class="prompt">&gt;&gt;&gt; </span>/set parameter num_ctx 8192            <span class="c"># 对话内</span>
+<span class="c"># 或 API 请求里带 "num_ctx": 8192 —— 单次调用</span></pre>
+        </div>
+        <p><small>代价是内存：上下文越大，KV 缓存越大，和 <code>OLLAMA_NUM_PARALLEL</code> 相乘后更是成倍涨。别一步到位开满。</small></p>
+
+        <h3>坑四：OLLAMA_HOST=0.0.0.0 之后的裸奔</h3>
+        <div class="note warn"><b>本地 API 没有鉴权。</b>改成绑定 0.0.0.0 意味着同网段任何人都能调用你的模型、增删你的模型文件。要么只在内网用并配防火墙，要么套 SSH 隧道；绝不要把 11434 直接暴露到公网。</div>
+      </section>
+
+      <!-- ===== 08 进阶资源 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与官方资源</h2>
+        <ul>
+          <li><a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a> — macOS / Windows / Linux 安装包总入口</li>
+          <li><a href="https://docs.ollama.com" target="_blank" rel="noopener">docs.ollama.com</a> — 官方文档（CLI、API、Modelfile、GPU、FAQ）</li>
+          <li><a href="https://github.com/ollama/ollama" target="_blank" rel="noopener">github.com/ollama/ollama</a> — 源码仓库与 Releases</li>
+          <li><a href="https://ollama.com/search" target="_blank" rel="noopener">ollama.com/search</a> — 模型库，按 coding / vision / embedding / reasoning 筛选</li>
+          <li><a href="https://github.com/ollama/ollama-python" target="_blank" rel="noopener">ollama-python</a> — 官方 Python 库</li>
+          <li><a href="https://github.com/ollama/ollama-js" target="_blank" rel="noopener">ollama-js</a> — 官方 JavaScript 库</li>
+          <li><a href="https://docs.ollama.com/integrations" target="_blank" rel="noopener">Integrations 文档</a> — 各编码 Agent / IDE / 框架的接入指南</li>
+        </ul>
+        <div class="note"><b>下一步去哪：</b>本页跑通了「本地模型 + OpenAI 兼容 API」，就可以接着玩 <b>hermes-agent.html</b>——一个能接 Ollama 的开源智能体，把「自己的模型」升级成「自己的 Agent」；想用国产开源模型做工程化脚手架，看 <b>deepseek-harness.html</b>。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span><b>ollama -v</b> 出版本号，浏览器开 <b>http://localhost:11434</b> 显示 Ollama is running</span></label>
+          <label><input type="checkbox" data-key="c2"><span>用 <b>ollama run</b> 完整跑过一次对话，并用 <b>/bye</b> 正常退出</span></label>
+          <label><input type="checkbox" data-key="c3"><span>用 <b>ollama ps</b> 看过一次模型占用，知道 100% GPU 和 CPU/GPU 混合的区别</span></label>
+          <label><input type="checkbox" data-key="c4"><span>用 curl 或 Python 成功调通过一次 <b>/api/chat</b> 或 <b>/v1/chat/completions</b></span></label>
+          <label><input type="checkbox" data-key="c5"><span>知道默认上下文是 <b>4096</b>，以及用 <b>num_ctx</b> 调大会付出多少内存</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="skills.html"><span>← 上一篇</span><b>Skills（技能）教程</b></a>
+        <a class="next" href="hermes-agent.html"><span>下一篇 →</span><b>Hermes Agent 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 Ollama 官方文档（docs.ollama.com：quickstart、cli、modelfile、faq、api、linux、macos）与 GitHub 仓库（ollama/ollama）整理，2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 模型库与命令迭代较快，具体以官方文档与模型库页面当前输出为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

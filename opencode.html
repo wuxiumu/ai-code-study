@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenCode 教程 · AI Code Study</title>
+<meta name="description" content="OpenCode 上手指南：安装、启动、接模型、AGENTS.md 项目约定、自定义 Agent、权限与 MCP、命令速查与自检清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/opencode.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCode 教程 · AI Code Study">
+<meta property="og:description" content="OpenCode 上手指南：安装、启动、接模型、AGENTS.md 项目约定、自定义 Agent、权限与 MCP、命令速查与自检清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/opencode.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OpenCode 教程 · AI Code Study">
+<meta name="twitter:description" content="OpenCode 上手指南：安装、启动、接模型、AGENTS.md 项目约定、自定义 Agent、权限与 MCP、命令速查与自检清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "OpenCode：开源、能换任意模型的编码 Agent",
+  "description": "OpenCode 上手指南：安装、启动、接模型、AGENTS.md 项目约定、自定义 Agent、权限与 MCP、命令速查与自检清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/opencode.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="opencode">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools" class="on">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-tools">AI 编程工具</a><span>/</span>
+      <b>OpenCode</b>
+    </nav>
+    <p class="eyebrow">CODING TOOLS · <b>OPENCODE</b> · 开源模型无关的终端 Agent</p>
+    <h1>OpenCode：开源、能换任意模型的<br><em>编码 Agent</em></h1>
+    <p class="lede">这一页教你把 OpenCode 装进终端：五分钟跑通第一问，把项目约定写进 AGENTS.md，给不同任务配不同的 Agent，再用速查表把它焊进日常。命令都能直接复制。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/your-project</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">curl -fsSL https://opencode.ai/install | bash</span></div>
+        <div class="term-line"><span class="out">opencode installed — /Users/you/.opencode/bin</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">cd ~/your-project &amp;&amp; opencode</span></div>
+        <div class="term-line"><span class="out">OpenCode 2.x ready — type /connect to add a provider</span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">/connect</span></div>
+        <div class="term-line"><span class="ok">anthropic connected — /models to switch anytime</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装</a>
+        <a href="#s3"><span class="idx">03</span>快速上手</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战定制</a>
+        <a href="#s7"><span class="idx">07</span>避坑与常见问题</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="kimi-code.html">Kimi Code CLI</a>
+        <a href="claude-code.html">Claude Code</a>
+        <a href="codex.html">Codex 教程</a>
+        <a href="index.html#cat-tools">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装</a>
+          <a href="#s3"><span class="idx">03</span>快速上手</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战定制</a>
+          <a href="#s7"><span class="idx">07</span>避坑与常见问题</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 它是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>它是什么：不锁在任何一家模型上的终端 Agent</h2>
+        <p>OpenCode 是一个开源的 AI 编码 Agent，主战场是终端：进入项目目录敲 <code>opencode</code>，就得到一个能读代码、改文件、跑命令、回答问题的全屏 TUI。它的卖点和 Claude Code、Codex 这类「绑定自家模型」的工具正好相反——<b>模型只是插件</b>，Anthropic、OpenAI、Google、DeepSeek、本地 Ollama 都能接，用 <code>/models</code> 随时换。</p>
+        <p>它由 SST 团队开发（该团队现已更名 Anomaly），代码在 GitHub 上完全公开，迭代速度极快：从 2025 年 5 月的 v0.x 一路演进到今天的 2.x 大版本，还提供了桌面应用和 IDE 扩展——但终端 TUI 始终是文档最完整、能力最全的主入口。</p>
+        <p>和同类工具比，它的差异点可以浓缩成三个词：<b>开源</b>（代码可审、生态共建）、<b>模型无关</b>（模型目录接在 models.dev 上，75+ 家 provider 随换）、<b>约定通用</b>（AGENTS.md、MCP、Agent Skills 等开放标准它都认）。如果你想在「工具能力」和「模型选择」两个维度上分开做决定，它就是为此而生的。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>开发团队</dt><dd>SST（现已更名 Anomaly）</dd></div>
+          <div class="fact"><dt>代码仓库</dt><dd>github.com/anomalyco/opencode（原 sst/opencode）</dd></div>
+          <div class="fact"><dt>软件形态</dt><dd>终端 TUI / 桌面应用 / IDE 扩展</dd></div>
+          <div class="fact"><dt>模型接入</dt><dd>任意 provider，含本地 Ollama</dd></div>
+          <div class="fact"><dt>npm 包名</dt><dd class="no">opencode-ai（不是 opencode）</dd></div>
+          <div class="fact"><dt>配置目录</dt><dd>~/.config/opencode/</dd></div>
+          <div class="fact"><dt>项目规则文件</dt><dd>AGENTS.md（/init 自动生成）</dd></div>
+          <div class="fact"><dt>当前大版本</dt><dd>2.x（与 1.x 不能并存）</dd></div>
+        </dl>
+
+        <div class="note"><b>什么时候选它而不是别家：</b>你不想被某一家模型的账单绑死；团队里有人用 Claude、有人用 GPT、有人跑本地模型，想统一工具；或者你在做工具选型，希望切换模型的成本是「敲一个斜杠命令」。反过来说，如果你只认某一家模型的官方支持，直接用它的原装 CLI 更省心。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：脚本、npm、包管理器，三选一</h2>
+        <p>推荐官方脚本——下载独立二进制、无需 Node.js。全平台通用；Windows 用户官方文档建议优先用 WSL，纯 Windows 也可以走 Chocolatey / Scoop。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">官方脚本（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">npm / Bun / pnpm</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">Homebrew / Windows</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># macOS / Linux / WSL：下载二进制 + 安装，无需 Node</span>
+curl -fsSL https://opencode.ai/install | bash
+
+<span class="c"># 装完重开一个终端，确认进 PATH 了</span>
+opencode --version</pre>
+          </div>
+          <small>脚本会把 <b>opencode</b> 放进用户 bin 目录，最后会打印安装路径。新终端里找不到命令时，先重开终端，再翻第 07 节。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 注意：包名是 opencode-ai，不是 opencode</span>
+npm install -g opencode-ai
+
+<span class="c"># Bun / pnpm / Yarn 同理</span>
+bun install -g opencode-ai
+pnpm install -g opencode-ai
+
+opencode --version</pre>
+          </div>
+          <small>Node 只是分发渠道，二进制本身独立运行。npm 全局 bin 目录必须在 PATH 里，否则会 command not found。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># macOS / Linux（Homebrew，官方 tap）</span>
+brew install anomalyco/tap/opencode
+
+<span class="c"># Windows（Chocolatey / Scoop）</span>
+choco install opencode
+scoop install opencode
+
+<span class="c"># 也可以直接跑 Docker 镜像</span>
+docker run -it --rm ghcr.io/anomalyco/opencode</pre>
+          </div>
+          <small>装完重开终端再验证。以后升级可以直接用 <code>opencode upgrade</code>，它会自动识别你的安装方式。</small>
+        </div>
+
+        <div class="note warn"><b>最容易踩的第一个坑就在安装：</b>npm 上的包名是 <b>opencode-ai</b>，而单独一个 <b>opencode</b> 的包与本工具无关——装错了既报不出版本号，也启动不了 TUI。核对方法很简单：<code>opencode --version</code> 能出版本号才算装对。</div>
+      </section>
+
+      <!-- ===== 03 快速上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>快速上手：五分钟跑通第一问</h2>
+        <p>OpenCode 的能力边界跟着<b>工作目录</b>走：在哪个目录启动，它默认就只能看到那个目录里的东西。所以第一戒律和所有终端 Agent 一样——先 <code>cd</code> 进仓库，再启动。</p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 第一次完整流程</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 1. 进项目，启动 TUI</span>
+cd ~/your-project
+opencode
+
+<span class="c"># 2. 首次使用：接一个模型 provider（选厂商、贴 API Key）</span>
+<span class="prompt">&gt; </span>/connect
+
+<span class="c"># 3. 提第一个问题，@ 可以模糊搜索并引用文件</span>
+<span class="prompt">&gt; </span>解释一下 <span class="g">@src/main.go</span> 的启动流程
+
+<span class="c"># 4. 改坏了随时撤：撤销上一条消息和它产生的文件改动</span>
+<span class="prompt">&gt; </span>/undo</pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>接模型：/connect 或命令行 auth</h4><p>在 TUI 里 <b>/connect</b> 选厂商贴 Key；不想进 TUI 也可以直接 <b>opencode auth login</b>。凭证存本机，之后所有会话共用。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>先用只读任务试水</h4><p>「解释这个模块」「画出调用关系」这类请求不写文件，适合拿来验证模型接通了、上下文装得下你的仓库。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>用 @ 引文件、用 ! 跑命令</h4><p>输入 <b>@</b> 会弹出文件模糊搜索；消息前加 <b>!</b>（如 <b>!ls -la</b>）直接执行 shell 并把输出交给模型。这两个符号是最常用的效率开关。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>记住 Tab 和 /undo</h4><p><b>Tab</b> 在 Build / Plan 两种模式间切换（先规划再动手）；<b>/undo</b> 撤掉上一轮消息与文件改动，<b>/redo</b> 找回来。这两个保命键依赖 Git，见第 07 节。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">只想单发问答、不进交互界面？用 <b>opencode run</b>：<code>opencode run "这个项目的入口在哪"</code>。要接进脚本就加 <code>--format json</code> 拿结构化事件流。</div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：Agent、规则、模型、权限四件套</h2>
+
+        <h3>主代理与子代理：Build、Plan、general、explore</h3>
+        <p>OpenCode 里的「Agent」是一套可配置的提示词 + 工具权限 + 模型组合。内置两个主代理：<b>Build</b>（全工具，直接干活）和 <b>Plan</b>（默认禁止改文件，先出计划），用 <b>Tab</b> 切换。另有内置子代理 <b>general</b>（全权干杂活）和 <b>explore</b>（只读探索）——主代理会按任务自动派活，你也可以用 <code>@general 帮我……</code> 手动点名。</p>
+        <p>子代理默认只能由主代理派起（<code>subagent_depth</code> 默认 1，不许套娃）；要让它「只干活不上菜单」，配置里加 <code>hidden: true</code>；要整个关掉某个 Agent，用 <code>disable: true</code>。这套开关让「谁能干什么」变成仓库里看得见的配置，而不是口头约定。</p>
+
+        <h3>AGENTS.md：把项目约定写进仓库</h3>
+        <p>第一次在仓库里跑 <b>/init</b>，它会扫描代码库并在项目根生成 <b>AGENTS.md</b>——构建命令、代码风格、目录结构都写在这份文件里，每次会话自动加载，建议提交进 Git。它的加载规则很宽厚：向上逐级找 AGENTS.md；没有才回退读 <code>CLAUDE.md</code>；个人全局规则放 <code>~/.config/opencode/AGENTS.md</code>。这就是 AGENTS.md 开放标准的好处——约定写一份，Claude Code、Codex、OpenCode 都认。</p>
+
+        <h3>模型无关：一个命令接一家 provider</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 模型管理</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 命令行登录 provider（也可用 TUI 里的 /connect）</span>
+opencode auth login
+opencode auth list        <span class="c"># 看已配置的凭证</span>
+
+<span class="c"># 列出可用模型；--refresh 从 models.dev 刷新缓存</span>
+opencode models
+opencode models anthropic
+
+<span class="c"># 临时指定模型跑一条命令</span>
+opencode run --model google/gemini-2.5-pro <span class="g">"总结这个仓库的技术栈"</span>
+
+<span class="c"># TUI 里随时换模型</span>
+<span class="prompt">&gt; </span>/models</pre>
+        </div>
+        <p>想写死默认模型，在配置里加 <code>"model": "anthropic/claude-sonnet-4-5"</code>；轻量任务（起标题、做摘要）走 <code>small_model</code>。本地模型一样是 provider：起好 Ollama，<code>opencode auth login</code> 里选 ollama 即可。</p>
+
+        <h3>权限与 MCP：问、放行、拒绝三档</h3>
+        <p>权限用 <code>permission</code> 键控制，值为 <b>ask</b>（默认弹审批）、<b>allow</b>（放行）、<b>deny</b>（拒绝），可以按工具名配，也可以用通配符精确到某条 shell 命令。外部系统能力走 MCP：配置里的 <code>"mcp"</code> 键声明服务器，或命令行 <code>opencode mcp add</code> 接入，接入后的工具名以 <code>mymcp_</code> 前缀出现，权限照样能对它下通配符。</p>
+
+        <div class="code">
+          <div class="code-head"><span>opencode.json · 权限示例</span><button class="copy" type="button">复制</button></div>
+<pre>{
+  <span class="g">"$schema"</span>: "https://opencode.ai/config.json",
+  <span class="g">"permission"</span>: {
+    <span class="g">"edit"</span>: "ask",
+    <span class="g">"bash"</span>: {
+      <span class="g">"*"</span>: "allow",
+      <span class="g">"rm -rf *"</span>: "deny",
+      <span class="g">"git push*"</span>: "ask"
+    }
+  }
+}</pre>
+        </div>
+
+        <div class="note"><b>一张图记住四件套：</b>AGENTS.md 管「它该懂什么」，Agent 管「它以什么身份干」，provider 管「它用什么脑子」，permission 管「它哪些事不能干」。四层各自独立配置、互相组合——理解了这张图，opencode.json 里的其他键都只是细枝末节。</div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：装完就靠这张表</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了某个命令叫什么，直接搜 <b>会话</b>、<b>模型</b>、<b>撤销</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索命令、键位、配置项，比如 模型 / undo / provider" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">启动参数</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">斜杠命令</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">键位</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">配置与 provider</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">opencode [目录]</td><td>在指定目录启动 TUI 交互会话</td></tr>
+                <tr><td class="k">opencode run "&lt;提示&gt;"</td><td>非交互执行一条任务，结果打印到终端</td></tr>
+                <tr><td class="k">opencode run --model &lt;p/m&gt;</td><td>临时指定模型，如 anthropic/claude-sonnet-4-5</td></tr>
+                <tr><td class="k">opencode run --agent &lt;名&gt;</td><td>用指定 Agent（主代理或子代理）执行</td></tr>
+                <tr><td class="k">opencode run --format json</td><td>输出 JSON 事件流，给脚本和管道消费</td></tr>
+                <tr><td class="k">opencode run -f &lt;文件&gt;</td><td>附带文件作为任务输入</td></tr>
+                <tr><td class="k">opencode -c / --continue</td><td>继续最近一次会话（run 同样支持）</td></tr>
+                <tr><td class="k">opencode -s &lt;id&gt;</td><td>按会话 id 继续指定会话</td></tr>
+                <tr><td class="k">opencode auth login</td><td>命令行配置 provider 凭证</td></tr>
+                <tr><td class="k">opencode models [provider]</td><td>列出可用模型；--refresh 刷新缓存</td></tr>
+                <tr><td class="k">opencode agent create</td><td>交互式创建自定义 Agent（list 可列出）</td></tr>
+                <tr><td class="k">opencode mcp add</td><td>接入 MCP 服务器（list / auth 管理它们）</td></tr>
+                <tr><td class="k">opencode serve</td><td>以无界面 HTTP 服务跑，供 IDE / 远端接</td></tr>
+                <tr><td class="k">opencode upgrade</td><td>自升级，可指定版本或 --method 换渠道</td></tr>
+                <tr><td class="k">opencode session list</td><td>列出历史会话（--format json 便于脚本取 id）</td></tr>
+                <tr><td class="k">opencode web</td><td>起一个本地 Web UI，浏览器里用同一套会话</td></tr>
+                <tr><td class="k">opencode github install</td><td>给仓库装 GitHub 集成，PR 里 @ 它干活</td></tr>
+                <tr><td class="k">opencode export [id]</td><td>导出会话（import 可再导入）</td></tr>
+                <tr><td class="k">opencode stats</td><td>用量统计：天数、模型、项目维度</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">/connect</td><td>添加 provider，贴入 API Key 完成接入</td></tr>
+                <tr><td class="k">/models</td><td>列出并切换当前会话的模型</td></tr>
+                <tr><td class="k">/init</td><td>扫描仓库，生成或完善 AGENTS.md</td></tr>
+                <tr><td class="k">/new</td><td>开新会话清空上下文（别名 /clear）</td></tr>
+                <tr><td class="k">/sessions</td><td>列出并切换历史会话（别名 /resume、/continue）</td></tr>
+                <tr><td class="k">/compact</td><td>压缩当前会话上下文（别名 /summarize）</td></tr>
+                <tr><td class="k">/undo</td><td>撤销上一条消息及其文件改动（需要 Git）</td></tr>
+                <tr><td class="k">/redo</td><td>恢复被 /undo 撤掉的内容（需要 Git）</td></tr>
+                <tr><td class="k">/editor</td><td>调用外部编辑器（EDITOR 变量）写长输入</td></tr>
+                <tr><td class="k">/export</td><td>把当前会话导出为 Markdown 并打开</td></tr>
+                <tr><td class="k">/details</td><td>展开 / 收起工具执行的细节输出</td></tr>
+                <tr><td class="k">/thinking</td><td>切换思维块显示；ctrl+t 循环模型变体</td></tr>
+                <tr><td class="k">/themes</td><td>列出并切换 TUI 主题</td></tr>
+                <tr><td class="k">/update</td><td>检查并安装新版本</td></tr>
+                <tr><td class="k">/exit</td><td>退出（别名 /quit、/q）</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>按键</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">Tab</td><td>在 Build / Plan 主代理间切换</td></tr>
+                <tr><td class="k">ctrl+x（leader）</td><td>默认前导键，下面的组合都以它开头</td></tr>
+                <tr><td class="k">ctrl+x n</td><td>新会话（等价 /new）</td></tr>
+                <tr><td class="k">ctrl+x m</td><td>打开模型列表（等价 /models）</td></tr>
+                <tr><td class="k">ctrl+x c</td><td>压缩会话（等价 /compact）</td></tr>
+                <tr><td class="k">ctrl+x u</td><td>撤销上一条消息（等价 /undo）</td></tr>
+                <tr><td class="k">ctrl+x r</td><td>重做（等价 /redo）</td></tr>
+                <tr><td class="k">ctrl+x l</td><td>会话列表（等价 /sessions）</td></tr>
+                <tr><td class="k">ctrl+x e</td><td>外部编辑器写输入（等价 /editor）</td></tr>
+                <tr><td class="k">ctrl+x x</td><td>导出会话为 Markdown（等价 /export）</td></tr>
+                <tr><td class="k">ctrl+x t</td><td>主题列表（等价 /themes）</td></tr>
+                <tr><td class="k">ctrl+x q</td><td>退出（等价 /exit）</td></tr>
+                <tr><td class="k">ctrl+p</td><td>命令面板，全部命令可搜</td></tr>
+                <tr><td class="k">ctrl+t</td><td>循环切换模型的推理变体</td></tr>
+                <tr><td class="k">! 前缀</td><td>消息以 ! 开头直接跑 shell，输出进上下文</td></tr>
+                <tr><td class="k">@ 符号</td><td>模糊搜索并引用文件内容到消息里</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>配置项</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">~/.config/opencode/</td><td>全局配置目录：opencode.json、tui.json、AGENTS.md</td></tr>
+                <tr><td class="k">opencode.json（项目根）</td><td>项目级配置，可提交进 Git，团队共享</td></tr>
+                <tr><td class="k">$schema</td><td>"https://opencode.ai/config.json"，编辑器自动补全</td></tr>
+                <tr><td class="k">"model"</td><td>默认模型，格式 provider/model</td></tr>
+                <tr><td class="k">"small_model"</td><td>轻量任务（标题、摘要）用的便宜模型</td></tr>
+                <tr><td class="k">"provider"</td><td>按厂商配置，Key 可写 {env:XXX} 引用环境变量</td></tr>
+                <tr><td class="k">"permission"</td><td>edit / bash / webfetch 等的 ask / allow / deny</td></tr>
+                <tr><td class="k">"instructions"</td><td>额外注入的规则文件，支持通配符和远程 URL</td></tr>
+                <tr><td class="k">"mcp"</td><td>声明 MCP 服务器（type、url、enabled）</td></tr>
+                <tr><td class="k">"agent"</td><td>JSON 方式定义 Agent；也可用 Markdown 文件</td></tr>
+                <tr><td class="k">.opencode/agents/</td><td>项目自定义 Agent 目录（一个 md 一个 Agent）</td></tr>
+                <tr><td class="k">~/.config/opencode/agents/</td><td>全局自定义 Agent 目录，跨项目可用</td></tr>
+                <tr><td class="k">tui.json</td><td>TUI 专属配置（主题、keybinds），与 opencode.json 同目录</td></tr>
+                <tr><td class="k">OPENCODE_CONFIG</td><td>指定额外的配置文件路径，夹在全局与项目之间</td></tr>
+                <tr><td class="k">OPENCODE_CONFIG_DIR</td><td>改用自定义配置目录代替默认的 ~/.config/opencode</td></tr>
+                <tr><td class="k">AGENTS.md</td><td>项目规则主文件；无它时回退读 CLAUDE.md</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「模型」「会话」「权限」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：把 OpenCode 培养成你仓库的成员</h2>
+        <p>裸装的 OpenCode 是个通才。按下面四步做完，它就带上了你仓库的记忆、你的审查标准和你自己的快捷命令——这一套做完大概 20 分钟。</p>
+
+        <h3>第一步：生成并打磨 AGENTS.md</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>cd ~/your-project
+git status          <span class="c"># 确认工作区干净，改动可回滚</span>
+opencode
+
+<span class="prompt">&gt; </span>/init
+<span class="c"># 它会扫仓库、写 AGENTS.md，你人工补两段：</span>
+<span class="c">#   1. 构建与测试命令（npm test / go test ./...）</span>
+<span class="c">#   2. 团队红线（不许动 migrations/、提交信息格式）</span>
+git add AGENTS.md &amp;&amp; git commit -m <span class="g">"docs: add AGENTS.md for AI agents"</span></pre>
+        </div>
+
+        <h3>第二步：加一个 review 子代理</h3>
+        <p>子代理用 Markdown 定义，文件名即 Agent 名。在项目根建 <code>.opencode/agents/review.md</code>：</p>
+        <div class="code">
+          <div class="code-head"><span>.opencode/agents/review.md</span><button class="copy" type="button">复制</button></div>
+<pre>---
+description: 审查当前改动，输出问题清单，不改任何文件
+mode: subagent
+temperature: 0.1
+permission:
+  edit: deny
+  bash: deny
+---
+
+你是资深代码审查者。审查当前 git diff：
+
+1. 先按严重度分组：bug / 安全 / 风格
+2. 每条问题给出文件、行号、修法
+3. 不改任何文件，只输出清单
+4. 最后用一句话给出「可合并 / 需修改」结论</pre>
+        </div>
+        <p><small>关键在 <code>permission</code>：把 edit 和 bash 都设为 deny，它就只能读只能想——审查者不该动手改代码。之后主代理会按 description 自动派活，你也可以 <code>@review 看一下刚才的改动</code> 手动点名。</small></p>
+
+        <h3>第三步：把常用流程做成自定义命令</h3>
+        <p>在 <code>.opencode/commands/</code> 下放一个 Markdown 文件，文件名就是斜杠命令：</p>
+        <div class="code">
+          <div class="code-head"><span>.opencode/commands/fix-tests.md</span><button class="copy" type="button">复制</button></div>
+<pre>---
+description: 跑测试、修失败用例，直到全绿
+agent: build
+---
+
+1. 运行测试命令并收集失败用例
+2. 逐个分析失败原因，最小化修复，不顺手重构
+3. 再跑一遍，直到全部通过
+4. 输出：改了哪些文件、为什么改
+
+$ARGUMENTS</pre>
+        </div>
+        <p><small>存盘后在 TUI 里敲 <code>/fix-tests 只看 unit 目录</code>——$ARGUMENTS 会替换成你附带的说明。</small></p>
+
+        <h3>第四步：非交互接进脚本与 CI</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 让它替你干夜活</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 单发任务：审查未提交改动，结果存档</span>
+opencode run --agent review <span class="g">"审查当前工作区改动"</span> | tee review.md
+
+<span class="c"># JSON 事件流，喂给脚本或日志管道</span>
+opencode run --format json <span class="g">"把 CHANGELOG.md 更新到最新版本"</span>
+
+<span class="c"># 查看本周用量，确认没跑飞</span>
+opencode stats --days 7</pre>
+        </div>
+
+        <h3>第五步（可选）：接上 GitHub，让它守 PR</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 安装 GitHub 集成（含给仓库配 Action）</span>
+opencode github install
+
+<span class="c"># 之后可以在 issue / PR 评论里让它干活：</span>
+<span class="c">#   @opencode 帮我看看这个 PR 有没有漏掉迁移脚本</span>
+<span class="c"># 手动触发一次集成运行：</span>
+opencode github run</pre>
+        </div>
+        <p><small>这一步把 OpenCode 从本地工具升级成团队的异步成员：PR 里的评论就是任务，改完的代码回到分支里等你 review。权限依然走配置里的 permission 键，CI 里尤其要先收紧再放开。</small></p>
+
+        <div class="note"><b>验收标准：</b>四步做完，仓库里有 AGENTS.md 和 .opencode/ 目录；新会话里 <code>@review</code> 能被识别；<code>/fix-tests</code> 出现在斜杠菜单里；<code>opencode run</code> 不进 TUI 直接出结果。做到这四条，OpenCode 就不只是个聊天窗口了。</div>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑与常见问题：四个最常见的坎</h2>
+
+        <h3>坑一：opencode: command not found</h3>
+        <p>九成是 PATH 问题。脚本装的二进制在用户 bin 目录，新装的路径往往要重开终端才生效；npm 装的则是全局 bin 目录不在 PATH。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 定位</span><button class="copy" type="button">复制</button></div>
+<pre>which opencode                      <span class="c"># 有输出说明 PATH 正常</span>
+echo $PATH | tr <span class="g">':'</span> <span class="g">'\n'</span> | grep -iE <span class="g">'opencode|npm|homebrew'</span>
+
+<span class="c"># 临时验证：直接用绝对路径跑</span>
+~/.opencode/bin/opencode --version</pre>
+        </div>
+
+        <h3>坑二：装错了包 / 装错了仓库</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 自检与纠正</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 错：npm i -g opencode（这不是本工具）</span>
+npm uninstall -g opencode
+<span class="c"># 对：</span>
+npm install -g opencode-ai
+
+<span class="c"># Homebrew 用官方 tap 全名</span>
+brew install anomalyco/tap/opencode</pre>
+        </div>
+        <p><small>顺带一提：OpenCode 1.x 和 2.x 用的是同一个 <code>opencode</code> 命令，两者不能并存。从 1.x 升 2.x 前先看一眼官方 changelog，别在半路混装。</small></p>
+
+        <h3>坑三：/undo 没反应或撤不干净</h3>
+        <div class="note warn"><b>/undo 和 /redo 的回滚建立在 Git 之上：</b>目录不是 Git 仓库时它保不住你的文件。开工前先 <b>git init</b> 并提交一次基线；仓库里留着它改之前的状态，撤销才有意义。这也是所有编码 Agent 的通用前提，不是 OpenCode 的特例。</div>
+
+        <h3>坑四：权限全开后跑飞了</h3>
+        <p>有 <code>--auto</code> 参数可以把未明确禁止的权限全部自动放行，方便但危险。在陌生仓库、有未提交改动、或目录里躺着生产密钥时，别用。更稳的做法是把红线写进配置：</p>
+        <div class="code">
+          <div class="code-head"><span>opencode.json · 红线示例</span><button class="copy" type="button">复制</button></div>
+<pre>{
+  <span class="g">"permission"</span>: {
+    <span class="g">"bash"</span>: {
+      <span class="g">"rm -rf *"</span>: "deny",
+      <span class="g">"git push*"</span>: "ask",
+      <span class="g">"curl * | sh"</span>: "deny"
+    }
+  }
+}</pre>
+        </div>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与资源</h2>
+        <ul>
+          <li><a href="https://opencode.ai/docs/" target="_blank" rel="noopener">OpenCode 官方文档</a>——安装、配置、Agent、权限的权威来源，先通读 Getting Started。</li>
+          <li><a href="https://github.com/anomalyco/opencode" target="_blank" rel="noopener">GitHub 仓库 anomalyco/opencode</a>——原 sst/opencode；看 README、提 issue、读源码都在这里。</li>
+          <li><a href="https://opencode.ai/changelog" target="_blank" rel="noopener">官方 Changelog</a>——版本迭代极快，升级前扫一眼新特性与破坏性变更。</li>
+          <li><a href="https://opencode.ai/docs/agents/" target="_blank" rel="noopener">Agents 文档</a>——主代理、子代理、权限细粒度配置的完整说明，本页 s6 的展开版。</li>
+          <li><a href="https://opencode.ai/docs/config/" target="_blank" rel="noopener">Config 文档</a>——opencode.json 全部键位说明，含企业托管配置。</li>
+          <li><a href="https://models.dev" target="_blank" rel="noopener">models.dev</a>——OpenCode 的模型目录来源，各家 provider 与定价一目了然。</li>
+          <li><a href="https://opencode.ai/docs/permissions/" target="_blank" rel="noopener">Permissions 文档</a>——ask / allow / deny 的完整规则与通配符写法。</li>
+        </ul>
+        <div class="note"><b>学完本页去哪：</b>把 s6 的四步在你自己的真实仓库跑通。然后读本站 <a href="claude-code.html">Claude Code 教程</a> 对照同类的权限模型，再进 <a href="skills.html">Skills（技能）教程</a>——OpenCode 与多家 Agent 一样支持 Agent Skills 开放格式，把重复流程沉淀成技能是下一步最有性价比的事。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>装完重开了终端，<b>opencode --version</b> 能出版本号，且包名没装错（opencode-ai）</span></label>
+          <label><input type="checkbox" data-key="c2"><span>用 <b>/connect</b> 或 <b>opencode auth login</b> 接通了至少一家 provider，<b>/models</b> 能列出模型</span></label>
+          <label><input type="checkbox" data-key="c3"><span>在真实仓库里跑过一次只读任务，试过 <b>@</b> 引文件和 <b>!</b> 跑命令</span></label>
+          <label><input type="checkbox" data-key="c4"><span>跑过 <b>/init</b>，仓库里有提交进 Git 的 AGENTS.md</span></label>
+          <label><input type="checkbox" data-key="c5"><span>知道 <b>/undo</b> 依赖 Git，且没在陌生目录开过 <b>--auto</b></span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="codex.html"><span>← 上一篇</span><b>Codex 教程</b></a>
+        <a class="next" href="vibe-coding.html"><span>下一篇 →</span><b>Vibe Coding 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 OpenCode 官方文档（opencode.ai/docs）与 GitHub 仓库（原 sst/opencode，现 anomalyco/opencode）整理，覆盖安装、CLI、TUI、agents、config、rules 等文档页；2026-11 校对。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 版本迭代较快，具体命令与配置以 <b>opencode --help</b> 与官方文档的当前内容为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hermes Agent 教程 · AI Code Study</title>
+<meta name="description" content="Hermes Agent 上手指南：Nous Research 出品的自进化开源智能体——安装启动、记忆与技能系统、学习循环、模型配置、长期自主与避坑清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/hermes-agent.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hermes Agent 教程 · AI Code Study">
+<meta property="og:description" content="Hermes Agent 上手指南：Nous Research 出品的自进化开源智能体——安装启动、记忆与技能系统、学习循环、模型配置、长期自主与避坑清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/hermes-agent.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hermes Agent 教程 · AI Code Study">
+<meta name="twitter:description" content="Hermes Agent 上手指南：Nous Research 出品的自进化开源智能体——安装启动、记忆与技能系统、学习循环、模型配置、长期自主与避坑清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Hermes Agent：越用越强的自进化智能体",
+  "description": "Hermes Agent 上手指南：Nous Research 出品的自进化开源智能体——安装启动、记忆与技能系统、学习循环、模型配置、长期自主与避坑清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/hermes-agent.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="hermes-agent">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open" class="on">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-open">开源模型与智能体</a><span>/</span>
+      <b>Hermes Agent</b>
+    </nav>
+    <p class="eyebrow">OPEN AGENTS · <b>HERMES AGENT</b> · 会自我进化的开源智能体</p>
+    <h1>Hermes Agent：越用越强的<em>自进化</em>智能体</h1>
+    <p class="lede">Nous Research 的开源 Agent，口号是「The agent that grows with you」：它把你的使用经验沉淀成记忆和技能，下次直接复用。这篇带你装好它、接上模型、跑通第一次「学习循环」，并把自主权限的边界划清楚。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</span></div>
+        <div class="term-line"><span class="out">… Hermes Agent 已安装。运行 <span class="ok">hermes setup --portal</span> 开始配置</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">hermes setup --portal</span></div>
+        <div class="term-line"><span class="ok">✔ 模型供应商与 4 个 Tool Gateway 工具已就绪</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">hermes chat</span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">把「整理 git log 写周报」的流程固化下来</span></div>
+        <div class="term-line"><span class="ok">✔ 已沉淀技能 ~/.hermes/skills/weekly-report/SKILL.md</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装</a>
+        <a href="#s3"><span class="idx">03</span>第一次启动</a>
+        <a href="#s4"><span class="idx">04</span>记忆与技能</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战：长出技能</a>
+        <a href="#s7"><span class="idx">07</span>避坑</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="ollama.html">Ollama</a>
+        <a href="deepseek-harness.html">DeepSeek Harness</a>
+        <a href="pi-agent.html">Pi Agent</a>
+        <a href="index.html#cat-open">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装</a>
+          <a href="#s3"><span class="idx">03</span>第一次启动</a>
+          <a href="#s4"><span class="idx">04</span>记忆与技能</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战：长出技能</a>
+          <a href="#s7"><span class="idx">07</span>避坑</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 它是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>Hermes Agent 是什么：自带学习循环的开源 Agent</h2>
+        <p>Hermes Agent 是 Nous Research 出品的免费开源 AI Agent（MIT 协议），macOS、Windows、Linux 都能跑。大多数 Agent 用完即忘，它的差异点在于<b>内置学习循环</b>：对话之外会周期性地做一次自我评审，把值得留的东西自动写进两套存储——<b>持久记忆</b>（你的偏好、环境事实、踩过的坑）和<b>技能</b>（可复用的操作流程，写成 SKILL.md，下次像命令一样调用）。</p>
+        <p>它同样是一台「可长期自主运行」的机器：通过网关接到 Telegram、Discord、Slack、WhatsApp、Signal、Email，定时任务用内置 cron，还能派生隔离子 Agent 并行干活。新版本支持<b>完全本地</b>跑开源模型（管理自己的 llama.cpp 运行时，或接 Ollama 等 OpenAI 兼容端点）——模型和记忆都在你机器上，数据不出门。</p>
+        <p>和仓库里的编码 Agent（Claude Code、Codex 那类）比，定位并不重叠：编码 Agent 围绕「一个仓库里的任务」设计，会话结束基本就散了；Hermes 围绕「一个长期跟着你的助手」设计——跨平台收发消息、跨会话记住你和项目、把重复劳动沉淀成技能。当然它也能读代码、跑命令、写文件，纯当编码助手用完全没问题，只是它的杀手锏在「记得住」。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>出品方</dt><dd>Nous Research</dd></div>
+          <div class="fact"><dt>开源协议</dt><dd>MIT</dd></div>
+          <div class="fact"><dt>仓库 / 官网</dt><dd>github.com/NousResearch/hermes-agent · hermes-agent.nousresearch.com</dd></div>
+          <div class="fact"><dt>当前版本</dt><dd>v0.22.x（写作时，以仓库 Releases 为准）</dd></div>
+          <div class="fact"><dt>平台</dt><dd>macOS 12+ / Windows 10+ / Linux / WSL2 / Android（Termux）</dd></div>
+          <div class="fact"><dt>数据目录</dt><dd>~/.hermes/</dd></div>
+          <div class="fact"><dt>技能 / 记忆</dt><dd>~/.hermes/skills/ · ~/.hermes/memories/</dd></div>
+          <div class="fact"><dt>版本迭代速度</dt><dd class="no">极快，命令与配置以官方文档当前版为准</dd></div>
+        </dl>
+
+        <div class="note"><b>一句话理解它的分工：</b>记忆里放「每次对话都要知道的事实」（常驻提示词），技能里放「按需加载的操作流程」（用时才展开）。学习循环做的事，就是把你的使用经验分流到这两处。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：脚本一条命令，桌面版双击</h2>
+        <p>CLI 和桌面 App 共用同一套 Agent、技能与记忆，装一种即可，两种都装也不冲突。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">macOS / Linux</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">Windows</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">桌面版</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal · macOS / Linux / WSL2</span><button class="copy" type="button">复制</button></div>
+<pre>curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+
+<span class="c"># 验证 + 自检</span>
+hermes --version
+hermes doctor</pre>
+          </div>
+          <small>官方文档还覆盖 Nix/NixOS 与 Android（Termux）等安装方式，以安装页为准。装好后数据都在 <b>~/.hermes/</b>。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>PowerShell · Windows 原生</span><button class="copy" type="button">复制</button></div>
+<pre>iex (irm https://hermes-agent.nousresearch.com/install.ps1)
+
+hermes --version</pre>
+          </div>
+          <small>WSL2 用户也可以走上面的 macOS/Linux 脚本。桌面版另有 Windows 10/11 的 Microsoft Store 与独立安装包。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>桌面版 · 图形界面</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># macOS 12+：官网下载 Hermes-Setup.dmg</span>
+<span class="c"># Windows 10/11：Microsoft Store 搜 Hermes，或官网下载 Hermes-Setup.exe</span>
+
+<span class="c"># 按引导连接模型供应商后，即可开始对话</span>
+<span class="c"># Bot 模式、技能审批等都在图形界面里操作</span></pre>
+          </div>
+          <small>桌面版与 CLI 同源：官方说法是「Same agent, same skills, same memory」。无头部署用 <code>hermes serve</code> 起后端。</small>
+        </div>
+
+        <div class="note warn"><b>升级与排障：</b>版本迭代非常快，遇到怪问题先 <code>hermes update</code> 升级，再 <code>hermes doctor --fix</code> 自检配置；「以官方安装页与仓库 Releases 为准」在这里不是客套话。</div>
+      </section>
+
+      <!-- ===== 03 第一次启动 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>第一次启动：接模型、说第一句话</h2>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 最短路径</span><button class="copy" type="button">复制</button></div>
+<pre>hermes setup --portal   <span class="c"># 交互向导：一次 OAuth 配好模型 + 网关工具</span>
+hermes chat             <span class="c"># 进入交互对话</span>
+
+<span class="prompt">&gt; </span>/status               <span class="c"># 会话信息 + 本地摘要</span>
+<span class="prompt">&gt; </span>/help skills          <span class="c"># 只看技能相关的帮助</span>
+<span class="prompt">&gt; </span>/quit</pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>接一个模型供应商</h4><p>最快是 <code>hermes setup --portal</code>：一次 OAuth 同时拿到模型与 Tool Gateway 工具。也可以用 <code>hermes model</code> 交互选择 Nous Portal、OpenRouter、OpenAI 或任意 OpenAI 兼容端点。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>在对话里试一个真实任务</h4><p>给它一件会重复做的事，比如「总结这个仓库最近一周的改动并写份周报」。工具调用默认会请求批准，先熟悉它的审批面板。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>确认它记住了你</h4><p>退出重进后说「还记得我上次让你干什么吗」。它的长期记忆在会话开始时注入，跨会话生效；<code>hermes journey</code> 能看它学到了什么的时间线。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">密钥不放配置文件里：所有大写键名（如 <b>OPENROUTER_API_KEY</b>）都视为环境变量，<code>hermes config set OPENROUTER_API_KEY sk-or-…</code> 会写进 <b>~/.hermes/.env</b>；非密钥配置统一在 <b>~/.hermes/config.yaml</b>。</div>
+
+        <h3>日常巡检：五个高频诊断命令</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 出问题先跑这一组</span><button class="copy" type="button">复制</button></div>
+<pre>hermes status --full    <span class="c"># Agent、凭证、平台全量状态</span>
+hermes doctor --fix     <span class="c"># 配置与依赖体检，能修的直接修</span>
+hermes logs             <span class="c"># 看 / 过滤 agent、gateway、error 日志</span>
+hermes usage            <span class="c"># 当前账户的用量与限流窗口</span>
+hermes sessions list    <span class="c"># 历史会话都在，可续聊</span></pre>
+        </div>
+        <p><small>还有一个网页版管理台：<code>hermes dashboard</code>，改配置、填密钥、管会话都在浏览器里点点就行。</small></p>
+
+        <h3>长会话救急：压上下文，别硬扛</h3>
+        <div class="code">
+          <div class="code-head"><span>对话内 · 上下文管理</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>/context            <span class="c"># 看上下文窗口被什么占了</span>
+<span class="prompt">&gt; </span>/compress 保留架构结论   <span class="c"># 手动压缩，可指定要留的重点</span>
+<span class="prompt">&gt; </span>/undo               <span class="c"># 撤掉最近一次问答再重问</span>
+<span class="prompt">&gt; </span>/new                <span class="c"># 彻底重开；记忆快照重新加载</span></pre>
+        </div>
+      </section>
+
+      <!-- ===== 04 记忆与技能 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>记忆与技能：它靠什么「越用越懂你」</h2>
+
+        <h3>持久记忆：两份小文件</h3>
+        <p>核心记忆就是 <b>~/.hermes/memories/</b> 下的两个文件：<b>MEMORY.md</b>（环境事实、项目约定、经验教训，上限约 2200 字符）和 <b>USER.md</b>（你的偏好与沟通风格，上限约 1375 字符）。它们在<b>会话开始时</b>冻结成快照注入提示词——会话中它写的新记忆立即落盘，但要到下一次会话才进提示词。历史会话则存在 SQLite（<code>~/.hermes/state.db</code>）里，用 FTS5 全文检索按需召回，几乎零 token 成本。</p>
+        <p>记忆是<b>按 profile 隔离</b>的：默认档案读 <code>~/.hermes/memories/</code>，名为 <code>work</code> 的档案读 <code>~/.hermes/profiles/work/memories/</code>。如果你发现它「忘了」某件事，先确认没切错档案，再直接 <code>cat</code> 那两个文件看它到底记没记。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 直接查它的记忆</span><button class="copy" type="button">复制</button></div>
+<pre>cat ~/.hermes/memories/MEMORY.md   <span class="c"># 它记了什么，一目了然</span>
+hermes memory setup                <span class="c"># 可选：接入外部语义记忆供应商</span>
+hermes journey                     <span class="c"># 学习时间线：哪些记忆/技能何时产生</span></pre>
+        </div>
+
+        <h3>技能：写成文件的流程</h3>
+        <p>技能是目录 <b>~/.hermes/skills/&lt;名字&gt;/</b> 下的 <b>SKILL.md</b>：YAML frontmatter（name、description、version…）加正文（When to Use / Procedure / Pitfalls / Verification）。Agent 通过 skill_manage 工具自己创建和修改技能；<code>/learn</code> 能把本地文档、URL、笔记整本蒸馏成技能。技能走「渐进披露」：先看技能列表（约 3k token），用到哪个再加载哪个，不会撑爆上下文。</p>
+        <div class="code">
+          <div class="code-head"><span>SKILL.md · 结构示意</span><button class="copy" type="button">复制</button></div>
+<pre>---
+name: weekly-report
+description: 整理 git log 按固定格式产出周报
+version: 1.0.0
+---
+<span class="g">## When to Use</span>
+用户要求整理一周改动 / 产出周报时。
+
+<span class="g">## Procedure</span>
+1. git log --since="7 days ago" 取提交
+2. 按 功能/修复/其他 分组 ……
+
+<span class="g">## Pitfalls</span>
+merge 提交不要重复计数。
+
+<span class="g">## Verification</span>
+ reports/ 下生成的文件能通过用户确认。</pre>
+        </div>
+        <p><small>这是结构示意，不是它的某份真实文件；具体字段（platforms、requires_toolsets 等进阶项）以官方 Skills 文档为准。技能还可以带 <code>references/</code>、<code>scripts/</code>、<code>templates/</code> 等子目录。</small></p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 技能管理与审批</span><button class="copy" type="button">复制</button></div>
+<pre>hermes skills list                 <span class="c"># 本地技能一览</span>
+hermes skills search &lt;关键词&gt;       <span class="c"># 从 Skills Hub 搜</span>
+hermes skills install &lt;名&gt;          <span class="c"># 安装（自动做安全扫描）</span>
+
+<span class="prompt">&gt; </span>/skills pending                  <span class="c"># 开 write_approval 后，待批的写入在这里</span>
+<span class="prompt">&gt; </span>/skills diff &lt;id&gt;                <span class="c"># 看它想改什么</span>
+<span class="prompt">&gt; </span>/skills approve &lt;id&gt;             <span class="c"># 批准落盘</span></pre>
+        </div>
+
+        <h3>学习循环：后台评审 + 策展器</h3>
+        <p>每轮对话结束后，后台会跑一次<b>自我评审</b>：把值得沉淀的内容写成记忆或技能（提示词里表现为「💾 Memory updated」这类通知），频率用 <code>memory.nudge_interval</code> / <code>skills.creation_nudge_interval</code> 调节；<code>/refine</code> 让它立刻评审一轮。后台还有一个<b>策展器（curator）</b>负责技能的日常维护——去重、瘦身、修错，<code>hermes curator lock &lt;技能&gt;</code> 可以把重要技能设为只读，防止它越改越歪。</p>
+
+        <h3>长期自主：网关、cron 与 Bot 模式</h3>
+        <p>把常驻的 <code>hermes gateway</code> 接上任意消息平台，它就是一个 24 小时在线的助手；<code>/heartbeat</code> 与 <code>/loop</code> 让它在空闲时定期自检推进；Bot 模式把多个 profile 变成一群「有独立模型、记忆、技能和人设（SOUL.md）的 Bot」，各自挂各自的 cron 例行任务。自主运行的安全阀在下面第 07 节展开。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 自主化的最小骨架</span><button class="copy" type="button">复制</button></div>
+<pre>hermes profile create   <span class="c"># 一个 profile 就是一个 Bot 的全部家当</span>
+hermes gateway start    <span class="c"># 常驻网关，接管各消息平台的收发</span>
+hermes cron list        <span class="c"># 例行任务一览（Bot 的任务带 bot:&lt;名&gt; 前缀）</span>
+
+<span class="c"># config.yaml 里与自主运行相关的安全阀</span>
+approvals.single_query_mode: deny    <span class="c"># 一次性请求默认拒绝自动执行</span>
+agent.bot_mode_protocol: on          <span class="c"># Bot 群聊协议（默认开）</span></pre>
+        </div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：概念、命令、操作、配置一张表</h2>
+        <p class="muted" style="font-size:14px">这块能搜。忘了某个入口直接搜 <b>技能</b>、<b>记忆</b>、<b>模型</b> 这样的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索概念 / 命令 / 配置，比如 记忆 / refine / local_runtime" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">核心概念</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">安装与启动</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">常用操作</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">模型配置</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>概念</th><th>是什么</th></tr></thead>
+              <tbody>
+                <tr><td class="k">长期记忆 MEMORY.md</td><td>~/.hermes/memories/ 下，约 2200 字符（≈800 token），每次会话开始注入</td></tr>
+                <tr><td class="k">用户画像 USER.md</td><td>你的偏好与沟通风格，约 1375 字符（≈500 token）</td></tr>
+                <tr><td class="k">冻结快照</td><td>记忆在会话开始时注入并固定；会话内新写入只落盘，下次会话生效</td></tr>
+                <tr><td class="k">会话检索 FTS5</td><td>~/.hermes/state.db（SQLite）全文检索历史会话，按需召回、零 token 成本</td></tr>
+                <tr><td class="k">外部语义记忆</td><td>hermes memory setup 接入（Mem0、Honcho 等），与内置记忆并行不替代</td></tr>
+                <tr><td class="k">技能 SKILL.md</td><td>~/.hermes/skills/&lt;名&gt;/SKILL.md，YAML frontmatter + When to Use/Procedure/Pitfalls/Verification</td></tr>
+                <tr><td class="k">学习循环</td><td>每轮后台自我评审，自动沉淀记忆/技能；/refine 立即触发一次</td></tr>
+                <tr><td class="k">策展器 curator</td><td>hermes curator 后台维护技能质量；curator lock 把技能设为只读</td></tr>
+                <tr><td class="k">写审批 write_approval</td><td>memory.write_approval / skills.write_approval 开启后，写入先进 ~/.hermes/pending/ 待批</td></tr>
+                <tr><td class="k">profile 档案</td><td>~/.hermes/profiles/&lt;名&gt;/，独立配置、模型、记忆、技能、凭证；SOUL.md 定人设</td></tr>
+                <tr><td class="k">网关 gateway</td><td>hermes gateway 把 Agent 常驻接到 Telegram / Discord / Slack / WhatsApp / Signal / Email</td></tr>
+                <tr><td class="k">沙箱 terminal</td><td>命令执行后端：local / Docker / SSH / Singularity / Modal 等五种</td></tr>
+                <tr><td class="k">子 Agent</td><td>隔离的并行工作流；/bg 把任务丢到后台会话，/agents 看活跃任务</td></tr>
+                <tr><td class="k">journey 时间线</td><td>hermes journey（别名 learning / memory-graph）：它学到的记忆与技能的成长记录</td></tr>
+                <tr><td class="k">渐进披露</td><td>技能按需加载：列表约 3k token → 展开单个 SKILL.md → 再读其参考文件</td></tr>
+                <tr><td class="k">SOUL.md</td><td>每个 profile 的人设文件；Bot 的性格、口吻、行为边界都写在这里</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">curl -fsSL …/install.sh | bash</td><td>macOS / Linux / WSL2 官方安装脚本</td></tr>
+                <tr><td class="k">iex (irm …/install.ps1)</td><td>Windows PowerShell 官方安装命令</td></tr>
+                <tr><td class="k">hermes setup --portal</td><td>交互向导：一次 OAuth 配好模型与 Tool Gateway 工具</td></tr>
+                <tr><td class="k">hermes chat</td><td>交互对话主入口（全局参数：--resume、--continue、--yolo 等）</td></tr>
+                <tr><td class="k">hermes -z "&lt;提示&gt;"</td><td>程序化一次性调用：只输出最终回复文本</td></tr>
+                <tr><td class="k">hermes model</td><td>交互选择默认供应商与模型（含本地模型目录）</td></tr>
+                <tr><td class="k">hermes status [--full]</td><td>Agent、凭证、平台状态</td></tr>
+                <tr><td class="k">hermes doctor [--fix]</td><td>诊断并修复配置与依赖问题</td></tr>
+                <tr><td class="k">hermes update</td><td>升级到最新稳定版并重装依赖</td></tr>
+                <tr><td class="k">hermes serve</td><td>无头后端服务器（供桌面 App / 远程接入）</td></tr>
+                <tr><td class="k">hermes backup / import</td><td>把 ~/.hermes 打包备份 / 从 zip 恢复</td></tr>
+                <tr><td class="k">hermes profile create / list</td><td>管理多个隔离档案（Bot 的载体）</td></tr>
+                <tr><td class="k">hermes cron list / status</td><td>例行任务调度器；create、pause、runs 等子命令齐全</td></tr>
+                <tr><td class="k">hermes gateway start / status</td><td>常驻消息网关：跑起来、看状态、装成系统服务</td></tr>
+                <tr><td class="k">hermes dashboard</td><td>打开网页版管理台（配置、密钥、会话）</td></tr>
+                <tr><td class="k">hermes logs [名称]</td><td>查看 / 跟踪 agent、gateway、error 日志</td></tr>
+                <tr><td class="k">hermes uninstall</td><td>卸载</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>斜杠命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">/help [关键词]</td><td>帮助面板，支持按关键词过滤</td></tr>
+                <tr><td class="k">/new [名]</td><td>新开会话（别名 /reset）；记忆快照下次会话刷新</td></tr>
+                <tr><td class="k">/model [名]</td><td>查看/切换模型；--provider、--reasoning 等旗标</td></tr>
+                <tr><td class="k">/status</td><td>会话信息与本地摘要</td></tr>
+                <tr><td class="k">/context</td><td>上下文窗口占用可视化（别名 /ctx）</td></tr>
+                <tr><td class="k">/compress [焦点]</td><td>手动压缩上下文</td></tr>
+                <tr><td class="k">/memory [pending|approve|reject]</td><td>记忆写审批：查看/批准/拒绝待写入</td></tr>
+                <tr><td class="k">/skills [pending|diff|approve]</td><td>技能写审批与技能搜索安装</td></tr>
+                <tr><td class="k">/learn &lt;资料&gt;</td><td>把文档/URL/笔记蒸馏成技能</td></tr>
+                <tr><td class="k">/refine [焦点]</td><td>立刻跑一次记忆/技能自我评审</td></tr>
+                <tr><td class="k">/goal &lt;文本&gt;</td><td>跨轮次的常驻目标；/heartbeat、/loop 做定时自检</td></tr>
+                <tr><td class="k">/yolo</td><td>跳过危险命令审批——想清楚再开</td></tr>
+                <tr><td class="k">/approvals [manual|smart|off]</td><td>审批模式三档</td></tr>
+                <tr><td class="k">/usage</td><td>token 用量、费用与限额</td></tr>
+                <tr><td class="k">/&lt;技能名&gt;</td><td>把已装技能当命令直接跑（最多可链 5 个）</td></tr>
+                <tr><td class="k">/journey [list|delete]</td><td>学习时间线：看它最近沉淀了什么，删掉不要的</td></tr>
+                <tr><td class="k">/bg &lt;提示&gt;</td><td>把任务丢进独立后台会话，不占当前对话</td></tr>
+                <tr><td class="k">/handoff &lt;平台&gt;</td><td>把当前会话移交给某个消息平台继续</td></tr>
+                <tr><td class="k">/retry / /undo</td><td>重发上一条 / 撤掉最近一次问答</td></tr>
+                <tr><td class="k">/btw &lt;问题&gt;</td><td>不占当前会话的快速插问</td></tr>
+                <tr><td class="k">/quit / /exit</td><td>退出（--delete 连会话历史一起删）</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>配置项 / 命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">~/.hermes/config.yaml</td><td>主配置文件（非密钥）；hermes config show / edit / get / set</td></tr>
+                <tr><td class="k">~/.hermes/.env</td><td>所有密钥放这里；UPPER_SNAKE 键名自动视为环境变量</td></tr>
+                <tr><td class="k">hermes config set OPENROUTER_API_KEY …</td><td>写密钥的标准姿势（保存进 .env，不进 config.yaml）</td></tr>
+                <tr><td class="k">hermes model → Local models</td><td>本地模型入口：按你的机器列出目录、装引擎、下载、设默认</td></tr>
+                <tr><td class="k">local_runtime.enabled</td><td>true 时随 Hermes 启动托管的 llama.cpp 服务</td></tr>
+                <tr><td class="k">local_runtime.backend</td><td>auto | cuda | metal | vulkan | hip | cpu</td></tr>
+                <tr><td class="k">providers.llamacpp.base_url</td><td>自建 llama-server，如 http://127.0.0.1:8081/v1</td></tr>
+                <tr><td class="k">Ollama 接入</td><td>任意运行中的 OpenAI 兼容服务器都能填；官方另有「Run Hermes Locally with Ollama」专文</td></tr>
+                <tr><td class="k">hermes moa / hermes fallback</td><td>混合多 Agent 预设 / 主模型出错时的备选链</td></tr>
+                <tr><td class="k">auxiliary.background_review</td><td>把后台评审交给更便宜的模型跑，可设 token 上限</td></tr>
+                <tr><td class="k">hermes portal status</td><td>Nous Portal 订阅状态与 Tool Gateway 路由</td></tr>
+                <tr><td class="k">hermes usage</td><td>会话外查看账户额度与限流窗口</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「技能」「审批」「模型」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：亲手跑通一次「长出技能」</h2>
+        <p>目标是让它把一件你每周都做的事固化成技能。全程不到半小时，做完你就理解了记忆、技能、审批三件事如何咬合。</p>
+
+        <h3>第一步：把任务交给它</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>hermes chat
+
+<span class="prompt">&gt; </span>看看这个仓库最近一周的 git log，按「功能/修复/其他」分类，
+  写成一份周报存到 reports/ 目录。以后每周一都按这个格式来。</pre>
+        </div>
+        <p>它会探索仓库、跑 git 命令、写文件——每一步都要你在终端里批准。这是正常节奏，先让它把事情做完。</p>
+
+        <h3>第二步：让它复盘，触发评审</h3>
+        <div class="code">
+          <div class="code-head"><span>对话内</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>/refine 把刚才的流程整理成可复用的技能
+
+<span class="c"># 也可以什么都不打：每轮结束的后台评审会自动做这件事</span></pre>
+        </div>
+        <p>它会从这次经历里提炼「步骤 + 坑 + 验证方法」——技能沉淀的是<b>经验而不是流水账</b>，这正是它和「导出聊天记录」的区别。</p>
+
+        <h3>第三步：检查与批准落盘</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 审批与查看</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>/skills pending            <span class="c"># 开了 write_approval 时，待批写入在这里</span>
+<span class="prompt">&gt; </span>/skills diff &lt;id&gt;          <span class="c"># 逐行看它想写什么</span>
+<span class="prompt">&gt; </span>/skills approve &lt;id&gt;
+
+cat ~/.hermes/skills/weekly-report/SKILL.md   <span class="c"># 成品长这样，随时手改</span></pre>
+        </div>
+
+        <h3>第四步：下次当命令用</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 技能即命令</span><button class="copy" type="button">复制</button></div>
+<pre>hermes chat
+
+<span class="prompt">&gt; </span>/weekly-report 本周重点写后端性能优化
+
+<span class="c"># 复盘时间线，看它这段时间学会了什么</span>
+hermes journey</pre>
+        </div>
+
+        <div class="note"><b>进阶玩法：</b>用 <code>hermes bundles create</code> 把多个技能捆成一个 <code>/&lt;bundle&gt;</code> 命令；把周报类例行任务挂到 <code>/cron</code> 或网关平台，让它每周一自动交作业——这就是「长期自主」的最小可用形态。</div>
+
+        <h3>第五步：把例行任务挂上 cron</h3>
+        <div class="code">
+          <div class="code-head"><span>对话内 · 定时自动化</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>/cron add 每周一早上九点，跑 weekly-report 技能并把周报发给我
+
+<span class="prompt">&gt; </span>/cron list        <span class="c"># 所有例行任务、下次触发时间</span>
+<span class="prompt">&gt; </span>/cron pause &lt;id&gt;  <span class="c"># 出门前先按下暂停</span></pre>
+        </div>
+        <p><small>cron 也能在会话外管理（<code>hermes cron status / runs</code>）。挂定时任务的前提是把审批与沙箱想清楚——见下一节坑一。</small></p>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：自主性是双刃剑</h2>
+
+        <h3>坑一：自主权限的边界没想清楚</h3>
+        <p><code>/yolo</code> 跳过危险命令审批，<code>/approvals off</code> 全放行——配合常驻网关和 cron，等于让它 24 小时无人值守地在你机器上执行东西。默认档位是安全的：一次性请求默认拒绝自动执行（<code>approvals.single_query_mode: deny</code>），写审批默认关闭但建议打开（<code>memory.write_approval</code> / <code>skills.write_approval</code>）。把它的「放行层级」记成三道闸：</p>
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>第一道：工具审批</dt><dd style="color:var(--ink-2)">跑命令、改文件默认弹审批；/approvals manual → smart → off 逐级放开</dd></div>
+          <div class="fact"><dt>第二道：写入审批</dt><dd style="color:var(--ink-2)">memory.write_approval / skills.write_approval，管住它对记忆和技能的改写</dd></div>
+          <div class="fact"><dt>第三道：全局急停</dt><dd style="color:var(--ink-2)">hermes pause 一键冻结所有 cron 与网关轮次，hermes resume 恢复</dd></div>
+        </dl>
+        <p>养成两个习惯：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 安全阀</span><button class="copy" type="button">复制</button></div>
+<pre>hermes pause      <span class="c"># 全局急停：cron、网关轮次全部暂停</span>
+hermes resume     <span class="c"># 恢复</span>
+
+<span class="prompt">&gt; </span>/approvals smart   <span class="c"># 长期自主前至少用 smart，别一上来就 off</span></pre>
+        </div>
+        <div class="note warn"><b>一条硬线：</b>给 Bot 挂 cron 之前，先在手动模式下完整跑过同样的任务，并确认沙箱后端（Docker / SSH 等隔离环境）配置好了——别让自主任务直接跑在裸机上。</div>
+
+        <h3>坑二：记忆膨胀</h3>
+        <p>MEMORY.md 有 2200 字符硬上限，写满了工具会报错并要求它「先删再加」；但更隐蔽的问题是<b>记了没用的</b>——过期结论、一次性事实慢慢挤占常驻 token。定期做三件事：<code>hermes journey list</code> 看沉淀了什么、<code>journey delete &lt;id&gt;</code> 清掉过时项、直接手编 <code>~/.hermes/memories/MEMORY.md</code>（它就是普通 Markdown）。改完记忆记得 <code>/new</code> 开新会话，新快照才生效。</p>
+
+        <h3>坑三：技能质量退化</h3>
+        <p>自进化系统的通病：技能越写越多、越写越肥，坏技能还会被后续修改放大。官方自带的防线要知道：<b>尺寸警戒线</b>（正文过大约 24k 字符会触发 oversized-body 告警）、<b>引用膨胀</b>（references 超过 60 个文件告警）、<b>内容扫描</b>（skills.guard_agent_created）与安装时安全扫描。你要做的是三招：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 技能保质</span><button class="copy" type="button">复制</button></div>
+<pre>hermes skills audit      <span class="c"># 体检：找出有问题的技能</span>
+hermes curator status    <span class="c"># 策展器在维护什么</span>
+hermes curator lock &lt;技能&gt;  <span class="c"># 核心技能设为只读，不许它乱改</span></pre>
+        </div>
+
+        <h3>坑四：本地小模型 vs 云端模型的能力差</h3>
+        <p>本地跑开源模型很香（数据不出机器），但别高估小模型：官方排障文档明确提示，<b>30B 以下的小模型经常「嘴上说保存了」，实际根本没调用工具</b>——这是幻觉，不是记忆丢失，先查 <code>/memory pending</code> 和技能目录。官方对本地配置的底线是：显存 8 GB 起跑小模型、16 GB 跑 27–35B 高质量档、量化别低于 4-bit、上下文至少 64K。务实做法是<b>混合</b>：主力任务用云端强模型，后台评审（<code>auxiliary.background_review</code>）这类低成本环节交给本地小模型。</p>
+      </section>
+
+      <!-- ===== 08 进阶资源 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与官方资源</h2>
+        <ul>
+          <li><a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">hermes-agent.nousresearch.com</a> — 官网与下载入口</li>
+          <li><a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">官方文档</a> — 配置、记忆、技能、Bot 模式、CLI 全参考</li>
+          <li><a href="https://github.com/NousResearch/hermes-agent" target="_blank" rel="noopener">github.com/NousResearch/hermes-agent</a> — 源码仓库</li>
+          <li><a href="https://github.com/NousResearch/hermes-agent/releases" target="_blank" rel="noopener">Releases</a> — 版本以这里为准（写作时 v0.22.x）</li>
+          <li><a href="https://hermes-agent.nousresearch.com/docs/skills" target="_blank" rel="noopener">Skills Hub</a> — 官方技能目录，兼容 agentskills.io 开放标准</li>
+          <li><a href="https://hermes-agent.nousresearch.com/docs/guides/troubleshooting-agent-quality" target="_blank" rel="noopener">Agent 质量排障指南</a> — 回答变差、技能退化时先翻这篇</li>
+          <li><a href="https://hermes-agent.nousresearch.com/docs/reference/environment-variables" target="_blank" rel="noopener">环境变量参考</a> — 密钥与开关的标准写法</li>
+          <li><a href="https://portal.nousresearch.com" target="_blank" rel="noopener">Nous Portal</a> — 官方托管：云端 Agent 与订阅模型</li>
+        </ul>
+        <div class="note"><b>下一步去哪：</b>想让它完全离线工作，先看 <b>ollama.html</b> 把本地模型跑起来，再回 hermes 配 <code>local_runtime</code> 或 Ollama 端点；想研究国产开源模型驱动的工程化脚手架，翻 <b>deepseek-harness.html</b>。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>跑完安装脚本，<b>hermes --version</b> 出版本号，<b>hermes doctor</b> 无报错</span></label>
+          <label><input type="checkbox" data-key="c2"><span><b>hermes setup --portal</b> 或 <b>hermes model</b> 接好了至少一个模型供应商</span></label>
+          <label><input type="checkbox" data-key="c3"><span>完整跑过一次真实任务，并用 <b>/status</b>、<b>/context</b> 看过会话状态</span></label>
+          <label><input type="checkbox" data-key="c4"><span>触发过一次 <b>/refine</b>，在 <b>~/.hermes/skills/</b> 里见到它写的 SKILL.md</span></label>
+          <label><input type="checkbox" data-key="c5"><span>知道 <b>hermes pause</b> 是全局急停，并且开 <b>/yolo</b> 之前想清楚了代价</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="ollama.html"><span>← 上一篇</span><b>Ollama 教程</b></a>
+        <a class="next" href="deepseek-harness.html"><span>下一篇 →</span><b>DeepSeek Harness 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 Hermes Agent 官网（hermes-agent.nousresearch.com 及其 /docs：configuration、memory、skills、cli-commands、slash-commands、bot-mode、local-models）与 GitHub 仓库（NousResearch/hermes-agent）整理，2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 版本迭代较快（写作时 v0.22.x），具体命令与配置以官方文档与仓库 Releases 为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

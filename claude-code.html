@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code 教程 · AI Code Study</title>
+<meta name="description" content="Claude Code 上手指南：安装、登录、CLAUDE.md 项目记忆、权限模式、斜杠命令与快捷键速查、实战流程、避坑与自检清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/claude-code.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Claude Code 教程 · AI Code Study">
+<meta property="og:description" content="Claude Code 上手指南：安装、登录、CLAUDE.md 项目记忆、权限模式、斜杠命令与快捷键速查、实战流程、避坑与自检清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/claude-code.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Claude Code 教程 · AI Code Study">
+<meta name="twitter:description" content="Claude Code 上手指南：安装、登录、CLAUDE.md 项目记忆、权限模式、斜杠命令与快捷键速查、实战流程、避坑与自检清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Claude Code：把整个仓库交给终端里的 Agent",
+  "description": "Claude Code 上手指南：安装、登录、CLAUDE.md 项目记忆、权限模式、斜杠命令与快捷键速查、实战流程、避坑与自检清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/claude-code.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="claude-code">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools" class="on">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-tools">AI 编程工具</a><span>/</span>
+      <b>Claude Code</b>
+    </nav>
+    <p class="eyebrow">CODING TOOLS · <b>CLAUDE CODE</b> · Anthropic 官方终端 Agent</p>
+    <h1>Claude Code：把整个仓库交给<em>终端里的 Agent</em></h1>
+    <p class="lede">它不是补全工具，而是一个能自己读代码、改文件、跑命令的 Agent。这一页从安装讲到日常流程：怎么装、怎么登录、怎么让它记住项目约定、权限怎么给，最后给你一张能搜的命令速查表。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/my-project</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">npm install -g @anthropic-ai/claude-code</span></div>
+        <div class="term-line"><span class="out">added 1 package in 6s</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">claude</span></div>
+        <div class="term-line"><span class="out">✻ Welcome to Claude Code! 按 <span class="ok">/login</span> 用 Anthropic 账号登录</span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">/init</span></div>
+        <div class="term-line"><span class="ok">CLAUDE.md created — 已分析 128 个文件，写入项目约定</span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">修复 auth 模块 token 过期不刷新的问题，并补一个回归测试</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装</a>
+        <a href="#s3"><span class="idx">03</span>登录与首次使用</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>命令速查</a>
+        <a href="#s6"><span class="idx">06</span>实战流程</a>
+        <a href="#s7"><span class="idx">07</span>避坑指南</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="kimi-code.html">Kimi Code CLI</a>
+        <a href="codex.html">Codex 教程</a>
+        <a href="opencode.html">OpenCode</a>
+        <a href="index.html#cat-tools">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装</a>
+          <a href="#s3"><span class="idx">03</span>登录与首次使用</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>命令速查</a>
+          <a href="#s6"><span class="idx">06</span>实战流程</a>
+          <a href="#s7"><span class="idx">07</span>避坑指南</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>它是什么：住在终端里的「会用你电脑的同事」</h2>
+        <p>Claude Code 是 Anthropic 官方出的 agentic coding 工具，2025 年 2 月以研究预览发布、5 月正式可用。装完之后你的终端里多了一个 <code>claude</code> 命令：它启动后读的是你当前目录这个真实仓库——自己决定先看哪些文件、跑哪些测试、改哪几行，每一步动作都会显示出来等你确认。补全工具猜你想打的下一行代码；Claude Code 接的是「把这个问题修了」「把这个模块的测试补齐」这种任务级指令。</p>
+        <p>它解决的痛点很具体：改一个 bug 要在编辑器、终端、浏览器之间来回切。有了它，读代码、定位、改文件、跑测试、看日志这一整条链路都发生在一个会话里，而且它的每一步写操作默认要你点头。</p>
+        <p>适用场景：接手陌生仓库想快速摸清结构、修跨多文件的 bug、批量重构、写测试、跑脚本整理数据。不适合拿它当聊天机器人闲聊——它的一切设计都围绕「对你的文件系统动手」。</p>
+        <p>它和编辑器插件、网页版不冲突，而是分工：IDE 插件管行内补全和小重构，Claude Code 管跨文件的整段任务，网页版适合异步派活。三者的账号与订阅是同一套，先装 CLI 把核心心智练起来，其他入口都是换壳。</p>
+        <ul>
+          <li><b>适合：</b>接手陌生仓库摸结构；修跨多文件的 bug；批量重构与迁移；给老代码补测试；把重复的整理工作脚本化。</li>
+          <li><b>不适合：</b>对单文件的行级补全（这是 IDE 插件的活）；需要严格最小权限的陌生环境（先审它的计划再放行）；不想让工具碰文件系统的纯问答。</li>
+        </ul>
+
+        <dl class="facts">
+          <div class="fact"><dt>开发商</dt><dd>Anthropic（官方工具）</dd></div>
+          <div class="fact"><dt>发布节奏</dt><dd>2025-02 研究预览 · 2025-05 正式发布</dd></div>
+          <div class="fact"><dt>安装渠道</dt><dd>npm / 官方脚本 / Homebrew</dd></div>
+          <div class="fact"><dt>运行依赖</dt><dd>npm 方式需 Node.js ≥ 18；脚本装独立二进制</dd></div>
+          <div class="fact"><dt>平台</dt><dd>macOS · Linux · Windows（原生/WSL）</dd></div>
+          <div class="fact"><dt>计费</dt><dd>Pro/Max 订阅，或 Console API 按量</dd></div>
+          <div class="fact"><dt>免费层</dt><dd class="no">无，订阅与 API 均付费</dd></div>
+          <div class="fact"><dt>源码</dt><dd>github.com/anthropics/claude-code 公开</dd></div>
+        </dl>
+
+        <div class="note"><b>先记一个心智模型：</b>Claude Code 的能力边界跟着<b>工作目录</b>走。在哪个目录启动，它默认就只能看到那个目录里的东西。所以「进仓库再启动」是使用它的第一戒律；真要跨仓库，用 --add-dir 显式授权（见第 03 节）。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：三条路，选一条走完</h2>
+        <p>推荐 npm 方式——只要机器上有 Node 18+，一条命令搞定，升级也走同一条路。不想装 Node 就用官方脚本（下载独立二进制）；macOS 用户也可以走 Homebrew。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">npm（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">官方脚本</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">Homebrew</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 需要 Node.js ≥ 18</span>
+node --version
+npm install -g @anthropic-ai/claude-code
+
+<span class="c"># 装完先确认能跑</span>
+claude --version
+
+<span class="c"># 以后升级也走 npm</span>
+npm update -g @anthropic-ai/claude-code</pre>
+          </div>
+          <small>npm 全局 bin 目录必须在 PATH 里。用 nvm 的机器先 <code>nvm install --lts &amp;&amp; nvm use</code> 切好版本再装，别用系统自带的旧 node。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># macOS / Linux：下载原生二进制 + 校验，不依赖 Node</span>
+curl -fsSL https://claude.ai/install.sh | bash
+
+<span class="c"># 装完重开一个终端再验证</span>
+claude --version</pre>
+          </div>
+          <small>脚本会把安装路径打印在最后，装完<b>重开终端</b>再敲 <code>claude</code>，避免 PATH 没刷新的假故障。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># macOS（Homebrew cask）</span>
+brew install --cask claude-code
+
+<span class="c"># 升级 / 卸载</span>
+brew upgrade --cask claude-code
+brew uninstall --cask claude-code</pre>
+          </div>
+          <small>brew 装到 /opt/homebrew/bin，同样装完重开终端。</small>
+        </div>
+
+        <div class="note warn"><b>装完先体检：</b>首次运行 <code>claude doctor</code> 可以一次性检查安装类型、Node 版本和 PATH 是否正常。装完敲 <code>claude</code> 没反应时，先 <b>重开终端</b> 再试——新进 PATH 的可执行文件不会出现在旧窗口里。Windows 用户优先用官方提供的原生安装方式或 WSL，具体以安装文档为准。</div>
+
+        <h3>升级与卸载</h3>
+        <p>Claude Code 自带自动更新，也可以手动升级；卸载方式跟着安装渠道走：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 升级与卸载</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># npm 安装的：升级 / 卸载</span>
+npm update -g @anthropic-ai/claude-code
+npm uninstall -g @anthropic-ai/claude-code
+
+<span class="c"># brew 安装的：</span>
+brew upgrade --cask claude-code
+brew uninstall --cask claude-code
+
+<span class="c"># 升级后跑一次体检确认无恙</span>
+claude doctor</pre>
+        </div>
+        <small>配置与凭证在 ~/.claude/，卸载重装不会丢；想彻底清空再删这个目录。</small>
+      </section>
+
+      <!-- ===== 03 登录与首次使用 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>登录与第一次使用：OAuth 一条路走通</h2>
+        <p>第一次敲 <code>claude</code> 会进入交互界面并引导登录：走 Anthropic 账号 OAuth，浏览器里授权一次就完事。有 Pro/Max 订阅直接用订阅额度；没有订阅就绑定 Anthropic Console 的 API key 按量计费。两种方式都从同一条登录流程进，选其一即可。</p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 登录与登出</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 启动后按提示走 OAuth（订阅或 API 计费都在这里选）</span>
+claude
+
+<span class="c"># 已经进会话了，也可以用斜杠命令</span>
+<span class="prompt">&gt; </span>/login
+<span class="prompt">&gt; </span>/logout    <span class="c"># 换账号或共用机器时清掉凭证</span></pre>
+        </div>
+
+        <h3>启动即用的四种姿势</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 常用启动方式</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 交互会话，附带一句开场任务</span>
+claude <span class="g">"梳理这个项目的入口和目录结构"</span>
+
+<span class="c"># 单次模式：打印结果就退出，适合脚本</span>
+claude -p <span class="g">"README 里描述的启动步骤是哪几条"</span>
+
+<span class="c"># 继续上次会话（同目录）</span>
+claude -c
+
+<span class="c"># 从历史会话里挑一个恢复</span>
+claude -r</pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>进仓库再启动</h4><p><code>cd ~/your-project</code> 之后敲 <code>claude</code>。上下文边界就是当前目录，在错误目录启动等于让它盲干。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>先跑一次 /init</h4><p>它会分析代码库并生成 <b>CLAUDE.md</b> 项目记忆文件——以后每次会话自动带上这些约定，省去反复解释。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>从只读任务开始</h4><p>「解释这个模块」「列出所有 API 路由」这类只读请求默认放行；等它展示过几轮输出，再让它动文件。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>用 /cost 看消耗</h4><p>订阅用户看本次会话的用量，API 用户关心钱就直接盯着这条命令，心里有数。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">退出会话：输入 <b>/exit</b>，或空输入时连按两次 <b>Ctrl-C</b> / 按一次 <b>Ctrl-D</b>。会话记录都留着，下次 <code>claude -c</code> 接着干。</div>
+
+        <h3>会话与成本：三个习惯</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 会话管理</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 一事一会话：干完一件就 /clear，别在一个会话里混五件事</span>
+<span class="prompt">&gt; </span>/clear
+
+<span class="c"># 上下文涨了先压缩，并指定保留重点</span>
+<span class="prompt">&gt; </span>/compact 保留改了哪些文件和最终结论
+
+<span class="c"># 订阅用户看 /usage，API 用户看 /cost，心里有数</span>
+<span class="prompt">&gt; </span>/cost</pre>
+        </div>
+        <p><small>会话记录按目录保存，<b>claude -c</b> 和 <b>claude -r</b> 都只对「当前目录」生效——这也是进对目录再启动的另一个理由。重要结论别只留在会话里，让它写进 CLAUDE.md 或导出成 Markdown。另外双击 <b>Esc</b> 可以打开 rewind 菜单，把代码和对话一起回退到之前的检查点，改砸了有后悔药。</small></p>
+
+        <h3>跨仓库任务：--add-dir</h3>
+        <p>偶尔会遇到「改 A 仓库要同时看 B 仓库」的场景。启动时额外授权一个目录，会话里就能同时引用两边的文件：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 两个仓库一起开工</span><button class="copy" type="button">复制</button></div>
+<pre>cd ~/your-app
+claude --add-dir ~/shared-lib
+
+<span class="prompt">&gt; </span>把 shared-lib 里的日期工具迁移成本仓库可直接调用的模块，改完两边测试都跑</pre>
+        </div>
+        <p><small>会话中途也能用 <b>/add-dir</b> 临时加目录。授权是会话级的，退出即失效——比把两个仓库软链在一起干净得多。</small></p>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：记忆、权限、扩展机制</h2>
+
+        <h3>CLAUDE.md：项目记忆文件</h3>
+        <p><code>/init</code> 生成的 CLAUDE.md 是 Claude Code 的「项目交接文档」：构建命令、代码风格、目录结构、踩过的坑都写在这里，每次会话自动读入。层级有三层：仓库根的 <b>CLAUDE.md</b>（随 git 提交，全队共享）、<b>CLAUDE.local.md</b>（个人版，进 .gitignore）、<b>~/.claude/CLAUDE.md</b>（全局，对所有项目生效）。写得越具体越有用——「用 pnpm 不用 npm」「测试跑 vitest」「提交信息用中文」这种一句话，比一大段空话管用。</p>
+
+        <div class="code">
+          <div class="code-head"><span>记忆文件的三层结构</span><button class="copy" type="button">复制</button></div>
+<pre>~/your-project/CLAUDE.md          <span class="c"># 团队共享，随 git 提交</span>
+~/your-project/CLAUDE.local.md    <span class="c"># 个人补充，进 .gitignore</span>
+~/.claude/CLAUDE.md               <span class="c"># 全局：对所有项目生效</span>
+
+<span class="c"># 记忆文件里还能用 @路径 引入其他文件，拆分维护</span>
+<span class="c"># 详见 @./docs/style-guide.md 这类写法</span></pre>
+        </div>
+
+        <h3>权限模式：Shift+Tab 一键切换</h3>
+        <p>默认模式下，读文件、搜代码自动放行，写文件和跑命令每次弹审批。按 <b>Shift+Tab</b> 会在几个模式之间轮换，每个模式回答同一个问题——「哪些动作不用问你」：</p>
+        <ul>
+          <li><b>default</b>：默认档，写文件、跑命令都弹审批。陌生仓库用它。</li>
+          <li><b>acceptEdits</b>：文件编辑自动接受，跑命令仍要批准。自己常维护的仓库用它。</li>
+          <li><b>plan</b>：计划模式，只读地探索并产出方案，不动任何文件。大改动开工前先待在这里。</li>
+          <li><b>bypassPermissions</b>：全部放行，对应 <code>--dangerously-skip-permissions</code>。只留给容器与一次性环境。</li>
+        </ul>
+        <p>计划模式值得单独说一句：大改动前先进 plan 模式让它出方案，你批准了再动手，试错成本最低。</p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 权限的三种给法</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 会话内随时按 Shift+Tab 轮换模式</span>
+<span class="c"># 启动时直接指定</span>
+claude --permission-mode plan
+
+<span class="c"># 永久放行某些命令（写进 settings.json）</span>
+<span class="prompt">&gt; </span>/permissions</pre>
+        </div>
+
+        <h3>扩展机制：斜杠命令、hooks、subagents、skills</h3>
+        <p>斜杠命令是操作入口（下一节速查表）；<b>hooks</b> 是生命周期钩子，在「每次要跑 shell 前」「每次编辑文件后」这类时机自动执行你的脚本；<b>subagents</b> 是带独立上下文和提示词的子代理（<code>/agents</code> 管理，定义放在 .claude/agents/），适合让「代码审查员」用自己的视角干活，不污染主对话；<b>skills</b>（.claude/skills/）把一套操作流程封装成可复用的技能，用 <code>/skill-name</code> 调用。</p>
+
+        <div class="code">
+          <div class="code-head"><span>.claude/settings.json · hook 示意：编辑后自动格式化</span><button class="copy" type="button">复制</button></div>
+<pre>{
+  <span class="g">"hooks"</span>: {
+    <span class="g">"PostToolUse"</span>: [
+      {
+        <span class="g">"matcher"</span>: <span class="g">"Write|Edit"</span>,
+        <span class="g">"hooks"</span>: [
+          { <span class="g">"type"</span>: <span class="g">"command"</span>, <span class="g">"command"</span>: <span class="g">"npx prettier --write ."</span> }
+        ]
+      }
+    ]
+  }
+}</pre>
+        </div>
+        <small>事件名、matcher 与 stdin 传入的 JSON 结构以官方 Hooks 文档为准；先用最简单的命令验证链路通了再复杂化。</small>
+
+        <div class="code">
+          <div class="code-head"><span>.claude/agents/reviewer.md · 子代理定义示意</span><button class="copy" type="button">复制</button></div>
+<pre>---
+name: reviewer
+description: 严格的代码审查员，审查完主动汇报问题
+tools: Read, Grep, Glob
+---
+
+你是一名资深代码审查员。只报告问题，不修改代码；
+输出按「严重 / 建议 / 风格」三档分组，每条给出文件与行号。</pre>
+        </div>
+        <small>frontmatter 里的 name / description / tools 字段写法以官方 Subagents 文档为准。</small>
+
+        <h3>MCP：把外部工具接进来</h3>
+        <p>通过 Model Context Protocol 可以给它接数据库、浏览器、issue 系统等外部工具：项目级配置写在 <code>.mcp.json</code> 里随仓库共享，<code>/mcp</code> 查看连接状态，<code>claude mcp add</code> 在命令行添加。想让它能看网页、查数据库，走这条路。</p>
+
+        <div class="code">
+          <div class="code-head"><span>.mcp.json · 项目级 MCP 服务器示意</span><button class="copy" type="button">复制</button></div>
+<pre>{
+  <span class="g">"mcpServers"</span>: {
+    <span class="g">"github"</span>: {
+      <span class="g">"command"</span>: <span class="g">"npx"</span>,
+      <span class="g">"args"</span>: [<span class="g">"-y"</span>, <span class="g">"@modelcontextprotocol/server-github"</span>]
+    }
+  }
+}</pre>
+        </div>
+        <small>具体服务器包名与字段以 MCP 官方文档为准；接完用 /mcp 确认连接状态。</small>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 命令行管理 MCP</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 添加（-- 后面是真正的启动命令）</span>
+claude mcp add github -- npx -y @modelcontextprotocol/server-github
+
+<span class="c"># 查看 / 删除</span>
+claude mcp list
+claude mcp remove github</pre>
+        </div>
+
+        <div class="note"><b>版本习惯：</b>Claude Code 迭代很快，隔一阵 <code>claude doctor</code> 体检一次，版本旧了就升级。本页命令以官方文档 code.claude.com/docs 当前版本为准。</div>
+      </section>
+
+      <!-- ===== 05 命令速查 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：四个标签页，忘什么搜什么</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了某个命令叫什么，直接搜 <b>会话</b>、<b>压缩</b>、<b>权限</b> 之类的关键词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索命令、快捷键、文件，比如 compact / plan / CLAUDE.md" aria-label="搜索命令">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">启动参数</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">斜杠命令</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">快捷键</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">配置文件</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">claude</td><td>在当前目录开一个交互会话（REPL）</td></tr>
+                <tr><td class="k">claude "&lt;任务&gt;"</td><td>启动会话并附带一句开场提示词</td></tr>
+                <tr><td class="k">claude -p "&lt;提示&gt;"</td><td>打印模式：单次执行输出结果即退出，适合脚本</td></tr>
+                <tr><td class="k">claude -c</td><td>继续本目录最近一次会话（--continue）</td></tr>
+                <tr><td class="k">claude -r [会话id]</td><td>恢复历史会话；不给 id 弹会话选择器</td></tr>
+                <tr><td class="k">--model &lt;模型&gt;</td><td>指定本次会话模型，也可用 /model 在会话内切</td></tr>
+                <tr><td class="k">--permission-mode plan</td><td>以计划模式启动，只出方案不动手</td></tr>
+                <tr><td class="k">--add-dir &lt;目录&gt;</td><td>额外授权一个工作目录（跨仓库任务用）</td></tr>
+                <tr><td class="k">-p --output-format json</td><td>打印模式输出 JSON / JSONL 事件流，供程序消费</td></tr>
+                <tr><td class="k">--dangerously-skip-permissions</td><td>跳过所有权限审批。只在隔离/可信环境用</td></tr>
+                <tr><td class="k">claude mcp add ...</td><td>命令行添加 MCP 服务器（还有 list / remove）</td></tr>
+                <tr><td class="k">claude doctor</td><td>体检：安装类型、版本、配置健康检查</td></tr>
+                <tr><td class="k">claude agents</td><td>查看后台 Agent 会话的运行状态</td></tr>
+                <tr><td class="k">claude update</td><td>检查并更新到最新版</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">/help</td><td>列出所有命令与说明</td></tr>
+                <tr><td class="k">/init</td><td>分析代码库，生成 CLAUDE.md 项目记忆</td></tr>
+                <tr><td class="k">/clear</td><td>清空上下文开新对话（退出重进也行）</td></tr>
+                <tr><td class="k">/compact [重点]</td><td>压缩历史对话释放上下文，可指定保留什么</td></tr>
+                <tr><td class="k">/model</td><td>切换本次会话的模型</td></tr>
+                <tr><td class="k">/permissions</td><td>查看和管理工具权限规则（允许/询问/拒绝）</td></tr>
+                <tr><td class="k">/resume</td><td>从历史会话列表挑一个接着聊</td></tr>
+                <tr><td class="k">/review</td><td>让 Claude 审查代码（如当前改动或一个 PR）</td></tr>
+                <tr><td class="k">/diff</td><td>查看工作区改动，含 Claude 已做的编辑</td></tr>
+                <tr><td class="k">/context [all]</td><td>可视化上下文占用，给出优化建议</td></tr>
+                <tr><td class="k">/tasks</td><td>查看后台任务与已完成的 subagents</td></tr>
+                <tr><td class="k">/effort</td><td>调整推理力度（low 到 max / auto）</td></tr>
+                <tr><td class="k">/background [提示]</td><td>把当前会话转为后台 Agent，腾出终端</td></tr>
+                <tr><td class="k">/branch / /fork</td><td>分支当前对话试另一方向 / 复制为后台会话</td></tr>
+                <tr><td class="k">/btw</td><td>旁支提问，不进主对话历史</td></tr>
+                <tr><td class="k">/cost</td><td>查看本次会话的 token 用量与花费（/usage 别名）</td></tr>
+                <tr><td class="k">/mcp</td><td>查看已接入的 MCP 服务器与工具状态</td></tr>
+                <tr><td class="k">/agents</td><td>管理 subagents（创建、编辑、启用）</td></tr>
+                <tr><td class="k">/hooks</td><td>管理生命周期钩子</td></tr>
+                <tr><td class="k">/memory</td><td>查看/编辑各层 CLAUDE.md 记忆文件</td></tr>
+                <tr><td class="k">/rewind</td><td>回退到之前的检查点（代码、对话或两者）</td></tr>
+                <tr><td class="k">/add-dir</td><td>会话中临时加入额外工作目录</td></tr>
+                <tr><td class="k">/status</td><td>查看版本、模型、账号、目录等当前状态</td></tr>
+                <tr><td class="k">/config</td><td>打开设置面板（主题、编辑器行为等）</td></tr>
+                <tr><td class="k">/doctor</td><td>会话内的安装健康检查</td></tr>
+                <tr><td class="k">/export</td><td>把当前会话导出为文件或复制到剪贴板</td></tr>
+                <tr><td class="k">/usage</td><td>查看订阅用量与限额</td></tr>
+                <tr><td class="k">/vim</td><td>切换 Vim 编辑模式（/config 里可设默认）</td></tr>
+                <tr><td class="k">/terminal-setup</td><td>为当前终端配置 Shift+Enter 换行支持</td></tr>
+                <tr><td class="k">/bug</td><td>提交问题反馈（可附带会话诊断信息）</td></tr>
+                <tr><td class="k">/login /logout</td><td>切换账号登录态</td></tr>
+                <tr><td class="k">/exit</td><td>退出（别名 /quit）</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>按键</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">Shift+Tab</td><td>轮换权限模式：default → acceptEdits → plan → bypass</td></tr>
+                <tr><td class="k">Esc</td><td>打断当前输出 / 关闭弹窗</td></tr>
+                <tr><td class="k">Esc Esc</td><td>清空当前草稿；输入为空时打开 rewind 回退菜单</td></tr>
+                <tr><td class="k">Ctrl-C</td><td>打断；输入框为空时连按两次退出</td></tr>
+                <tr><td class="k">Ctrl-D</td><td>输入框为空时退出会话</td></tr>
+                <tr><td class="k">Ctrl-O</td><td>打开详细 transcript 视图（工具调用细节）</td></tr>
+                <tr><td class="k">Ctrl-R</td><td>反向搜索输入历史</td></tr>
+                <tr><td class="k">Ctrl-Enter</td><td>立即发送排队的消息，不等当前回合</td></tr>
+                <tr><td class="k">Option+P</td><td>切换模型</td></tr>
+                <tr><td class="k">Option+T</td><td>开关扩展思考（extended thinking）</td></tr>
+                <tr><td class="k">Ctrl-V</td><td>粘贴剪贴板图片（iTerm2 用 Cmd+V，Windows 用 Alt+V）</td></tr>
+                <tr><td class="k">Ctrl-B</td><td>把正在跑的 bash 命令转到后台</td></tr>
+                <tr><td class="k">Ctrl-T</td><td>显示/隐藏任务清单</td></tr>
+                <tr><td class="k">Ctrl-G</td><td>用外部编辑器写长提示词</td></tr>
+                <tr><td class="k">Ctrl-Y / Alt+Y</td><td>粘贴刚删除的文本；Alt+Y 轮换粘贴历史</td></tr>
+                <tr><td class="k">Ctrl-S</td><td>暂存当前草稿，再按恢复</td></tr>
+                <tr><td class="k">Ctrl-Z</td><td>挂起进程（Unix），fg 恢复</td></tr>
+                <tr><td class="k">Ctrl-X Ctrl-K</td><td>3 秒内按两次，停掉所有后台子任务</td></tr>
+                <tr><td class="k">? 空输入时</td><td>开关快捷键帮助面板</td></tr>
+                <tr><td class="k">! 开头</td><td>shell 模式：直接执行命令，输出进入上下文</td></tr>
+                <tr><td class="k">@ 文件路径</td><td>引用文件（带自动补全）</td></tr>
+                <tr><td class="k">\ + Enter</td><td>换行输入；支持的终端也可用 Option+Enter / Shift+Enter</td></tr>
+                <tr><td class="k">↑ / ↓</td><td>翻输入历史 / 在多行输入中移动光标</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>文件 / 目录</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">CLAUDE.md</td><td>仓库根项目记忆：构建命令、代码约定（/init 生成）</td></tr>
+                <tr><td class="k">CLAUDE.local.md</td><td>个人版记忆，加进 .gitignore，不共享给队友</td></tr>
+                <tr><td class="k">~/.claude/CLAUDE.md</td><td>全局记忆，对你所有项目生效</td></tr>
+                <tr><td class="k">.claude/settings.json</td><td>项目共享设置：permissions、hooks、model、env</td></tr>
+                <tr><td class="k">.claude/settings.local.json</td><td>项目个人设置（自动进 .gitignore）</td></tr>
+                <tr><td class="k">~/.claude/settings.json</td><td>用户级全局设置</td></tr>
+                <tr><td class="k">.claude/agents/*.md</td><td>自定义 subagents 定义</td></tr>
+                <tr><td class="k">.claude/skills/</td><td>自定义 skills（每个技能一个目录）</td></tr>
+                <tr><td class="k">.mcp.json</td><td>项目级 MCP 服务器配置，随仓库共享</td></tr>
+                <tr><td class="k">CLAUDE.md 的 @import</td><td>记忆文件里用 @路径 引入其他 md，拆分维护</td></tr>
+                <tr><td class="k">settings.json 的 statusLine</td><td>自定义底部状态栏脚本（显示分支、用量等）</td></tr>
+                <tr><td class="k">managed-settings.json</td><td>企业托管策略，优先级最高（部署见官方文档）</td></tr>
+                <tr><td class="k">~/.claude/</td><td>以上用户级内容的家目录，凭证也在这里</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的内容。换个词试试，比如「会话」「压缩」「权限」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：给一个真实仓库修一个跨文件 bug</h2>
+        <p>走一遍完整闭环：计划 → 实现 → 验证 → 审查 → 提交。这个流程可以直接抄到你手头的项目上。</p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 第一步：开场与计划</span><button class="copy" type="button">复制</button></div>
+<pre>cd ~/your-project
+claude
+
+<span class="prompt">&gt; </span>/init                    <span class="c"># 新仓库先建 CLAUDE.md（做过的跳过）</span>
+<span class="prompt">&gt; </span>用户反馈登录后 token 过期不会自动刷新。
+  先进 plan 模式，读一下 src/auth，给我修复方案</pre>
+        </div>
+
+        <h3>第二步：批准方案，让它动手</h3>
+        <p>方案里的每一条都可以质疑——直接回复「第 2 步换成 X」比事后返工便宜。涉及大范围的改动，动手前先开个分支，改砸了整体回退：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>git checkout -b fix/token-refresh</pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 实现与验证</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 方案确认后切回默认模式，按 Shift+Tab 即可</span>
+<span class="prompt">&gt; </span>按刚才的方案改，改完跑 npm test，全绿再停
+
+<span class="c"># 它会：改相关文件 → 自己跑测试 → 汇报结果</span>
+<span class="prompt">&gt; </span>/diff                     <span class="c"># 亲眼过一遍它改了什么</span></pre>
+        </div>
+
+        <h3>第三步：换个视角审查</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 审查与提交</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>/review                  <span class="c"># 让它审查当前改动</span>
+<span class="prompt">&gt; </span>按审查意见修完，然后帮我写一条符合仓库风格的 commit message</pre>
+        </div>
+
+        <h3>第四步：把审查交给 subagent，主对话保持干净</h3>
+        <p>审查会产生大量「读代码」的上下文，全塞进主对话很浪费。第 04 节定义过 reviewer 子代理，这里派上用场——它的会话独立，只把结论带回主线：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 调用子代理</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>用 reviewer 子代理审查 src/auth 的改动，只报告问题不改代码
+<span class="prompt">&gt; </span>/agents                <span class="c"># 查看和管理已定义的子代理</span></pre>
+        </div>
+
+        <h3>第五步：把这次踩的坑沉淀回 CLAUDE.md</h3>
+        <p>修完一件事，花一分钟把新约定写进记忆文件，下次会话就不用再教一遍：</p>
+        <div class="code">
+          <div class="code-head"><span>CLAUDE.md · 追加一条本次学到的约定</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>把「token 刷新必须走 src/auth/refresh.ts 的统一入口」
+  这条约定追加到 CLAUDE.md，保持原有格式</pre>
+        </div>
+
+        <h3>一次性任务的脚本化</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 打印模式接进脚本</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 不进交互界面，拿结果就走——适合 CI 或批处理</span>
+claude -p <span class="g">"把 CHANGELOG.md 里最近三条版本号整理成 JSON 数组输出"</span> \
+  --output-format json
+
+<span class="c"># CI 里做个检查：新代码里不许出现 TODO</span>
+claude -p <span class="g">"git diff 里有没有新增 TODO？只回答 yes 或 no"</span></pre>
+        </div>
+        <p><small>CI 里跑注意两点：凭证用环境变量注入的方式（以官方 CI 文档为准），并且任务描述里写清「只输出结论」——打印模式的输出会被程序消费，啰嗦的排版是负担。</small></p>
+
+        <div class="note"><b>省 token 的诀窍：</b>任务描述里直接给文件路径和验收标准（「改完跑 npm test」），它就不会满仓库乱逛。上下文涨到几十轮后记得 <b>/compact</b>，或把独立子任务交给 subagent 隔离。</div>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个最常见的翻车点</h2>
+        <p>下面四个坑覆盖了新手问题的绝大多数。每一个都给出自检动作，照做即可绕开。</p>
+
+        <h3>坑一：上下文越长，回答越慢越飘</h3>
+        <p>一个会话里连干五件事，token 涨上去了，质量也会掉。模型开始忘记开头说过的约定、重复问已经确认过的问题，就是征兆。对策是把大任务拆会话：一件事做完就 <code>/clear</code>，接着干下一件；必须延续的用 <code>/compact 保留修改了哪些文件和结论</code> 指定保留重点。</p>
+        <div class="note warn"><b>什么时候必须 /clear：</b>换了一个不相关的新任务时。旧任务的上下文对新任务只有干扰——模型会不停回望前文已经否掉的方案。</div>
+
+        <h3>坑二：一上来就 --dangerously-skip-permissions</h3>
+        <p>这个开关等于把「能不能删文件、能不能跑任意命令」的判断权全交出去。它有真实用途（容器、CI、一次性虚拟机），但放在你天天用的开发机上就是在赌。养成习惯：陌生仓库用默认模式，自己的常维护仓库用 acceptEdits，plan 模式留给大重构。高频放行的命令应该固化成规则，而不是每次手点：</p>
+        <div class="code">
+          <div class="code-head"><span>.claude/settings.json · 权限规则示意</span><button class="copy" type="button">复制</button></div>
+<pre>{
+  <span class="g">"permissions"</span>: {
+    <span class="g">"allow"</span>: [
+      <span class="g">"Bash(npm run test:*)"</span>,
+      <span class="g">"Edit(src/**)"</span>
+    ],
+    <span class="g">"deny"</span>: [
+      <span class="g">"Read(.env)"</span>
+    ]
+  }
+}</pre>
+        </div>
+        <small>规则语法以官方 Settings 文档为准；写完用 /permissions 面板核对是否生效。</small>
+
+        <h3>坑三：CLAUDE.md 写成散文，等于没写</h3>
+        <p>记忆文件的常见死法：团队里谁都能往里加两句，半年后变成一篇没人读的内部维基。定期用 <code>/memory</code> 打开修剪——删掉过期的、合并重复的、把长段落改成条目。</p>
+        <div class="code">
+          <div class="code-head"><span>CLAUDE.md · 对比</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 反面教材：全是愿景</span>
+这是一个现代化的项目，我们追求高质量代码……
+
+<span class="c"># 正面教材：全是可执行约定</span>
+- 包管理用 pnpm，禁止 npm install
+- 测试：pnpm test（vitest），改 src/ 后必须跑
+- 提交信息用中文，格式：模块: 动作</pre>
+        </div>
+        <p><small>记忆文件是给模型看的操作手册，不是给人看的 README。条目式、命令式、有「禁止」字样，效果远好于成段的介绍文字。</small></p>
+
+        <h3>坑四：终端按键没反应</h3>
+        <p>Shift+Enter 换行、图片粘贴这些快捷键跟终端模拟器强相关。iTerm2、WezTerm、Ghostty、Kitty 原生支持 Shift+Enter；Apple Terminal 这类不支持的，会话里跑一次让它帮你配置：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>/terminal-setup    <span class="c"># 为当前终端写入换行键绑定，配置完重启会话</span></pre>
+        </div>
+        <p>Windows 上粘贴图片用 Alt+V（iTerm2 用 Cmd+V）。实在不对劲，<code>claude doctor</code> 加上换一个现代终端，能解决绝大多数「按了没反应」。</p>
+      </section>
+
+      <!-- ===== 08 进阶资源 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与官方资源</h2>
+        <ul>
+          <li><a href="https://code.claude.com/docs" target="_blank" rel="noopener">code.claude.com/docs</a> — 官方文档总站：快速上手、CLI 参考、斜杠命令、设置全在这。</li>
+          <li><a href="https://code.claude.com/docs/en/interactive-mode" target="_blank" rel="noopener">Interactive mode</a> — 快捷键与输入模式的权威清单（本页快捷键表出自这里）。</li>
+          <li><a href="https://code.claude.com/docs/en/slash-commands" target="_blank" rel="noopener">Slash commands</a> — 全部斜杠命令的官方清单。</li>
+          <li><a href="https://code.claude.com/docs/en/common-workflows" target="_blank" rel="noopener">Common workflows</a> — 官方的常见工作流合集，值得逐条过。</li>
+          <li><a href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener">github.com/anthropics/claude-code</a> — 官方仓库：更新日志、示例、issue 区。</li>
+          <li><a href="https://code.claude.com/docs/en/settings" target="_blank" rel="noopener">Settings 文档</a> — settings.json 的权限规则、hooks、环境变量完整写法。</li>
+          <li><a href="https://code.claude.com/docs/en/sub-agents" target="_blank" rel="noopener">Subagents 文档</a> — 自定义子代理的定义格式与调度方式。</li>
+          <li><a href="https://code.claude.com/docs/en/hooks" target="_blank" rel="noopener">Hooks 文档</a> — 生命周期钩子的事件名与配置示例。</li>
+          <li><a href="https://code.claude.com/docs/en/mcp" target="_blank" rel="noopener">MCP 集成</a> — 接入外部 MCP 服务器（数据库、浏览器、issue 等）。</li>
+        </ul>
+        <div class="note"><b>学完本页去哪：</b>把本页 s6 的实战流程在你手头的真实仓库走一遍——工具是练出来的，不是读出来的。然后回头把 <a href="codex.html">Codex 教程</a> 过一遍——同类的 OpenAI 方案，沙箱思路不同；再看看 <a href="skills.html">Skills（技能）</a>，把重复流程沉淀成技能是 Claude Code 进阶最有性价比的一步。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>装完重开了终端，<b>claude --version</b> 能出版本号，<b>claude doctor</b> 无异常</span></label>
+          <label><input type="checkbox" data-key="c2"><span>完成过一次 OAuth 登录，知道自己走的是订阅还是 API 计费</span></label>
+          <label><input type="checkbox" data-key="c3"><span>在真实仓库跑过一次 <b>/init</b>，CLAUDE.md 里写进了至少三条硬约定</span></label>
+          <label><input type="checkbox" data-key="c4"><span>用 Shift+Tab 切过 plan 模式，完整走完「方案 → 批准 → 验证」闭环</span></label>
+          <label><input type="checkbox" data-key="c5"><span>试过 <b>/compact</b> 和 <b>claude -c</b>，知道长会话怎么续、什么时候该 /clear</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="kimi-code.html"><span>← 上一篇</span><b>Kimi Code CLI 教程</b></a>
+        <a class="next" href="codex.html"><span>下一篇 →</span><b>Codex 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 Claude Code 官方文档（code.claude.com/docs：CLI 参考、交互模式、斜杠命令、设置）整理，更新至 2026-11。版本迭代较快，具体命令与行为以 <b>claude --help</b> 与 <b>/help</b> 的当前输出为准。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 本页为独立学习笔记，与 Anthropic 无隶属关系。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

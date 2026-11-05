@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TensorFlow 教程 · AI Code Study</title>
+<meta name="description" content="TensorFlow 上手指南：pip 安装、Keras 3 多后端、Tensor 与 GradientTape、tf.data 管道、Fashion-MNIST CNN 实战、回调与保存部署、避坑与自检清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/tensorflow.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TensorFlow 教程 · AI Code Study">
+<meta property="og:description" content="TensorFlow 上手指南：pip 安装、Keras 3 多后端、Tensor 与 GradientTape、tf.data 管道、Fashion-MNIST CNN 实战、回调与保存部署、避坑与自检清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/tensorflow.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TensorFlow 教程 · AI Code Study">
+<meta name="twitter:description" content="TensorFlow 上手指南：pip 安装、Keras 3 多后端、Tensor 与 GradientTape、tf.data 管道、Fashion-MNIST CNN 实战、回调与保存部署、避坑与自检清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "TensorFlow：从Keras 一行到生产部署",
+  "description": "TensorFlow 上手指南：pip 安装、Keras 3 多后端、Tensor 与 GradientTape、tf.data 管道、Fashion-MNIST CNN 实战、回调与保存部署、避坑与自检清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/tensorflow.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="tensorflow">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml" class="on">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-ml">机器学习框架</a><span>/</span>
+      <b>TensorFlow</b>
+    </nav>
+    <p class="eyebrow">MACHINE LEARNING · <b>TENSORFLOW</b> · Google 的深度学习框架</p>
+    <h1>TensorFlow：从<em>Keras 一行</em>到生产部署</h1>
+    <p class="lede">这页带你把 TensorFlow 2.x 装起来、跑起来：两行 Keras 建模型，一个闭环走完 compile → fit → evaluate → predict，最后用一个 Fashion-MNIST 的 CNN 实战把 EarlyStopping 和 .keras 保存串起来。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/ml-playground</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">pip install tensorflow</span></div>
+        <div class="term-line"><span class="out">Successfully installed <span class="ok">keras-3.15.1 tensorflow-2.21.0</span> …</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">python</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">import tensorflow as tf</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">model = tf.keras.Sequential([tf.keras.layers.Dense(64, activation="relu"), tf.keras.layers.Dense(1)])</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">model.compile("adam", "mse"); model.fit(x, y, epochs=5)</span></div>
+        <div class="term-line"><span class="out">Epoch 5/5 - loss: 0.0231（示意输出）</span> <span class="ok">两行建模型，一行开训</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装与环境</a>
+        <a href="#s3"><span class="idx">03</span>五分钟上手</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>API 速查</a>
+        <a href="#s6"><span class="idx">06</span>实战：Fashion-MNIST</a>
+        <a href="#s7"><span class="idx">07</span>避坑清单</a>
+        <a href="#s8"><span class="idx">08</span>进阶与资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="machine-learning.html">机器学习教程</a>
+        <a href="scikit-learn.html">Scikit-learn 教程</a>
+        <a href="pytorch.html">PyTorch 教程</a>
+        <a href="langchain.html">LangChain 教程</a>
+        <a href="index.html#cat-ml">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装与环境</a>
+          <a href="#s3"><span class="idx">03</span>五分钟上手</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>API 速查</a>
+          <a href="#s6"><span class="idx">06</span>实战：Fashion-MNIST</a>
+          <a href="#s7"><span class="idx">07</span>避坑清单</a>
+          <a href="#s8"><span class="idx">08</span>进阶与资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 它是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>Google 的深度学习框架：Keras 3 时代</h2>
+        <p>TensorFlow 是 Google 开源的深度学习框架，覆盖「定义模型 → 训练 → 保存 → 部署」整条链路。2.x 默认以 <b>eager 执行</b>（写一行、跑一行，跟普通 Python 一样好调试）；从 2.16 起，默认内置的高层 API 就是 <b>Keras 3</b>——同一套 Keras 代码，后端可以换成 TensorFlow、JAX 或 PyTorch。</p>
+        <p>它解决的问题很直接：你不想手写梯度下降和矩阵求导，只想把精力放在模型结构和数据上。用 <code>model.fit()</code> 十行以内就能完成一次完整训练；等模型练好了，<code>.keras</code> 保存、<code>model.export()</code> 导出、TF Serving 上线，路径都是官方铺好的。</p>
+        <p>适合谁：要在生产环境部署模型（TF Serving / LiteRT 移动端）的团队、想用最省事 API 入门深度学习的初学者。如果你的方向是研究、追新论文，PyTorch 生态更主流——两套都值得摸一遍，心智模型是相通的。</p>
+        <p>一句话版本史：1.x 的静态图让无数人吃过「先定义再 run」的苦，2.0 起全面拥抱 eager 执行；2.16 把 Keras 3 推上默认位，打通多后端。现在装 2.x，你拿到的就是「默认即时执行 + Keras 3」的组合。</p>
+        <p>生态位怎么记：训练用 TensorFlow / Keras；部署分两条线——服务器侧 TF Serving 吃 SavedModel，手机与嵌入式端走 LiteRT（原 TF Lite），浏览器里另有 TensorFlow.js。本页聚焦训练主线，部署概念在 s5、s7 里点到为止。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>最新稳定版</dt><dd>2.21.0（2026-11 核对）</dd></div>
+          <div class="fact"><dt>内置 Keras</dt><dd>Keras 3（2.16 起默认）</dd></div>
+          <div class="fact"><dt>开发方</dt><dd>Google，Apache-2.0 开源</dd></div>
+          <div class="fact"><dt>语言</dt><dd>Python（核心为 C++）</dd></div>
+          <div class="fact"><dt>Python 要求</dt><dd>≥ 3.10（2.21 移除了 3.9）</dd></div>
+          <div class="fact"><dt>执行方式</dt><dd>默认 eager，可切换图模式</dd></div>
+          <div class="fact"><dt>GPU 支持</dt><dd>Linux + NVIDIA CUDA（pip 装 [and-cuda]）</dd></div>
+          <div class="fact"><dt>macOS GPU 构建</dt><dd class="no">无——Apple Silicon 只能 CPU 跑</dd></div>
+        </dl>
+
+        <div class="note"><b>Keras 3 的另一层意义：</b>把 <code>import tensorflow as tf</code> 换成 <code>import keras</code>，再用 <code>KERAS_BACKEND=jax</code>（或 torch）切后端，同一份模型代码可以在三个框架之间迁移——写法见第 04 节。对初学者的好处是：学 Keras 这一门 API，背后三个引擎都能用。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：一条 pip 走完，GPU 另说</h2>
+        <p>TensorFlow 2.x 只有一个包名 <code>tensorflow</code>。装完验证 <code>tf.__version__</code> 有输出就说明环境没问题；要不要 GPU，看你的系统和硬件。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">pip 安装（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">Linux + NVIDIA GPU</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">旧代码兼容</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 先升级 pip（TF 对 pip 版本有要求，macOS 要求 pip &gt; 20.3）</span>
+pip install --upgrade pip
+
+<span class="c"># 三个平台通用；macOS 直接装，不需要任何 -macos 后缀包</span>
+pip install tensorflow
+
+<span class="c"># 验证</span>
+python -c <span class="g">"import tensorflow as tf; print(tf.__version__)"</span></pre>
+          </div>
+          <small>2.16 起 <b>tensorflow-macos</b> 这个包已经不需要了，Apple Silicon 上装 <b>tensorflow</b> 本体即可。首次 <code>import tensorflow</code> 会打印一屏日志，属正常现象。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># Linux + NVIDIA 显卡：extra 会带上匹配的 CUDA / cuDNN 运行库</span>
+pip install tensorflow[and-cuda]
+
+<span class="c"># 验证 GPU 是否被认到</span>
+python -c <span class="g">"import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"</span>
+
+<span class="c"># 输出形如 [PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')] 即成功</span></pre>
+          </div>
+          <small>新版本用「hermetic CUDA」方式自带运行库，本机不必再手动装 CUDA Toolkit。如果 WSL2 / Linux 下 GPU 列表为空，先确认驱动，再试试相邻版本（如 2.20）——2.21.0 有已知的 GPU 识别问题（见第 07 节）。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 仓库里是 Keras 2 的老代码：装兼容包，让 tf.keras 走回 Keras 2</span>
+pip install tf_keras
+export TF_USE_LEGACY_KERAS=1
+
+<span class="c"># 或者干脆钉住旧版本（不推荐新项目）</span>
+pip install <span class="g">"tensorflow==2.15.*"</span></pre>
+          </div>
+          <small>2.16 之前的 <code>tf.keras</code> 是 Keras 2 API，与 3.x 在导入方式、保存格式上有差异。老代码能兼容跑就行，新项目一律按 Keras 3 写。</small>
+        </div>
+
+        <div class="note warn"><b>GPU 心理预期先摆正：</b>macOS 没有 GPU 版 TensorFlow，Apple Silicon 只能 CPU 训练（小模型完全够用）；真正的 GPU 加速在 Linux + NVIDIA 上。Windows 用户要么装 Linux/WSL2，要么就用 CPU 把本页所有示例跑完——本页示例数据量都很小，CPU 没问题。</div>
+      </section>
+
+      <!-- ===== 03 五分钟上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>五分钟上手：8 行代码拟一条直线</h2>
+        <p>不碰图像、不碰 GPU，先用最小例子走完「建模型 → compile → fit → predict」闭环：让一个神经元自己学出 <b>y = 2x + 1</b> 里的系数。跑通它，你就跑通了 TensorFlow 90% 的日常形态。</p>
+
+        <div class="code">
+          <div class="code-head"><span>fit_line.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># python fit_line.py —— CPU 上几秒跑完</span>
+import numpy as np
+import tensorflow as tf
+
+x = np.linspace(-1, 1, 200).astype(<span class="g">"float32"</span>)
+y = 2 * x + 1 + 0.05 * np.random.randn(200).astype(<span class="g">"float32"</span>)   <span class="c"># 带噪声的观测</span>
+
+model = tf.keras.Sequential([tf.keras.layers.Dense(1)])            <span class="c"># 一行建模型</span>
+model.compile(optimizer=<span class="g">"sgd"</span>, loss=<span class="g">"mse"</span>)                        <span class="c"># 三要素配齐</span>
+model.fit(x, y, epochs=50, verbose=0)                              <span class="c"># 静默训练</span>
+print(model.predict(tf.constant([0.5]), verbose=0))                <span class="c"># 约 [[2.0]]（示意输出）</span></pre>
+          </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>准备数据</h4><p>numpy 数组直接喂给 Keras，它会自己转成 Tensor。注意 dtype 用 float32——TF 的默认计算精度就是它，float64 会报 dtype 不匹配。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>一行建模型</h4><p><code>Sequential</code> 按顺序堆层。<code>Dense(1)</code> 只有一个神经元：权重 w、偏置 b，正是要学的 2 和 1。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>compile 定三要素</h4><p>优化器怎么走（sgd）、损失怎么算（mse）、要盯什么指标（这次回归任务不需要 metrics）。编译只是配置，不碰数据。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>fit 开训、predict 验收</h4><p><code>fit</code> 里 epochs 是遍历全数据的次数，verbose=0 静音进度条。训完拿 0.5 去问模型，输出接近 <b>[[2.0]]</b>（y = 2×0.5 + 1）就说明学对了。</p></div>
+          </li>
+        </ul>
+
+          <div class="note">想看每轮 loss 就把 verbose 设为 1。第一次 <code>import tensorflow</code> 打的 CUDA 相关 WARNING 不影响 CPU 训练，可以无视；报 <b>dtype 错误</b>大概率是喂了 float64 的 numpy 数据，转成 float32 即可。</div>
+        <p>想亲眼验证学到了什么：训练完调 <code>model.get_weights()</code>，返回数组里 w ≈ 2、b ≈ 1——一个神经元学一条直线，参数刚好看得清清楚楚。</p>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：Tensor、Tape、tf.data 与建模三式</h2>
+
+        <h3>Tensor 与 Variable：数据和参数</h3>
+        <p><b>Tensor</b>（张量）是多维数组的统称，是 TF 里一切数据的容器；它是不可变的，算完产生新张量。<b>Variable</b> 是可训练的张量——模型的权重和偏置都是 Variable，训练器的本质就是每步沿着梯度改它。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt;&gt;&gt; </span>t = tf.constant([[1.0, 2.0], [3.0, 4.0]])   <span class="c"># 不可变张量</span>
+<span class="prompt">&gt;&gt;&gt; </span>v = tf.Variable([[1.0, 2.0]])              <span class="c"># 可训练变量：模型参数就是它</span>
+<span class="prompt">&gt;&gt;&gt; </span>t.shape, t.dtype
+<span class="out">(TensorShape([2, 2]), tf.float32)</span>
+<span class="prompt">&gt;&gt;&gt; </span>t + 10                                      <span class="c"># 运算产生新张量，t 本身不变</span></pre>
+          </div>
+
+        <h3>tf.GradientTape：自动求导</h3>
+        <p>eager 模式下，你在 <code>GradientTape</code> 上下文里做的每一步运算都被录在「磁带」上；出上下文后调 <code>gradient(目标, 变量)</code>，它就沿磁带反推导数。手写训练循环全靠它（第 06 节速查表里给了一整段模板）。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt;&gt;&gt; </span>x = tf.Variable(3.0)
+<span class="prompt">&gt;&gt;&gt; </span>with tf.GradientTape() as tape:
+<span class="prompt">...     </span>y = x ** 2 + 2 * x                       <span class="c"># y = x² + 2x</span>
+<span class="prompt">&gt;&gt;&gt; </span>dy_dx = tape.gradient(y, x)                 <span class="c"># 导数 2x + 2 在 x=3 处</span>
+<span class="prompt">&gt;&gt;&gt; </span>dy_dx.numpy()
+<span class="out">8.0</span></pre>
+          </div>
+
+        <h3>tf.data：把数据变成流水线</h3>
+        <p>数据一多就不能整块塞进内存，<code>tf.data.Dataset</code> 负责把数据变成「边流边喂」的管道：打乱、组批、预处理、预取各一步，链式写完。CPU 准备下一批和 GPU 训练上一批是并行的——<b>prefetch + AUTOTUNE</b> 是官方给的标准姿势，加上后训练速度常有可观提升。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre>ds = tf.data.Dataset.from_tensor_slices((x_train, y_train))   <span class="c"># 切成一条条样本</span>
+ds = ds.shuffle(10000).batch(128).prefetch(tf.data.AUTOTUNE)  <span class="c"># 打乱 → 组批 → 预取</span>
+model.fit(ds, epochs=5)                                       <span class="c"># Dataset 直接当 fit 输入</span></pre>
+          </div>
+
+        <h3>训练闭环与自定义训练循环</h3>
+        <p>Keras 把标准闭环封装成四步：<code>compile</code> 配置 → <code>fit</code> 训练 → <code>evaluate</code> 评估 → <code>predict</code> 推理，90% 的任务到这就够了。但当损失函数复杂到 fit 表达不了（GAN 的对抗损失、多任务联合优化）时，就要用 GradientTape 亲手写循环——这也是理解「训练到底在做什么」的最佳练习。</p>
+        <div class="code">
+          <div class="code-head"><span>custom_loop.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 自定义训练循环：结构永远不变——前向、求梯度、更新</span>
+optimizer = tf.keras.optimizers.Adam(1e-3)
+ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(64)
+
+for epoch in range(10):
+    for xb, yb in ds:
+        with tf.GradientTape() as tape:
+            logits = model(xb, training=True)                <span class="c"># 1 前向</span>
+            loss = tf.keras.losses.sparse_categorical_crossentropy(yb, logits)
+        grads = tape.gradient(loss, model.trainable_variables)           <span class="c"># 2 求梯度</span>
+        optimizer.apply_gradients(zip(grads, model.trainable_variables)) <span class="c"># 3 更新</span>
+    print(f<span class="g">"epoch {epoch} done"</span>)
+
+<span class="c"># fit 自带的进度条、回调、验证集都要自己补；先跑通 fit，再按需下探</span></pre>
+          </div>
+
+        <h3>Keras 建模三式：Sequential / Functional / Subclassing</h3>
+        <p><b>Sequential</b> 适合「一层接一层」的直筒模型（本页 s3、s6 都在用）；<b>Functional</b> 用 <code>Input</code> + 函数式调用拼图，适合多输入多输出、有分支的结构，是工程里最常用的；<b>Subclassing</b> 继承 <code>tf.keras.Model</code> 自己写 <code>call</code>，自由度最高、样板代码也最多。</p>
+        <div class="code">
+          <div class="code-head"><span>subclassed_model.py</span><button class="copy" type="button">复制</button></div>
+<pre>class MyModel(tf.keras.Model):            <span class="c"># 子类化：自由度最高的一式</span>
+    def __init__(self):
+        super().__init__()
+        self.dense = tf.keras.layers.Dense(10)
+
+    def call(self, inputs):               <span class="c"># 定义数据怎么流过模型</span>
+        return self.dense(inputs)
+
+model = MyModel()
+model.build(tf.TensorShape([None, 4]))    <span class="c"># 子类式要先 build 或跑一次才有形状</span></pre>
+          </div>
+        <p><small>选型口诀：直筒用 Sequential，有分叉用 Functional，搞研究要极尽灵活才上 Subclassing。三种方式都接同一套 compile / fit。</small></p>
+      </section>
+
+      <!-- ===== 05 API 速查 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>API 速查：常用的就这几张表</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了某个层、某个损失函数叫什么，直接搜 <b>conv</b>、<b>损失</b>、<b>早停</b>、<b>batch</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索层、损失、回调、数据管道，比如 conv / 早停 / batch" aria-label="搜索 Keras API">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="API 分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">层与模型</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">编译与损失</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">训练回调</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">数据管道</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">tf.keras.Sequential([...])</td><td>按顺序堆层的最简模型容器</td></tr>
+                <tr><td class="k">tf.keras.Input(shape=...)</td><td>声明输入形状，Functional 建模的入口</td></tr>
+                <tr><td class="k">tf.keras.Model(inputs, outputs)</td><td>函数式建模，多输入多输出就用它</td></tr>
+                <tr><td class="k">tf.keras.layers.Dense(64)</td><td>全连接层；activation="relu" 常配</td></tr>
+                <tr><td class="k">tf.keras.layers.Conv2D(32, 3)</td><td>二维卷积层，图像任务主力</td></tr>
+                <tr><td class="k">tf.keras.layers.MaxPooling2D()</td><td>最大池化，卷积后降尺寸</td></tr>
+                <tr><td class="k">tf.keras.layers.Flatten()</td><td>摊平成一维，卷积接全连接的桥</td></tr>
+                <tr><td class="k">tf.keras.layers.Dropout(0.5)</td><td>训练期随机置零一部分激活，抗过拟合</td></tr>
+                <tr><td class="k">tf.keras.layers.BatchNormalization()</td><td>批归一化，深网络稳定训练</td></tr>
+                <tr><td class="k">tf.keras.layers.Embedding(vocab, 16)</td><td>ID 序列转稠密向量，文本任务入口层</td></tr>
+                <tr><td class="k">tf.keras.layers.LSTM(64)</td><td>循环层，序列任务经典选择</td></tr>
+                <tr><td class="k">model.summary()</td><td>打印每层形状与参数量，建模完先看它</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">model.compile(optimizer, loss, metrics)</td><td>配置训练三要素，fit 前必调</td></tr>
+                <tr><td class="k">optimizer="adam"</td><td>字符串简写；细调用 keras.optimizers.Adam(learning_rate=1e-3)</td></tr>
+                <tr><td class="k">optimizer="sgd"</td><td>随机梯度下降；SGD(momentum=0.9) 更稳</td></tr>
+                <tr><td class="k">metrics=["accuracy"]</td><td>fit 过程中顺带计算并汇报的指标列表</td></tr>
+                <tr><td class="k">loss="sparse_categorical_crossentropy"</td><td>整数标签（0~9）的多分类，最常用</td></tr>
+                <tr><td class="k">loss="categorical_crossentropy"</td><td>one-hot 标签的多分类</td></tr>
+                <tr><td class="k">loss="binary_crossentropy"</td><td>二分类，输出层配 Dense(1, activation="sigmoid")</td></tr>
+                <tr><td class="k">loss="mse" / "mae"</td><td>回归：均方误差 / 平均绝对误差</td></tr>
+                <tr><td class="k">model.fit(x, y, epochs, batch_size, validation_split)</td><td>训练主体；validation_split=0.1 划验证集</td></tr>
+                <tr><td class="k">model.evaluate(x_test, y_test)</td><td>测试集评估，返回 loss 与 metrics 列表</td></tr>
+                <tr><td class="k">model.predict(x)</td><td>批量推理，返回预测数组</td></tr>
+                <tr><td class="k">model.save("model.keras")</td><td>全量保存（结构 + 权重 + 优化器状态），load_model 直接恢复</td></tr>
+                <tr><td class="k">model.export("serving_dir")</td><td>导出纯推理 SavedModel 目录，给 TF Serving 用</td></tr>
+                <tr><td class="k">keras.models.load_model("model.keras")</td><td>把 .keras 文件原样加载回来</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>回调</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">keras.callbacks.EarlyStopping(patience=3)</td><td>验证指标不再变好就提前停训</td></tr>
+                <tr><td class="k">…restore_best_weights=True</td><td>早停后自动回滚到历史最优权重，常配</td></tr>
+                <tr><td class="k">keras.callbacks.ModelCheckpoint("best.keras")</td><td>按轮保存；save_best_only=True 只存最优</td></tr>
+                <tr><td class="k">keras.callbacks.TensorBoard(log_dir="logs")</td><td>写训练曲线日志，可视化 loss / accuracy</td></tr>
+                <tr><td class="k">keras.callbacks.ReduceLROnPlateau(factor=0.5)</td><td>验证损失停滞时自动降学习率</td></tr>
+                <tr><td class="k">keras.callbacks.CSVLogger("train.log")</td><td>把每轮指标追加写进 CSV</td></tr>
+                <tr><td class="k">keras.callbacks.LearningRateScheduler(fn)</td><td>按 epoch 手工调学习率，fn 返回新 lr</td></tr>
+                <tr><td class="k">keras.callbacks.TerminateOnNaN()</td><td>loss 变 NaN 立即停训，排障好帮手</td></tr>
+                <tr><td class="k">monitor="val_accuracy"</td><td>回调的通用参数：指定盯哪个指标</td></tr>
+                <tr><td class="k">tensorboard --logdir logs</td><td>命令行起 TensorBoard，浏览器开 localhost:6006</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">tf.data.Dataset.from_tensor_slices((x, y))</td><td>从内存数组建数据集，逐条切片</td></tr>
+                <tr><td class="k">ds.shuffle(buffer_size)</td><td>打乱顺序，buffer 要够大才真乱</td></tr>
+                <tr><td class="k">ds.batch(32)</td><td>把单条样本组成批</td></tr>
+                <tr><td class="k">ds.map(fn)</td><td>逐条变换：归一化、resize、数据增强</td></tr>
+                <tr><td class="k">ds.take(5)</td><td>只取前几条样本，快速试管道用</td></tr>
+                <tr><td class="k">ds.prefetch(tf.data.AUTOTUNE)</td><td>预取下一批，让 CPU 和 GPU 并行</td></tr>
+                <tr><td class="k">ds.cache()</td><td>预处理结果缓存到内存，第二轮起省算力</td></tr>
+                <tr><td class="k">tf.data.AUTOTUNE</td><td>并行度交给运行时自动决定，预取/map 都能用</td></tr>
+                <tr><td class="k">tf.keras.datasets.fashion_mnist.load_data()</td><td>内置数据集，本页 s6 就用它</td></tr>
+                <tr><td class="k">tf.config.list_physical_devices("GPU")</td><td>列出 GPU，验证 CUDA 是否生效</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的 API。换个词试试，比如「conv」「损失」「早停」「batch」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：Fashion-MNIST 的 CNN 训练全程</h2>
+        <p>Fashion-MNIST 是 MNIST 的「换装版」：同样 6 万训练 + 1 万测试、28×28 灰度图、10 类，但换成 T 恤、裤子、鞋、包等服饰，比手写数字难一点，更适合当教学基准。目标：一个几十 KB 参数的小 CNN，CPU 上几分钟内把测试集准确率练到 <b>0.90 左右</b>。</p>
+
+        <h3>第 1 步：数据加载与预处理</h3>
+        <div class="code">
+          <div class="code-head"><span>fashion_mnist.py · 数据</span><button class="copy" type="button">复制</button></div>
+<pre>import tensorflow as tf
+
+<span class="c"># 1) 内置数据集：60000 训练 + 10000 测试，28x28 灰度图，10 类</span>
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
+
+<span class="c"># 2) 归一化到 0~1：像素 0~255 直接喂会让 loss 又大又不稳</span>
+x_train = x_train / 255.0
+x_test = x_test / 255.0
+
+<span class="c"># 3) 加通道维：(60000, 28, 28) -&gt; (60000, 28, 28, 1)，Conv2D 要求 4 维输入</span>
+x_train = x_train[..., tf.newaxis]
+x_test = x_test[..., tf.newaxis]
+
+print(x_train.shape, y_train.shape)   <span class="c"># (60000, 28, 28, 1) (60000,)</span></pre>
+          </div>
+
+        <h3>第 2 步：用 Functional 方式搭 CNN</h3>
+        <div class="code">
+          <div class="code-head"><span>fashion_mnist.py · 模型</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 两轮「卷积 + 池化」提特征，摊平后接全连接出 10 类</span>
+inputs = tf.keras.Input(shape=(28, 28, 1))
+x = tf.keras.layers.Conv2D(32, 3, activation=<span class="g">"relu"</span>)(inputs)
+x = tf.keras.layers.MaxPooling2D()(x)
+x = tf.keras.layers.Conv2D(64, 3, activation=<span class="g">"relu"</span>)(x)
+x = tf.keras.layers.MaxPooling2D()(x)
+x = tf.keras.layers.Flatten()(x)
+x = tf.keras.layers.Dropout(0.4)(x)                       <span class="c"># 小数据集防过拟合</span>
+outputs = tf.keras.layers.Dense(10, activation=<span class="g">"softmax"</span>)(x)
+model = tf.keras.Model(inputs, outputs)
+model.summary()                                           <span class="c"># 先看一眼结构与参数量</span></pre>
+          </div>
+        <p><small>别被 <code>Conv2D(32, 3)</code> 两个数字迷惑：32 是输出通道数，3 是卷积核边长。卷积核在全图上共享，参数量远小于同规模全连接层——这正是 CNN 适合图像的根本原因。</small></p>
+
+        <h3>第 3 步：compile + 回调 + fit</h3>
+        <div class="code">
+          <div class="code-head"><span>fashion_mnist.py · 训练</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 标签是 0~9 整数，用 sparse 前缀的交叉熵</span>
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(1e-3),
+    loss=<span class="g">"sparse_categorical_crossentropy"</span>,
+    metrics=[<span class="g">"accuracy"</span>],
+)
+
+callbacks = [
+    tf.keras.callbacks.EarlyStopping(monitor=<span class="g">"val_accuracy"</span>, patience=3,
+                                     restore_best_weights=True),   <span class="c"># 不再变好就停</span>
+    tf.keras.callbacks.ModelCheckpoint(<span class="g">"best_model.keras"</span>, monitor=<span class="g">"val_accuracy"</span>,
+                                       save_best_only=True),       <span class="c"># 只存最优</span>
+]
+
+history = model.fit(
+    x_train, y_train,
+    epochs=30,                <span class="c"># 上限开大，早停会自己收手</span>
+    batch_size=128,
+    validation_split=0.1,     <span class="c"># 留 10% 训练数据当验证集</span>
+    callbacks=callbacks,
+)</pre>
+          </div>
+        <p><small>fit 返回的 <code>history</code> 是个字典，<code>history.history["val_accuracy"]</code> 就是每轮验证准确率——画曲线就用它。训练尾段常见现象：train accuracy 还在涨、val 停滞甚至回落，EarlyStopping 就是在这个拐点上踩刹车。</small></p>
+
+        <h3>第 4 步：evaluate、predict 与保存</h3>
+        <div class="code">
+          <div class="code-head"><span>fashion_mnist.py · 评估与保存</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 测试集评估（fit 从没见过这 10000 张）</span>
+test_loss, test_acc = model.evaluate(x_test, y_test, verbose=0)
+print(f<span class="g">"测试集准确率：{test_acc:.3f}"</span>)        <span class="c"># 0.90 左右（示意输出）</span>
+
+<span class="c"># 单张预测：predict 返回 10 个概率，取最大者当类别</span>
+import numpy as np
+probs = model.predict(x_test[:3], verbose=0)
+print(probs.argmax(axis=1))                  <span class="c"># [9 2 1]（示意输出）</span>
+
+<span class="c"># 全量保存为 .keras：结构 + 权重 + 优化器状态一起带走</span>
+model.save(<span class="g">"fashion_mnist_cnn.keras"</span>)
+restored = tf.keras.models.load_model(<span class="g">"fashion_mnist_cnn.keras"</span>)</pre>
+          </div>
+
+        <h3>第 5 步：用 TensorBoard 看训练曲线</h3>
+        <div class="code">
+          <div class="code-head"><span>fashion_mnist.py · 日志</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 在第 3 步的 callbacks 列表里追加一项：</span>
+callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=<span class="g">"logs"</span>))
+
+<span class="c"># 训练开跑后，另开一个终端启动看板（浏览器开 http://localhost:6006）：</span>
+<span class="c"># tensorboard --logdir logs —— loss / accuracy 曲线实时刷新</span></pre>
+          </div>
+        <p><small>调参时盯着 val 曲线比盯终端数字直观得多——训练损失继续降、验证曲线抬头的那一眼，就是过拟合的现场。</small></p>
+        <p class="muted"><small>以上准确率与预测数字均为示意输出：CNN 初始化带随机性，同一份代码不同机器的结果会小幅波动。想部署成服务，把 <code>model.save</code> 换成 <code>model.export("serving")</code> 导出 SavedModel，交给 TF Serving 加载即可。</small></p>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：版本、形状、速度与保存</h2>
+
+        <h3>坑一：版本混装，Keras 2 / 3 断代</h3>
+        <p>最常见的环境病：<code>pip install tensorflow</code> 装的是 Keras 3，网上老教程却在用 Keras 2 API，跑起来满屏 <b>AttributeError</b>。2.16 是分水岭：之前 <code>tf.keras</code> 是 Keras 2，之后是 Keras 3。老代码别硬改，用官方兼容层。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>pip uninstall tensorflow-macos     <span class="c"># 2.16 起不再需要，留着会互相打架</span>
+pip install --upgrade --force-reinstall tensorflow
+pip install tf_keras               <span class="c"># Keras 2 兼容包</span>
+export TF_USE_LEGACY_KERAS=1       <span class="c"># 让 tf.keras 指回 Keras 2 行为</span></pre>
+          </div>
+        <div class="note warn"><b>判断方法：</b>出问题时先跑 <code>python -c "import keras; print(keras.__version__)"</code>。版本 3.x 开头就按 Keras 3 语法排查；另外确认同一个虚拟环境里只装了一份 tensorflow——混装 tensorflow、tensorflow-macos、tensorflow-gpu 是历史遗留重灾区。</div>
+
+        <h3>坑二：形状不对、没归一化，loss 不收敛</h3>
+        <p>图像进 Conv2D 必须是 4 维 <b>(批, 高, 宽, 通道)</b>，灰度图的通道维要自己补；像素 0~255 直接喂网络，梯度会被大数值搅得来回震荡。这两件事没做，症状都是「几十个 epoch 了 loss 还在 2 以上」。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 两个修正都齐了再进模型</span>
+x = x.astype("float32") / 255.0     <span class="c"># 归一化</span>
+x = x[..., tf.newaxis]              <span class="c"># (N, 28, 28) -&gt; (N, 28, 28, 1)</span>
+<span class="c"># 标签是整数就配 sparse_categorical_crossentropy；</span>
+<span class="c"># 报 sparse/one-hot 相关错误，八成是损失函数跟标签格式配错了对</span></pre>
+          </div>
+
+        <h3>坑三：训练慢——CPU 全在等数据，或 GPU 没用上</h3>
+        <p>慢有三个惯犯：没建 <code>tf.data</code> 管道（每步都在现场做预处理）、batch 太小（GPU 吃不饱）、GPU 根本没被认到。排查顺序也是这三步。</p>
+        <div class="code">
+          <div class="code-head"><span>python · GPU 排查</span><button class="copy" type="button">复制</button></div>
+<pre>import tensorflow as tf
+print(tf.config.list_physical_devices("GPU"))
+<span class="c"># 空列表 = GPU 没生效。Linux：确认装了 tensorflow[and-cuda]、驱动正常；</span>
+<span class="c"># WSL2：2.21.0 有 GPU 识别问题（见 GitHub issue #113541），可先用 2.20.0</span></pre>
+          </div>
+        <div class="note warn"><b>内存爆了：</b>OOM 多半是 batch_size 太大或数据集整个读进内存。前者调小 batch_size，后者把加载换成 tf.data 的逐条读取 + <code>cache()</code>/<code>prefetch()</code>，别一股脑 <code>np.load</code> 全量进 RAM。</div>
+
+        <h3>坑四：保存了模型，换环境加载报错</h3>
+        <p>两个高频报错都有明确解法：<b>加载 .keras 报 unknown layer</b>——自定义层/子类模型保存时要能被找到（自定义层实现 <code>get_config</code>，加载前先 import 定义它的模块）；<b>分不清两种保存</b>——<code>.keras</code> 是给「继续训练 / Python 里复用」的全量格式，<code>model.export()</code> 导出的是纯推理 SavedModel，只喂给 TF Serving 这类部署工具。</p>
+        <div class="code">
+          <div class="code-head"><span>python · 两条路线别混</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 路线 A：继续训练 / 自己加载推理</span>
+model.save("model.keras")
+m2 = tf.keras.models.load_model("model.keras")
+
+<span class="c"># 路线 B：上 TF Serving / 服务器部署（只含推理图）</span>
+model.export("serving/1")
+<span class="c"># Serving 端按目录号加载：serving/1, serving/2 … 模型版本管理天然成型</span></pre>
+          </div>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶：官方文档与部署路线</h2>
+        <p>本页只覆盖训练主线，下面这些是官方入口，按需取用：</p>
+        <ul>
+          <li><a href="https://www.tensorflow.org/install" target="_blank" rel="noopener">TensorFlow 安装指南</a> —— 各平台、GPU、虚拟环境的权威说法，版本冲突先查这里。</li>
+          <li><a href="https://www.tensorflow.org/tutorials" target="_blank" rel="noopener">官方教程库</a> —— 图像分类、NLP、时序、GAN 等成套的 Colab 教程，比任何二手教程都新。</li>
+          <li><a href="https://keras.io/" target="_blank" rel="noopener">Keras 3 开发者文档</a> —— 多后端说明、层与回调的完整 API、迁移指南都在这里。</li>
+          <li><a href="https://github.com/tensorflow/tensorflow" target="_blank" rel="noopener">GitHub 仓库</a> —— Release Notes 追版本变化（如 2.21 的 CUDA 变更）。</li>
+          <li><a href="https://github.com/tensorflow/serving" target="_blank" rel="noopener">TF Serving</a> —— 把 SavedModel 变成高吞吐推理服务的主流方案。</li>
+          <li><a href="https://github.com/google-ai-edge/LiteRT" target="_blank" rel="noopener">LiteRT（原 TF Lite）</a> —— 手机、嵌入式端部署；2.20 起 TFLite 已整体迁到 LiteRT 项目，新代码别再从 <code>tf.lite</code> 起手。</li>
+        </ul>
+        <div class="note"><b>学完下一步去哪：</b>① 拿同一个 Fashion-MNIST 去 <a href="pytorch.html">PyTorch 教程</a> 写一遍训练循环，对比两套框架的心智模型，理解会深一层；② 需要传统机器学习（表格数据）时回到 <a href="scikit-learn.html">Scikit-learn 教程</a>；③ 想动手部署，TF Serving + Docker 是最小可行路径。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>装完 <b>pip install tensorflow</b>，<b>import tensorflow as tf</b> 后 tf.__version__ 打出 2.2x</span></label>
+          <label><input type="checkbox" data-key="c2"><span>第 03 节的直线拟合跑通，predict 输出接近 <b>[[2.0]]</b></span></label>
+          <label><input type="checkbox" data-key="c3"><span>说得清 Sequential / Functional / Subclassing 各自适用什么结构</span></label>
+          <label><input type="checkbox" data-key="c4"><span>Fashion-MNIST 的 CNN 跑完，EarlyStopping 生效，<b>best_model.keras</b> 已生成，测试集准确率 0.9 左右</span></label>
+          <label><input type="checkbox" data-key="c5"><span>分得清 <b>model.save("x.keras")</b> 与 <b>model.export()</b> 各自给谁用</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="scikit-learn.html"><span>← 上一篇</span><b>Scikit-learn 教程</b></a>
+        <a class="next" href="pytorch.html"><span>下一篇 →</span><b>PyTorch 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 TensorFlow 官方文档（tensorflow.org/install、tensorflow.org/tutorials）与 Keras 3 文档（keras.io）整理，版本信息（TF 2.21、Keras 3.15）核对于 2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 深度学习框架迭代很快，具体 API 与安装参数以官方文档当前版本为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Code Study · AI 编程学习教程</title>
+<meta name="description" content="AI Code Study：21 门中文 AI 教程，覆盖 AI 基础、编码 Agent、开源智能体、机器学习框架、视觉与自动化，每篇都能跟着敲完。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Code Study · AI 编程学习教程">
+<meta property="og:description" content="AI Code Study：21 门中文 AI 教程，覆盖 AI 基础、编码 Agent、开源智能体、机器学习框架、视觉与自动化，每篇都能跟着敲完。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/index.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Code Study · AI 编程学习教程">
+<meta name="twitter:description" content="AI Code Study：21 门中文 AI 教程，覆盖 AI 基础、编码 Agent、开源智能体、机器学习框架、视觉与自动化，每篇都能跟着敲完。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "AI Code Study",
+  "url": "https://ai-code-study.chiguashentan.com/",
+  "description": "AI Code Study：21 门中文 AI 教程，覆盖 AI 基础、编码 Agent、开源智能体、机器学习框架、视觉与自动化，每篇都能跟着敲完。",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://ai-code-study.chiguashentan.com/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "AI Code Study",
+  "url": "https://ai-code-study.chiguashentan.com/"
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="home">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="#cat-basics" class="on">入门基础</a>
+      <a href="#cat-tools">AI 编程工具</a>
+      <a href="#cat-open">开源模型与智能体</a>
+      <a href="#cat-ml">机器学习框架</a>
+      <a href="#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <p class="eyebrow">AI CODE STUDY · <b>21 门教程</b> · 全部可以跟着敲完</p>
+    <h1>从第一行命令，<br>到<em>自己的 AI 应用</em></h1>
+    <p class="lede">像菜鸟教程一样把知识掰开揉碎：AI 基础、编码 Agent、开源模型、机器学习框架、视觉与自动化，五大分类 21 门教程。安装命令可直接复制，每篇结尾有自检清单。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">whoami</span></div>
+        <div class="term-line"><span class="out">learner — 想把 AI 真正用起来的人</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">ls tutorials/ | wc -l</span></div>
+        <div class="term-line"><span class="out">      21 门教程 · 5 大分类 · 从入门到实战</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">cat roadmap.txt</span></div>
+        <div class="term-line"><span class="out">基础 → 编程工具 → 开源智能体 → 框架 → 实战</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">open ai-code-study</span></div>
+        <div class="term-line"><span class="ok">正在进入学习路线… ✓</span> <span class="caret"></span></div>
+      </div>
+    </div>
+
+    <div class="search-row" style="margin-top:-8px">
+      <input id="siteSearch" type="search" placeholder="搜索教程：Claude Code、PyTorch、NLP、Agent…" aria-label="搜索教程">
+      <span class="hint" id="siteCount"></span>
+    </div>
+  </header>
+
+  <!-- ===== 入门基础 ===== -->
+  <section class="cat" id="cat-basics">
+    <p class="cat-idx">01 · BASICS</p>
+    <h2>入门基础</h2>
+    <p class="cat-desc">先把地图看全：AI 到底是什么，Agent 为什么突然火了，需要哪些数学，文本是怎么被机器理解的。</p>
+    <div class="cards">
+      <a class="card" href="ai.html">
+        <span class="num">01</span>
+        <h3>AI（人工智能）教程</h3>
+        <p>AI 是什么、能做什么、怎么开始学：概念、流派、应用全景与学习路线。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+      <a class="card" href="ai-agent.html">
+        <span class="num">02</span>
+        <h3>AI Agent（智能体）教程</h3>
+        <p>让模型自己动手：Agent 的原理、循环、工具调用与主流框架选型。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+      <a class="card" href="ai-math.html">
+        <span class="num">03</span>
+        <h3>AI 数学基础教程</h3>
+        <p>线性代数、概率、微积分——只讲做 AI 用得上的那一部分。</p>
+        <span class="meta">9 节 · 中级</span>
+      </a>
+      <a class="card" href="nlp.html">
+        <span class="num">04</span>
+        <h3>自然语言处理 NLP 教程</h3>
+        <p>从分词、词向量到 Transformer 与大模型，文本处理一条线讲透。</p>
+        <span class="meta">9 节 · 中级</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== AI 编程工具 ===== -->
+  <section class="cat" id="cat-tools">
+    <p class="cat-idx">02 · CODING TOOLS</p>
+    <h2>AI 编程工具</h2>
+    <p class="cat-desc">终端里的编码 Agent 们：装一个进你的仓库，把重复劳动交出去。</p>
+    <div class="cards">
+      <a class="card" href="kimi-code.html">
+        <span class="num">05</span>
+        <h3>Kimi Code CLI 教程</h3>
+        <p>在终端里跑起来的国产编码 Agent，登录、命令、权限一篇上手。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+      <a class="card" href="claude-code.html">
+        <span class="num">06</span>
+        <h3>Claude Code 教程</h3>
+        <p>Anthropic 官方终端编码助手：安装、CLAUDE.md、子代理与钩子。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+      <a class="card" href="codex.html">
+        <span class="num">07</span>
+        <h3>Codex 教程</h3>
+        <p>OpenAI 的编码 Agent：本地 CLI 与云端任务，代码评审与执行。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+      <a class="card" href="opencode.html">
+        <span class="num">08</span>
+        <h3>OpenCode 教程</h3>
+        <p>开源、模型无关的终端编码 Agent，可自托管、可换任意模型。</p>
+        <span class="meta">9 节 · 中级</span>
+      </a>
+      <a class="card" href="vibe-coding.html">
+        <span class="num">09</span>
+        <h3>Vibe Coding 教程</h3>
+        <p>用自然语言把想法聊成产品：方法论、工具链与质量控制。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+      <a class="card" href="skills.html">
+        <span class="num">10</span>
+        <h3>Skills（技能）教程</h3>
+        <p>给 Agent 写技能包：SKILL.md 结构、渐进披露与实战示例。</p>
+        <span class="meta">9 节 · 中级</span>
+      </a>
+      <a class="card" href="ai-coding-agents-compare.html">
+        <span class="num">☆</span>
+        <h3>编码 Agent 选型对比</h3>
+        <p>Claude Code、Codex、Kimi Code、OpenCode、Pi 怎么选？横向对比 + 决策树。</p>
+        <span class="meta">对比 · 导航</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== 开源模型与智能体 ===== -->
+  <section class="cat" id="cat-open">
+    <p class="cat-idx">03 · OPEN MODELS & AGENTS</p>
+    <h2>开源模型与智能体</h2>
+    <p class="cat-desc">把模型搬到自己电脑上，用开源骨架搭自己的智能体。</p>
+    <div class="cards">
+      <a class="card" href="ollama.html">
+        <span class="num">11</span>
+        <h3>Ollama 教程</h3>
+        <p>一条命令在自己电脑上跑大模型：安装、模型管理、API 与本地部署。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+      <a class="card" href="hermes-agent.html">
+        <span class="num">12</span>
+        <h3>Hermes Agent 教程</h3>
+        <p>开源智能体框架上手：架构、配置与第一个自动任务。</p>
+        <span class="meta">9 节 · 进阶</span>
+      </a>
+      <a class="card" href="deepseek-harness.html">
+        <span class="num">13</span>
+        <h3>DeepSeek Harness 教程</h3>
+        <p>给 DeepSeek 模型套上执行骨架：环境、评测与 Agent 化用法。</p>
+        <span class="meta">9 节 · 进阶</span>
+      </a>
+      <a class="card" href="pi-agent.html">
+        <span class="num">14</span>
+        <h3>Pi Agent 教程</h3>
+        <p>极简编码 Agent 的设计与使用：小内核、大扩展。</p>
+        <span class="meta">9 节 · 进阶</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== 机器学习框架 ===== -->
+  <section class="cat" id="cat-ml">
+    <p class="cat-idx">04 · MACHINE LEARNING</p>
+    <h2>机器学习框架</h2>
+    <p class="cat-desc">从传统机器学习到深度学习，再到用 LLM 搭应用——框架一个个过。</p>
+    <div class="cards">
+      <a class="card" href="machine-learning.html">
+        <span class="num">15</span>
+        <h3>机器学习教程</h3>
+        <p>从数据到模型：监督/无监督、训练评估、特征工程全景图。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+      <a class="card" href="scikit-learn.html">
+        <span class="num">16</span>
+        <h3>Scikit-learn 教程</h3>
+        <p>Python 机器学习标准库：fit/predict、Pipeline 与模型选择。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+      <a class="card" href="tensorflow.html">
+        <span class="num">17</span>
+        <h3>TensorFlow 教程</h3>
+        <p>Google 的深度学习框架：Keras 高层 API、训练与部署一条龙。</p>
+        <span class="meta">9 节 · 中级</span>
+      </a>
+      <a class="card" href="pytorch.html">
+        <span class="num">18</span>
+        <h3>PyTorch 教程</h3>
+        <p>研究者最爱的动态图框架：Tensor、autograd、nn 模块与训练循环。</p>
+        <span class="meta">9 节 · 中级</span>
+      </a>
+      <a class="card" href="langchain.html">
+        <span class="num">19</span>
+        <h3>LangChain 教程</h3>
+        <p>用链、组件与 LangGraph 编排 LLM 应用：RAG、工具与记忆。</p>
+        <span class="meta">9 节 · 中级</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== 视觉与自动化 ===== -->
+  <section class="cat" id="cat-vision">
+    <p class="cat-idx">05 · VISION & AUTOMATION</p>
+    <h2>视觉与自动化</h2>
+    <p class="cat-desc">让程序看见图像、替你操作浏览器。</p>
+    <div class="cards">
+      <a class="card" href="opencv.html">
+        <span class="num">20</span>
+        <h3>OpenCV 教程</h3>
+        <p>计算机视觉第一课：图像读写、滤波、边缘检测与目标跟踪。</p>
+        <span class="meta">9 节 · 中级</span>
+      </a>
+      <a class="card" href="selenium.html">
+        <span class="num">21</span>
+        <h3>Selenium 教程</h3>
+        <p>浏览器自动化与爬虫测试：定位、等待、Page Object 与无头模式。</p>
+        <span class="meta">9 节 · 入门</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <p>AI Code Study · 21 门教程 · 内容依据各项目官方文档与仓库整理，更新于 2026-11。</p>
+    <p class="site-foot"><a href="#cat-basics">回到顶部</a> · 各教程页脚附原始资料链接；版本迭代快，具体以官方文档为准。</p>
+  </footer>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

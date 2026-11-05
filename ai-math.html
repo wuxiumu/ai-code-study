@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 数学基础教程 · AI Code Study</title>
+<meta name="description" content="AI 数学基础入门：线性代数、概率统计、微积分三块最少必要知识，配 numpy/torch 可运行代码，手写反向传播，2026-11 更新。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/ai-math.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI 数学基础教程 · AI Code Study">
+<meta property="og:description" content="AI 数学基础入门：线性代数、概率统计、微积分三块最少必要知识，配 numpy/torch 可运行代码，手写反向传播，2026-11 更新。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/ai-math.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI 数学基础教程 · AI Code Study">
+<meta name="twitter:description" content="AI 数学基础入门：线性代数、概率统计、微积分三块最少必要知识，配 numpy/torch 可运行代码，手写反向传播，2026-11 更新。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "AI 的数学地基：三个最少必要知识块",
+  "description": "AI 数学基础入门：线性代数、概率统计、微积分三块最少必要知识，配 numpy/torch 可运行代码，手写反向传播，2026-11 更新。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/ai-math.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="ai-math">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics" class="on">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-basics">入门基础</a><span>/</span>
+      <b>AI 数学基础</b>
+    </nav>
+    <p class="eyebrow">BASICS · <b>MATH FOR AI</b> · 只讲用得上的数学</p>
+    <h1>AI 的数学地基：三个<em>最少必要</em>知识块</h1>
+    <p class="lede">线性代数、概率统计、微积分——每块只留模型代码里真正出现的部分。读完你能看懂 softmax、交叉熵、梯度下降这些词到底在说什么，并且每一行公式都有对应的 Python 可以亲手跑。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">python3 — numpy</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">import numpy as np</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">v = np.array([2.0, 1.0, 0.1]); w = np.array([1.0, 3.0, 0.5])</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">float(v @ w)</span></div>
+        <div class="term-line"><span class="out">5.05</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">x = np.array([2.0, 1.0, 0.1]); t = 0.7</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">e = np.exp((x - x.max()) / t); p = e / e.sum()</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">p.round(3)</span></div>
+        <div class="term-line"><span class="ok">array([0.766, 0.184, 0.051]) — 三个数变成一组概率，和为 1.0</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>三块地图</a>
+        <a href="#s2"><span class="idx">02</span>环境准备</a>
+        <a href="#s3"><span class="idx">03</span>十分钟热身</a>
+        <a href="#s4"><span class="idx">04</span>线代 · 概率 · 微积分</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战：手写小网络</a>
+        <a href="#s7"><span class="idx">07</span>避坑</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="ai.html">AI 人工智能</a>
+        <a href="ai-agent.html">AI Agent</a>
+        <a href="nlp.html">自然语言处理 NLP</a>
+        <a href="index.html#cat-basics">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>三块地图</a>
+          <a href="#s2"><span class="idx">02</span>环境准备</a>
+          <a href="#s3"><span class="idx">03</span>十分钟热身</a>
+          <a href="#s4"><span class="idx">04</span>线代 · 概率 · 微积分</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战：手写小网络</a>
+          <a href="#s7"><span class="idx">07</span>避坑</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>先画地图：AI 用的数学，核心就三块</h2>
+        <p>把深度学习拆开看，每一行模型代码背后只有三类数学在干活。<b>线性代数</b>管「数据怎么摆」——模型里所有东西（一段文本、一张图片、一批样本）都被摆成向量或矩阵，运算基本就是矩阵乘法。<b>概率统计</b>管「模型怎么表达不确定」——模型最后吐出的几乎总是一个分布，训练目标也是某种概率代价。<b>微积分</b>管「参数怎么改」——梯度、链式法则、梯度下降，全在这一块。</p>
+        <p>好消息是：不需要把大学教材从头啃一遍。下表是每块里真正会被模型代码用到的最小集合，按这个集合学，一周就有手感；集合之外的部分（证明、测度论、凸优化），等真的需要了再回来补也完全来得及。</p>
+        <p>这一页的用法建议（照着做效率最高）：</p>
+        <ul>
+          <li><b>按顺序读</b>：三块是层层依赖的——不懂点积就看不懂注意力，不懂链式法则就看不懂反向传播。</li>
+          <li><b>边读边跑</b>：每个代码块都完整可复制，REPL 里亲手敲一遍比看十遍记得牢。</li>
+          <li><b>速查表当词典</b>：读别的教程卡在符号上时，回这里搜一下就走。</li>
+          <li><b>第 06 节是毕业考</b>：手写反向传播跑通了，这一页的任务才算完成。</li>
+        </ul>
+
+        <dl class="facts">
+          <div class="fact"><dt>线性代数要留的</dt><dd>向量 / 矩阵 / 矩阵乘法 / 点积 / 特征向量</dd></div>
+          <div class="fact"><dt>概率统计要留的</dt><dd>条件概率 / 贝叶斯 / 分布 / 交叉熵 / softmax</dd></div>
+          <div class="fact"><dt>微积分要留的</dt><dd>导数 / 链式法则 / 梯度下降 / 学习率</dd></div>
+          <div class="fact"><dt>起点要求</dt><dd>高中数学 + 会一点 Python</dd></div>
+          <div class="fact"><dt>载体语言</dt><dd>numpy 数组（本页）与 torch 张量（API 对应）</dd></div>
+          <div class="fact"><dt>学完能看懂</dt><dd>nn.Linear、temperature、cross entropy、lr、backward</dd></div>
+          <div class="fact"><dt>学完能做</dt><dd>读懂模型代码的张量运算，手推两层网络的反向传播</dd></div>
+          <div class="fact"><dt>本页不覆盖</dt><dd class="no">测度论概率、凸优化证明、信息论推导</dd></div>
+        </dl>
+
+        <div class="note"><b>三块怎么配合：</b>看一个 Transformer 的单次前向——注意力打分是 query 和 key 的<b>点积</b>（线代），输出层是 <b>softmax</b> 分布、训练目标是<b>交叉熵</b>（概率），整个模型靠<b>反向传播 + 梯度下降</b>更新（微积分）。下面每一节都围绕这张地图展开，讲一块就跑一块。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>环境准备：装 numpy 就够，torch 可选</h2>
+        <p>本页所有例子只依赖 numpy；PyTorch 用来对照同一段数学在框架里长什么样，装不装都不影响阅读。建议用虚拟环境，别往系统 Python 里硬塞。</p>
+        <p>numpy 对版本没有特别要求，装新版即可；本页输出基于 Python 3.12 + NumPy 2.5 实测，不同小版本的打印格式可能有细微差别（比如 numpy 2.x 的标量会显示成 <code>np.float64(…)</code>），数值本身一致。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">venv + pip（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">uv</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">Notebook / Colab</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 1) 建一个独立环境，不污染系统 Python</span>
+python3 -m venv .venv
+source .venv/bin/activate      <span class="c"># Windows 是 .venv\Scripts\activate</span>
+
+<span class="c"># 2) 本页主力，只有它也够跑完全部例子</span>
+pip install numpy
+python -c <span class="g">"import numpy; print(numpy.__version__)"</span>
+
+<span class="c"># 3) 可选：想对照 PyTorch 再装（CPU 版即可入门）</span>
+pip install torch</pre>
+          </div>
+          <small>torch 的 GPU（CUDA）版本安装命令因平台、显卡驱动而异，以 <b>pytorch.org</b> 首页生成的命令为准。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># uv 更快：一行建环境，装包几乎无感</span>
+uv venv
+source .venv/bin/activate
+
+uv pip install numpy
+uv pip install torch          <span class="c"># 可选</span></pre>
+          </div>
+          <small>uv 是 Rust 写的 Python 包管理器，命令与 pip 大体对应，把 <b>pip install</b> 换成 <b>uv pip install</b> 即可；旧系统装不了 uv，退回 venv + pip，效果相同。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 本地 Jupyter：每个单元格就是一段 python3，改一个数立刻看到结果</span>
+pip install notebook
+jupyter lab
+
+<span class="c"># 或者什么都不装：浏览器打开 Google Colab，</span>
+<span class="c"># numpy / torch 都已预装，格子里的 &gt;&gt;&gt; 演示可以直接照抄</span></pre>
+          </div>
+          <small>学数学类内容强烈建议用 Notebook：公式、代码、输出放在一起，来回改参数试感觉。</small>
+        </div>
+
+        <div class="note warn"><b>装完先验货：</b>在新终端里 <b>python -c "import numpy; print(numpy.__version__)"</b>，能出版本号才算数。torch 包有数百 MB，第一次安装慢属正常；如果 import 报 ModuleNotFoundError，多半是没进虚拟环境，先 <b>source .venv/bin/activate</b>。</div>
+      </section>
+
+      <!-- ===== 03 快速上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>十分钟热身：向量、矩阵与第一个 softmax</h2>
+        <p>不求全，只求把后面反复出现的三件东西先跑通：向量、矩阵乘法、softmax。复制进 REPL 或 Notebook，逐行看输出。</p>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · warmup.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> numpy <span class="g">as</span> np
+
+<span class="c"># 向量：一摞有序的数，模型里几乎所有东西的形态</span>
+v = np.array([1.0, 2.0, 3.0])
+print(v.shape)                 <span class="c"># (3,)</span>
+
+<span class="c"># 矩阵乘法：把同一个「变换」批量作用到一摞列向量上</span>
+A = np.array([[1.0, 0.0],
+              [0.0, 2.0]])     <span class="c"># 对角阵：x 不动，y 翻倍</span>
+V = np.array([[1.0, 2.0],
+              [3.0, 4.0]])     <span class="c"># 两列 = 两个被变换的向量</span>
+print(A @ V)
+<span class="c"># [[1. 2.]</span>
+<span class="c">#  [6. 8.]]</span>
+
+<span class="c"># 第一个 softmax：任意一组数 → 和为 1 的概率分布</span>
+<span class="g">def</span> softmax(x, t=1.0):
+    e = np.exp((x - x.max()) / t)   <span class="c"># 减 max 防溢出；除以 t 是温度</span>
+    <span class="g">return</span> e / e.sum()
+
+print(softmax(np.array([2.0, 1.0, 0.1])).round(3))
+<span class="c"># [0.659 0.242 0.099]</span></pre>
+          </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>先看 shape，再谈运算</h4><p>90% 的 numpy 报错是形状对不上。任何一行写完先 <code>print(x.shape)</code>，脑子里的形状和代码里的形状一致了，运算自然对。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>@ 是「批量变换」</h4><p><code>A @ V</code> 一次变换了 V 的两列——这就是「矩阵乘法为什么存在」的答案：它天生就是为了批量处理而发明的记号。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>softmax 三行写完</h4><p>exp 归一化之前先减 <code>x.max()</code>，结果数学上完全等价但数值稳定——这是全行业通用的行规，第 07 节解释为什么。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>用 torch 对齐验证</h4><p><code>torch.softmax(torch.tensor([2., 1., 0.1]), dim=-1)</code> 应给出同样三个数。两边能对上，说明你理解的数学是对的。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">这三件事就是后面一切的原料：矩阵乘法负责<b>前向</b>，softmax 负责<b>输出</b>，shape 检查负责你的血压。接下来第 04 节把三个知识块的原理一次讲透。</div>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 把热身代码存成 warmup.py 运行</span><button class="copy" type="button">复制</button></div>
+<pre>$ python warmup.py
+(3,)
+[[1. 2.]
+ [6. 8.]]
+[0.659 0.242 0.099]</pre>
+          </div>
+          <small>三段输出分别对应：向量形状、批量变换、概率分布。</small>
+
+        <h3>顺手对齐一遍 PyTorch</h3>
+        <div class="code">
+          <div class="code-head"><span>python3 · torch 对照</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> torch
+
+logits = torch.tensor([2.0, 1.0, 0.1])
+print(torch.softmax(logits, dim=-1))
+<span class="c"># tensor([0.6590, 0.2418, 0.0992])：与 numpy 版完全一致</span>
+print(torch.softmax(logits / 0.7, dim=-1))
+<span class="c"># tensor([0.7658, 0.1835, 0.0507])：温度 0.7，第一类更敢押注</span></pre>
+          </div>
+          <small>numpy 与 torch 的 API 命名几乎一一对应，学会一个另一个看文档就会。后续小节同理，不再重复对照。</small>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>三个知识块：每块只留模型代码里真正出现的部分</h2>
+
+        <h3>线性代数：向量、矩阵与「批量变换」</h3>
+        <p>向量就是一排有序的数：一个词的嵌入是向量，一句话（token 序列）摆成矩阵，一批样本再摞成更高维的张量——模型世界里没有「一段文字」「一张图」，只有数组。矩阵乘法 <code>A @ V</code> 的直观读法是：<b>A 是一台变换机器，V 的每一列是一个输入，乘一次等于把所有输入一起变完</b>。深度学习的「前向传播」，本质就是一长串矩阵乘法连着做，中间夹着逐元素的非线性函数。</p>
+        <p>点积是线代里出场率最高的运算：两个同长向量对应相乘再求和，结果越大方向越一致。把向量先除以自身长度（归一化）再做点积，得到的就是夹角余弦：1 表示同向、0 表示垂直。<b>注意力机制的底座就是这一下</b>——query 和每个 key 算相关度，分数高的词多分一点注意力。特征向量则是「矩阵作用后方向不变」的特殊方向（<code>A v = λv</code>），直觉上是被变换机器偏爱的方向：PCA 降维、谱方法都在找它们。</p>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · linear_algebra.py</span><button class="copy" type="button">复制</button></div>
+<pre>A = np.diag([2.0, 3.0])            <span class="c"># 变换机器：x 放大 2 倍，y 放大 3 倍</span>
+v = np.array([1.0, 1.0])
+print(A @ v)                       <span class="c"># [2. 3.]：一次乘法，批量变换</span>
+
+u = np.array([1.0, 0.0, 1.0]); w = np.array([1.0, 1.0, 0.0])
+cos = u @ w / (np.linalg.norm(u) * np.linalg.norm(w))
+print(cos.round(3))                <span class="c"># 0.5：夹角 60°，方向只算半像</span>
+
+vals, vecs = np.linalg.eig(A)      <span class="c"># 特征向量：变换后方向不变的方向</span>
+print(vals)                        <span class="c"># [2. 3.]：坐标轴本身就是它的特征向量</span></pre>
+          </div>
+
+        <p>把「矩阵的一行 = 一个神经元的权重」这个视角接回模型代码：神经网络的<b>全连接层</b>（<code>nn.Linear(4, 2)</code>）本质就是一次矩阵乘法加一个偏置，<code>x @ W + b</code>，没有任何多余的东西：</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · linear_layer.py</span><button class="copy" type="button">复制</button></div>
+<pre>x = np.array([[1.0, 2.0, 3.0, 4.0]])               <span class="c"># 一个样本，4 维</span>
+W = np.arange(8, dtype=float).reshape(4, 2) / 10   <span class="c"># 4 个输入 × 2 个神经元</span>
+b = np.array([0.1, -0.1])
+print(x @ W + b)
+<span class="c"># [[4.1 4.9]]：这就是 nn.Linear 的全部数学</span></pre>
+          </div>
+        <p>更高维同理：卷积是「局部小矩阵乘」，注意力是「带权重的矩阵乘」——记住 <code>x @ W + b</code>，模型里的每一层都是它的变奏。</p>
+        <p><small>特征向量暂时用不上别慌：它在本页的角色是「看懂 PCA 降维和谱方法的直觉」。做 AI 前两年你可能一次都不手算它，但读论文遇到「主成分」「谱聚类」时，想起「找矩阵偏爱的方向」就够了。</small></p>
+
+        <h3>概率统计：模型输出的语言</h3>
+        <p>条件概率 P(A|B) 回答「已知 B 时，A 多大概率」；把它倒过来推就是<b>贝叶斯公式</b> <code>P(B|A) = P(A|B)·P(B) / P(A)</code>——知道「有病的人里多少比例验出阳性」，可以反推「验出阳性的人里多少真有病」。垃圾邮件过滤、医学检测、贝叶斯优化，骨架都是这一行。常见分布记两个就够：<b>伯努利</b>管「是 / 否」（分类标签），<b>高斯</b>管「连续测量」（权重初始化 <code>rng.normal</code> 的默认来源）。</p>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · bayes.py</span><button class="copy" type="button">复制</button></div>
+<pre>p_dis = 0.01                 <span class="c"># 患病率 P(D)：基础率</span>
+p_pos_dis = 0.99             <span class="c"># 敏感度 P(+|D)：有病的人 99% 验出阳性</span>
+p_pos_ok = 0.05              <span class="c"># 假阳性 P(+|健康)：健康人也有 5% 阳性</span>
+p_pos = p_dis * p_pos_dis + (1 - p_dis) * p_pos_ok
+print(p_dis * p_pos_dis / p_pos)     <span class="c"># 贝叶斯公式逐项代入</span>
+<span class="c"># 0.1666…：阳性结果里只有约 1/6 真有病</span></pre>
+          </div>
+          <p><small>「检测很准」和「你有病」是两回事——基础率越低，假阳性占的比重越大。垃圾邮件过滤、异常检测都要过这道坎。</small></p>
+        <p><b>交叉熵就是「猜错有多大代价」</b>：<code>−Σ yᵢ·log pᵢ</code>，真实类别上模型给的概率越低，代价越大。押对 70% 代价 0.357，只剩 10% 代价 2.303——对数把「错得离谱」惩罚得极重，这就是它当损失函数的原因。它的搭档是 softmax + <b>温度</b>：softmax 把一组打分变成概率分布，除以温度 t 控制分布的尖平；大模型生成文本时的 temperature 参数就是它——t 调小输出保守确定，t 调大天马行空。</p>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · probability.py</span><button class="copy" type="button">复制</button></div>
+<pre>p = np.array([0.7, 0.2, 0.1])          <span class="c"># 模型给出的预测分布</span>
+y1 = np.array([1, 0, 0]); y3 = np.array([0, 0, 1])
+print((-np.sum(y1 * np.log(p))).round(3))   <span class="c"># 0.357：押对了，代价小</span>
+print((-np.sum(y3 * np.log(p))).round(3))   <span class="c"># 2.303：押错到只剩 10%，代价大</span>
+
+x = np.array([3.0, 2.0, 0.5])
+<span class="g">for</span> t <span class="g">in</span> (0.5, 1.0, 2.0):
+    e = np.exp((x - x.max()) / t)
+    print(t, (e / e.sum()).round(2))
+<span class="c"># 0.5 [0.88 0.12 0.01]   温度越低分布越尖：0.88 → 0.69 → 0.53</span>
+<span class="c"># 1.0 [0.69 0.25 0.06]</span>
+<span class="c"># 2.0 [0.53 0.32 0.15]</span></pre>
+          </div>
+
+        <div class="note"><b>选哪个损失：</b>分类任务（输出是概率分布）用<b>交叉熵</b>，回归任务（输出是连续值）用 <b>MSE</b>。硬背没意思，本质是「输出服从什么分布，就用对应的极大似然损失」——这条原则后面学任何新损失都套得上。</div>
+          <p><small>顺带认识<b>熵</b> H(p)——分布自身的不确定性，也是交叉熵的前半截：</small></p>
+          <div class="code">
+            <div class="code-head"><span>python3 · entropy.py</span><button class="copy" type="button">复制</button></div>
+<pre>p = np.array([0.5, 0.5])
+print(-(p * np.log(p)).sum())     <span class="c"># 0.6931：五五开，最拿不准</span>
+q = np.array([0.99, 0.01])
+print(-(q * np.log(q)).sum())     <span class="c"># 0.0560：快确定了，熵很小</span></pre>
+            </div>
+
+        <h3>微积分：导数、链式法则与梯度下降</h3>
+        <p>导数回答「x 动一点，y 动多少」，几何上就是斜率。多个参数时对每个参数各求一次偏导，排成向量就是<b>梯度 ∇f</b>，指向上升最快的方向；训练要下降，所以每步沿负梯度走：<code>w ← w − lr·∇f</code>，这就是<b>梯度下降</b>。<b>学习率 lr</b> 是唯一的驾驶参数：太大会在碗壁之间来回震荡甚至飞成 NaN，太小则半天挪不动。</p>
+        <p>为什么需要<b>链式法则</b>？因为网络是嵌套函数 <code>y = f(g(h(x)))</code>：损失在最外层，参数在最内层，梯度只能一层层乘回来（f′·g′·h′）。「逐层乘回来」这套算法就是<b>反向传播</b>——第 06 节的手写实现里，你会看到它每一层长什么样。tanh 的导数是 <code>1 − tanh²</code>，sigmoid 的是 <code>σ(1−σ)</code>，这两个式子手推网络时天天用。</p>
+        <p>torch 的 autograd 把这套「逐层乘回来」自动化：你只需声明哪些张量需要梯度，<code>backward()</code> 会沿着计算图把整条链算完：</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · autograd.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> torch
+
+x = torch.tensor(2.0, requires_grad=<span class="g">True</span>)
+y = (x - 3) ** 2            <span class="c"># 同一只碗</span>
+y.backward()                <span class="c"># 自动求导：链式法则全自动</span>
+print(x.grad)               <span class="c"># tensor(-2.)：和手推的 2*(2-3) 一致</span></pre>
+          </div>
+          <p><small>以后写完任何手推梯度，都可以用第 03 节的中心差分对拍一遍——<b>数值梯度</b>是<b>解析梯度</b>的廉价验算器，这一招叫梯度检查（gradient check），是写自定义层的标准保险。</small></p>
+
+        <div class="code">
+          <div class="code-head"><span>python3 · calculus.py</span><button class="copy" type="button">复制</button></div>
+<pre>f  = <span class="g">lambda</span> x: (x - 3) ** 2          <span class="c"># 一只碗</span>
+df = <span class="g">lambda</span> x: 2 * (x - 3)          <span class="c"># 导数 = 斜率</span>
+
+h = 1e-6                            <span class="c"># 数值导数验算：中心差分</span>
+print((f(2.0 + h) - f(2.0 - h)) / (2 * h))
+<span class="c"># -2.0000000001…，真实导数正是 -2</span>
+
+x = 0.0                             <span class="c"># 梯度下降：沿负梯度滚到碗底</span>
+<span class="g">for</span> _ <span class="g">in</span> range(60):
+    x -= 0.1 * df(x)                <span class="c"># lr = 0.1</span>
+print(x)                            <span class="c"># 2.9999954…：基本到底了</span></pre>
+          </div>
+
+        <h3>三块在一次训练步里如何分工</h3>
+        <p>把三块拼回一次真实的训练迭代，分工一目了然——第 06 节会把这三行扩成 30 行完整代码：</p>
+
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>前向传播</dt><dd style="color:var(--ink-2)">线性代数：一摞矩阵乘法把输入算成预测（X @ W1 + b1 …）</dd></div>
+          <div class="fact"><dt>计算损失</dt><dd style="color:var(--ink-2)">概率统计：softmax 把输出变成分布，交叉熵量化「错了多少」</dd></div>
+          <div class="fact"><dt>反向传播</dt><dd style="color:var(--ink-2)">微积分：链式法则把误差逐层乘回每个参数</dd></div>
+          <div class="fact"><dt>参数更新</dt><dd style="color:var(--ink-2)">还是微积分：梯度下降沿负梯度走一步，学习率决定步幅</dd></div>
+        </dl>
+        <p>同一个循环在训练里有一堆名字：SGD、optimizer.step()、backward() + step()——名字在变，骨架永远是「前向 → 损失 → 反向 → 更新」这四拍。第 06 节会把这四拍一次写全。</p>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：符号、API、损失、求导</h2>
+        <p class="muted" style="font-size:14px">这一节当词典用。忘了符号含义、numpy 函数名、温度采样怎么写，直接在下面搜——中英文关键词都能搜到。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索符号、函数、概念，比如 点积 / softmax / 梯度" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="数学速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">必会符号</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">线代运算（numpy）</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">概率与损失</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">求导与优化</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>符号</th><th>含义</th></tr></thead>
+              <tbody>
+                <tr><td class="k">x ∈ ℝⁿ</td><td>一个 n 维向量，比如 3 个数排成一排</td></tr>
+                <tr><td class="k">xᵢ</td><td>向量的第 i 个分量（公式里从 1 数，代码里从 0 数）</td></tr>
+                <tr><td class="k">‖x‖</td><td>向量长度（L2 范数）：各分量平方和开根号</td></tr>
+                <tr><td class="k">x·y 或 ⟨x,y⟩</td><td>点积：对应位置相乘再求和，值大 = 方向像</td></tr>
+                <tr><td class="k">A ∈ ℝ^(m×n)</td><td>m 行 n 列的矩阵</td></tr>
+                <tr><td class="k">Aᵢⱼ</td><td>矩阵第 i 行第 j 列的元素</td></tr>
+                <tr><td class="k">Aᵀ</td><td>转置：行列互换，形状 (m,n) 变 (n,m)</td></tr>
+                <tr><td class="k">Iₙ</td><td>n 阶单位矩阵：乘谁谁不变</td></tr>
+                <tr><td class="k">∇f</td><td>梯度：f 对每个参数的偏导排成的向量，指向最陡上升方向</td></tr>
+                <tr><td class="k">∂L/∂w</td><td>损失 L 对参数 w 的偏导数（梯度里的一个分量）</td></tr>
+                <tr><td class="k">P(A|B)</td><td>条件概率：B 已发生时 A 的概率</td></tr>
+                <tr><td class="k">E[X]</td><td>期望：随机变量取值的长期加权平均</td></tr>
+                <tr><td class="k">H(p)</td><td>熵：分布的不确定性，越平越大</td></tr>
+                <tr><td class="k">argmax</td><td>让表达式取最大值的那个自变量</td></tr>
+                <tr><td class="k">∑</td><td>求和：∑ᵢ xᵢ 就是把所有分量加起来</td></tr>
+                <tr><td class="k">𝒩(μ, σ²)</td><td>正态（高斯）分布：均值 μ、方差 σ²，钟形曲线</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>numpy API</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">np.array([1., 2.])</td><td>从列表造向量，造矩阵传嵌套列表</td></tr>
+                <tr><td class="k">a.shape</td><td>形状。一切报错先打印它</td></tr>
+                <tr><td class="k">a.reshape(2, 3)</td><td>改形状，元素总数不变</td></tr>
+                <tr><td class="k">a @ b / np.dot(a, b)</td><td>矩阵乘法；一维输入时就是点积</td></tr>
+                <tr><td class="k">a.T</td><td>转置</td></tr>
+                <tr><td class="k">np.linalg.norm(v)</td><td>向量长度（默认 L2）</td></tr>
+                <tr><td class="k">v / np.linalg.norm(v)</td><td>归一化：只留方向，长度变 1</td></tr>
+                <tr><td class="k">np.eye(n)</td><td>n 阶单位矩阵</td></tr>
+                <tr><td class="k">np.diag([2., 3.])</td><td>由对角元素造对角阵：各轴独立缩放</td></tr>
+                <tr><td class="k">np.linalg.eig(A)</td><td>特征值与特征向量：找「方向不变」的方向</td></tr>
+                <tr><td class="k">np.linalg.solve(A, b)</td><td>解线性方程组 Ax = b</td></tr>
+                <tr><td class="k">np.tanh / np.exp</td><td>逐元素非线性 / 指数（softmax 的原料）</td></tr>
+                <tr><td class="k">np.zeros / np.ones</td><td>造全 0 / 全 1 数组：偏置初始化常用</td></tr>
+                <tr><td class="k">np.argmax(v)</td><td>最大值的下标：分布里挑最可能的类</td></tr>
+                <tr><td class="k">np.linalg.inv(A)</td><td>逆矩阵 A⁻¹（深度学习里少用，解方程请用 solve）</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API / 写法</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">np.exp / np.log</td><td>逐元素指数 / 自然对数（交叉熵的原料）</td></tr>
+                <tr><td class="k">softmax(x) 手写版</td><td>见第 03 节：exp 前先减 x.max()</td></tr>
+                <tr><td class="k">torch.softmax(logits, dim=-1)</td><td>torch 版；dim 指定沿哪一维归一化</td></tr>
+                <tr><td class="k">torch.softmax(logits / t, dim=-1)</td><td>温度采样：t 小更确定，t 大更随机</td></tr>
+                <tr><td class="k">-np.sum(y * np.log(p))</td><td>单样本交叉熵（y 是 one-hot 真值）</td></tr>
+                <tr><td class="k">F.cross_entropy(logits, y)</td><td>torch 常用损失：直接吃原始 logits，内部含 softmax</td></tr>
+                <tr><td class="k">np.mean((y - yhat) ** 2)</td><td>MSE：回归任务常用损失</td></tr>
+                <tr><td class="k">rng = np.random.default_rng(0)</td><td>建可复现随机数生成器，0 是种子</td></tr>
+                <tr><td class="k">rng.normal(0, 1, (3, 4))</td><td>从高斯分布抽样：均值 0、标准差 1</td></tr>
+                <tr><td class="k">rng.uniform(-1, 1, size=(64, 1))</td><td>从均匀分布抽样</td></tr>
+                <tr><td class="k">rng.choice(n, p=probs)</td><td>按概率分布 probs 采一个下标（采样生成）</td></tr>
+                <tr><td class="k">1 / (1 + np.exp(-x))</td><td>sigmoid：把打分压到 0~1，当概率用</td></tr>
+                <tr><td class="k">torch.multinomial(probs, 1)</td><td>按概率分布采样一个下标（大模型生成用它）</td></tr>
+                <tr><td class="k">np.clip(p, 1e-9, 1.0)</td><td>把概率夹在安全区间，防 log(0)</td></tr>
+                <tr><td class="k">p.round(3)</td><td>打印时控制小数位，输出干净</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API / 写法</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">(f(x+h) - f(x-h)) / (2*h)</td><td>中心差分：数值导数，用来验证手推公式</td></tr>
+                <tr><td class="k">np.gradient(y, x)</td><td>对数组直接求数值梯度</td></tr>
+                <tr><td class="k">w = torch.tensor(…, requires_grad=True)</td><td>声明这个张量需要梯度</td></tr>
+                <tr><td class="k">loss.backward()</td><td>反向传播：自动算出全部梯度写入 .grad</td></tr>
+                <tr><td class="k">w.grad</td><td>查看 w 的梯度（即 ∂L/∂w）</td></tr>
+                <tr><td class="k">with torch.no_grad():</td><td>推理时关闭梯度记录，省内存提速</td></tr>
+                <tr><td class="k">lr（学习率）</td><td>每步沿负梯度走多远：太大震荡发散，太小龟速</td></tr>
+                <tr><td class="k">torch.optim.SGD(params, lr=0.05)</td><td>随机梯度下降优化器</td></tr>
+                <tr><td class="k">optimizer.zero_grad()</td><td>每步开始前清梯度，否则会累加上一步的</td></tr>
+                <tr><td class="k">optimizer.step()</td><td>用算好的梯度真正更新参数</td></tr>
+                <tr><td class="k">torch.optim.Adam(params, lr=1e-3)</td><td>自适应学习率优化器：比 SGD 更省调参心力的默认选择</td></tr>
+                <tr><td class="k">torch.nn.utils.clip_grad_norm_(…)</td><td>梯度裁剪：梯度范数超限时按比例缩，防爆炸</td></tr>
+                <tr><td class="k">lr_scheduler（学习率调度）</td><td>训练后期把 lr 调小：先快后慢，收尾更稳</td></tr>
+                <tr><td class="k">梯度消失</td><td>链式法则里连乘大量小数，深层梯度趋近 0——激活函数选型的历史动因</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「点积」「softmax」「学习率」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：纯 numpy 手写一个能学习的两层网络</h2>
+        <p>目标任务：给 64 个标量样本，让网络自己学出 <code>y = 3x + 1</code>。结构 1 → 16 → 1，写成一行就是 <code>y = tanh(x·W1 + b1)·W2 + b2</code>——只有两个参数矩阵；隐藏层用 tanh，损失是 MSE，优化器就是第 04 节的梯度下降。没有任何黑盒，每一行都对应前面讲过的知识块。</p>
+
+        <h3>第 1 步：造数据、初始化参数</h3>
+        <div class="code">
+          <div class="code-head"><span>python3 · 数据与参数</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> numpy <span class="g">as</span> np
+
+rng = np.random.default_rng(0)          <span class="c"># 固定种子，结果可复现</span>
+X = rng.uniform(-1, 1, (64, 1))         <span class="c"># 64 个标量样本，形状 (64, 1)</span>
+Y = 3 * X + 1                           <span class="c"># 要学的目标：一条直线</span>
+
+W1 = rng.normal(0, 1, (1, 16)); b1 = np.zeros(16)   <span class="c"># 隐藏层参数</span>
+W2 = rng.normal(0, 1, (16, 1)); b2 = np.zeros(1)    <span class="c"># 输出层参数</span>
+lr = 0.05                               <span class="c"># 学习率：每步走多远</span></pre>
+          </div>
+          <p><small>种子固定为 0，意味着你在自己机器上跑出的 loss 数字会和本页输出一模一样——调参实验第一课：<b>可复现优先</b>。</small></p>
+
+        <h3>第 2 步：前向传播＝两连矩阵乘法（线性代数）</h3>
+        <div class="code">
+          <div class="code-head"><span>python3 · forward</span><button class="copy" type="button">复制</button></div>
+<pre>h = np.tanh(X @ W1 + b1)        <span class="c"># (64,1)@(1,16) → (64,16)，非线性压到 -1~1</span>
+y = h @ W2 + b2                 <span class="c"># (64,16)@(16,1) → (64,1)，网络输出</span>
+loss = np.mean((y - Y) ** 2)    <span class="c"># MSE：平均平方误差，越小学得越像</span></pre>
+          </div>
+
+        <h3>第 3 步：反向传播＝链式法则逐层乘回来（微积分）</h3>
+        <div class="code">
+          <div class="code-head"><span>python3 · backward</span><button class="copy" type="button">复制</button></div>
+<pre>dy = 2 * (y - Y) / y.size       <span class="c"># dL/dy：MSE 对输出的导数</span>
+dW2, db2 = h.T @ dy, dy.sum(0)  <span class="c"># 输出层梯度：上游差 × 本层输入</span>
+dh = dy @ W2.T * (1 - h ** 2)   <span class="c"># 穿过 tanh：它的导数是 1 − tanh²</span>
+dW1, db1 = X.T @ dh, dh.sum(0)  <span class="c"># 隐藏层梯度：同一套乘法再来一遍</span></pre>
+          </div>
+        <p><small>对照看：每一层的梯度都是「上游传来的误差 × 本层输入的转置 × 本层激活函数的导数」——这就是链式法则在矩阵世界里的长相。torch 的 <code>loss.backward()</code> 做的就是这两步的自动化。</small></p>
+
+        <h3>第 4 步：完整程序（直接复制运行）</h3>
+        <div class="code">
+          <div class="code-head"><span>python3 · mini_net.py 全文</span><button class="copy" type="button">复制</button></div>
+<pre><span class="g">import</span> numpy <span class="g">as</span> np
+
+rng = np.random.default_rng(0)
+X = rng.uniform(-1, 1, (64, 1))     <span class="c"># 64 个标量样本</span>
+Y = 3 * X + 1                       <span class="c"># 目标：学一条直线</span>
+
+W1 = rng.normal(0, 1, (1, 16)); b1 = np.zeros(16)
+W2 = rng.normal(0, 1, (16, 1)); b2 = np.zeros(1)
+lr = 0.05
+
+<span class="g">for</span> step <span class="g">in</span> range(2001):
+    <span class="c"># ---- 前向：线性代数 ----</span>
+    h = np.tanh(X @ W1 + b1)
+    y = h @ W2 + b2
+    loss = np.mean((y - Y) ** 2)
+
+    <span class="c"># ---- 反向：链式法则 ----</span>
+    dy = 2 * (y - Y) / y.size
+    dW2, db2 = h.T @ dy, dy.sum(0)
+    dh = dy @ W2.T * (1 - h ** 2)
+    dW1, db1 = X.T @ dh, dh.sum(0)
+
+    <span class="c"># ---- 更新：梯度下降 ----</span>
+    W1 -= lr * dW1; b1 -= lr * db1
+    W2 -= lr * dW2; b2 -= lr * db2
+    <span class="g">if</span> step % 500 == 0:
+        print(<span class="g">f"step {step:4d}   loss {loss:.4f}"</span>)
+
+x0 = np.array([[0.5]])
+pred = np.tanh(x0 @ W1 + b1) @ W2 + b2
+print(<span class="g">"predict x=0.5 -&gt;"</span>, pred.round(2), <span class="g">"(target 2.50)"</span>)</pre>
+          </div>
+
+        <div class="code">
+          <div class="code-head"><span>实际运行输出</span><button class="copy" type="button">复制</button></div>
+<pre>step    0   loss 20.8016
+step  500   loss 0.0008
+step 1000   loss 0.0004
+step 1500   loss 0.0004
+step 2000   loss 0.0003
+predict x=0.5 -&gt; [[2.52]] (target 2.50)</pre>
+          </div>
+        <p><small>loss 从 20.8 掉到 0.0003，预测 2.52 贴着目标 2.50——网络真的从数据里「学」出了那条直线，而不是被我们写死。</small></p>
+        <p><small>收敛形态也有信息量：绝大多数改善发生在前几百步，之后进入漫长的平台期。真实训练里通常配一个验证集，loss 不再下降就早停，省下的时间比调参多。</small></p>
+
+        <h3>第 5 步：跑起来之后，改这三个数</h3>
+        <div class="code">
+          <div class="code-head"><span>python3 · 三个实验</span><button class="copy" type="button">复制</button></div>
+<pre>lr = 0.9               <span class="c"># 改大：loss 可能不降反升，甚至 NaN</span>
+<span class="c"># lr = 0.005           # 改小：收敛明显变慢</span>
+<span class="c"># Y = np.sin(3 * X)    # 换个更难的目标：直线 → 曲线</span></pre>
+          </div>
+        <div class="note">亲手看到「学习率大了会炸、小了太慢」这一刻，你对 lr 的理解就从名词变成了手感。顺手把隐藏层从 16 改成 4，观察直线任务照样能学——<b>容量够用就行</b>也是一条直觉。</div>
+
+        <p>想再进一步：把回归改成分类，只需三处替换——损失从 MSE 换成<b>交叉熵</b>，输出层后面接 <b>softmax</b>，目标 <code>Y</code> 换成 one-hot 标签；网络结构、前向、反向的骨架一字不用动。这正是第 04 节「三块分工」图的意义：换任务换的是概率那一块，其余两块照旧。</p>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：新手最先撞上的四个坑</h2>
+
+        <h3>坑一：softmax 里 exp 溢出成 NaN</h3>
+        <p>logits 一大（比如 1000），<code>np.exp</code> 直接上溢成 inf，inf/inf 得 nan。解法是行业通用行规：<b>减去最大值再 exp</b>，数学上完全等价（分子分母同乘同一个常数 e^(−max)，分布不变），数值上永远安全。大模型生成里 logits 同样可能上千，所有框架的 softmax 内部都做了这一步。</p>
+        <div class="code">
+          <div class="code-head"><span>python3 · 数值稳定 softmax</span><button class="copy" type="button">复制</button></div>
+<pre>x = np.array([1000.0, 999.0])
+<span class="c"># np.exp(x)              # overflow → inf/inf = nan</span>
+e = np.exp(x - x.max())    <span class="c"># 减 max：等价且稳定</span>
+print((e / e.sum()).round(3))   <span class="c"># [0.731 0.269]</span></pre>
+          </div>
+
+        <h3>坑二：* 是逐元素乘，@ 才是矩阵乘</h3>
+        <p>写损失、写梯度时混用两者，不报错但结果悄悄错——这是最阴险的一类 bug。手推梯度时想「这步是点积还是逐元素」，落到代码里就对应 <code>@</code> 还是 <code>*</code>，一一对应就不会错。</p>
+        <div class="code">
+          <div class="code-head"><span>python3</span><button class="copy" type="button">复制</button></div>
+<pre>a = np.array([1.0, 2.0]); b = np.array([3.0, 4.0])
+print(a * b)     <span class="c"># [3. 8.]：逐元素相乘，shape 不变</span>
+print(a @ b)     <span class="c"># 11.0：点积，出来的是标量</span></pre>
+          </div>
+
+        <h3>坑三：(n,) 和 (n,1) 不是一回事</h3>
+        <p>一维数组和列向量在广播时行为完全不同。转置一维数组什么都不会发生（<code>.T</code> 对 (n,) 无效），误以为转了方向，后面的乘法就全错。</p>
+        <div class="code">
+          <div class="code-head"><span>python3</span><button class="copy" type="button">复制</button></div>
+<pre>a = np.array([1.0, 2.0, 3.0])        <span class="c"># shape (3,)</span>
+b = np.array([[1.0], [2.0], [3.0]])  <span class="c"># shape (3,1)</span>
+print((a * b).shape)                 <span class="c"># (3, 3)：广播悄悄扩张了</span>
+
+col = a[:, None]                     <span class="c"># 想要列向量，显式造：(3,1)</span>
+print(col.shape)                     <span class="c"># (3, 1)</span></pre>
+          </div>
+        <p><small>经验法则：凡是「一行是一个样本」的场合，坚持用二维形状 (batch, features)；(n,) 只留给纯一维运算。形状约定一旦固定，广播 bug 就少一大半。</small></p>
+
+        <h3>坑四：loss 变 NaN，按顺序查三处</h3>
+        <div class="code">
+          <div class="code-head"><span>python3 · NaN 排查清单</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 1) 学习率太大：步子迈飞了 → lr 除以 10 再试</span>
+<span class="c"># 2) log(0)：概率下溢为 0 → 写成 np.log(p + 1e-9)</span>
+<span class="c"># 3) 除零：分母用 y.size 这类真实计数，别写死常数</span>
+<span class="c"># 4) 梯度爆炸：连乘后巨大 → clip_grad_norm_ 裁剪一下</span></pre>
+          </div>
+        <div class="note warn"><b>心法：</b>NaN 几乎从不来自「模型不够好」，而来自这三类数值事故。遇到时把 lr 减半、给 log 加个极小值、打印中间张量的 min/max，一两分钟就能定位。</div>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶：把三块数学接回模型</h2>
+        <p>下面这些资源按「先直觉、后严谨」排序，前两个用一周，后两个用一两个月：</p>
+        <p>别按顺序全啃：先用 3Blue1Brown 建直觉，再拿 Karpathy 的视频配本页第 06 节动手，卡住了再回花书查严谨定义。数学书的正确读法是<b>按需查阅</b>，不是从头到尾。</p>
+        <ul>
+          <li><a href="https://www.3blue1brown.com/topics/linear-algebra">3Blue1Brown《线性代数的本质》</a>：动画把「矩阵 = 空间变换」讲透，B 站有官方账号，中文配音。</li>
+          <li><a href="https://mml-book.github.io">Mathematics for Machine Learning</a>（Deisenroth 等）：免费电子书，线代 → 概率 → 优化正好覆盖本页三块，深度适中。</li>
+          <li><a href="https://karpathy.ai/zero-to-hero.html">Karpathy: Neural Networks — Zero to Hero</a>：从手写反向传播一路写到 GPT，和本页第 06 节无缝衔接，全程视频 + 代码。</li>
+          <li><a href="https://www.deeplearningbook.org">《Deep Learning》（花书）</a>：Goodfellow 等；第 2–4 章就是本页内容的严谨版，查阅式阅读。</li>
+          <li><a href="https://numpy.org/doc/stable/user/quickstart.html">NumPy Quickstart</a>：官方快速教程，把数组操作补齐。</li>
+          <li><a href="https://pytorch.org/tutorials/">PyTorch Tutorials</a>：把本页每个 numpy 例子翻译成 torch 张量版本，是最好的练习题。</li>
+        </ul>
+        <div class="note"><b>下一步去哪：</b>推荐顺着 <a href="nlp.html">自然语言处理 NLP</a> 往前走——词向量、注意力、softmax 采样这些概念全是本页三块数学的直接应用，学以致用比再刷一本数学书有效得多。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：合上页面前，勾一遍</h2>
+        <p>五条全勾上，你手里就有一张能读懂大部分模型代码的数学地图。哪条没把握，就回对应小节再跑一遍代码——数学是跑会的，不是看会的。</p>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>能不看笔记手写<b>数值稳定的 softmax</b>（含减 max 那一行）</span></label>
+          <label><input type="checkbox" data-key="c2"><span>能向别人解释 <b>A @ V</b> 里谁变换谁、为什么这叫批量变换</span></label>
+          <label><input type="checkbox" data-key="c3"><span>给一个预测分布和真实标签，能算出<b>交叉熵</b>并解释它为什么越大越糟</span></label>
+          <label><input type="checkbox" data-key="c4"><span>能徒手推出两层网络每层参数的梯度（<b>链式法则</b>逐层乘回来）</span></label>
+          <label><input type="checkbox" data-key="c5"><span>跑通了第 06 节的小网络，并且<b>改过学习率</b>观察 loss 变化</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="ai-agent.html"><span>← 上一篇</span><b>AI Agent（智能体）教程</b></a>
+        <a class="next" href="nlp.html"><span>下一篇 →</span><b>自然语言处理 NLP 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 NumPy 官方文档（numpy.org/doc）、PyTorch 官方文档（pytorch.org/docs）与《Deep Learning》（Goodfellow、Bengio、Courville 著，中文社区称「深度学习花书」）整理；代码与输出为 Python 3.12 + NumPy 2.5 实际运行结果，整理于 2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 版本迭代较快，具体 API 以官方文档为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

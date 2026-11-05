@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent（智能体）教程 · AI Code Study</title>
+<meta name="description" content="AI Agent 入门：Agent 的定义与四要素、ReAct 循环、function calling 工具调用、记忆与规划、多智能体协作、主流框架地图，以及 30 行最小 Agent 实战与风险清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/ai-agent.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI Agent（智能体）教程 · AI Code Study">
+<meta property="og:description" content="AI Agent 入门：Agent 的定义与四要素、ReAct 循环、function calling 工具调用、记忆与规划、多智能体协作、主流框架地图，以及 30 行最小 Agent 实战与风险清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/ai-agent.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Agent（智能体）教程 · AI Code Study">
+<meta name="twitter:description" content="AI Agent 入门：Agent 的定义与四要素、ReAct 循环、function calling 工具调用、记忆与规划、多智能体协作、主流框架地图，以及 30 行最小 Agent 实战与风险清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "AI Agent：让模型从回答问题到完成任务",
+  "description": "AI Agent 入门：Agent 的定义与四要素、ReAct 循环、function calling 工具调用、记忆与规划、多智能体协作、主流框架地图，以及 30 行最小 Agent 实战与风险清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/ai-agent.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="ai-agent">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics" class="on">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-basics">入门基础</a><span>/</span>
+      <b>AI Agent</b>
+    </nav>
+    <p class="eyebrow">BASICS · <b>AI AGENT</b> · 让模型自己动手</p>
+    <h1>AI Agent：让模型从回答问题到<em>完成任务</em></h1>
+    <p class="lede">上一篇的模型只会「接话」，这一篇让它接活。拆开 Agent 的四个零件（LLM、工具、循环、目标），跑通一次工具调用，亲手写下 30 行最小 Agent，并拿到一张框架地图与风险清单。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">agent — ~/project</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">帮我把仓库里所有 TODO 收集成一份清单</span></div>
+        <div class="term-line"><span class="out">思考: 需要先搜代码 —— 调用 grep 工具</span></div>
+        <div class="term-line"><span class="pr">→ </span><span class="cmd">grep(pattern="TODO")</span></div>
+        <div class="term-line"><span class="out">观察: 命中 7 处 — main.py:12  utils.py:3  api.py:2 …</span></div>
+        <div class="term-line"><span class="out">思考: 信息够了,不需要再调工具</span></div>
+        <div class="term-line"><span class="ok">回答: 共找到 7 个 TODO,已按文件写入 TODO.md</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>Agent 是什么</a>
+        <a href="#s2"><span class="idx">02</span>准备环境</a>
+        <a href="#s3"><span class="idx">03</span>第一次工具调用</a>
+        <a href="#s4"><span class="idx">04</span>四大核心件</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>30 行最小 Agent</a>
+        <a href="#s7"><span class="idx">07</span>局限与风险</a>
+        <a href="#s8"><span class="idx">08</span>多智能体与资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="ai.html">AI（人工智能）</a>
+        <a href="ai-math.html">AI 数学基础</a>
+        <a href="nlp.html">自然语言处理 NLP</a>
+        <a href="index.html#cat-basics">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>Agent 是什么</a>
+          <a href="#s2"><span class="idx">02</span>准备环境</a>
+          <a href="#s3"><span class="idx">03</span>第一次工具调用</a>
+          <a href="#s4"><span class="idx">04</span>四大核心件</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>30 行最小 Agent</a>
+          <a href="#s7"><span class="idx">07</span>局限与风险</a>
+          <a href="#s8"><span class="idx">08</span>多智能体与资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 Agent 是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>Agent 是什么：一个公式讲清楚</h2>
+        <p>AI Agent（智能体）是让大模型在循环里自主使用工具、朝目标推进的系统。一个值得背下来的公式：<b>Agent = LLM（大脑）+ 工具（手脚）+ 循环（心跳）+ 目标（方向）</b>。LLM 负责判断下一步做什么，工具给它真正改变世界的能力，循环让「做一步、看结果、再决定」成为可能，目标则定义了「做完」长什么样。</p>
+        <p>它和上一篇的对话助手有什么不同？聊天机器人的世界是<b>一问一答</b>：你发消息，它回文本，交互结束。Agent 的世界是<b>接活—干活—交差</b>：你说目标，它自己拆步骤、调工具、看结果、修正方向，直到完成或需要你拍板。读文件、跑命令、查网页、写代码，都是它的「手」。用一张表看三种形态的边界：</p>
+        <table>
+          <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+          <thead><tr><th>形态</th><th>特征</th></tr></thead>
+          <tbody>
+            <tr><td class="k">聊天机器人</td><td>一问一答，只产出文本，不改任何东西</td></tr>
+            <tr><td class="k">固定工作流（LLM 链）</td><td>人预先写死步骤，模型只负责其中几步</td></tr>
+            <tr><td class="k">Agent</td><td>只给定目标与工具，<b>步骤由模型现场决定</b></td></tr>
+          </tbody>
+        </table>
+        <p>最后一行就是分水岭：<b>步骤谁说了算</b>。步骤是人写的叫工作流，步骤是模型看着办的就是 Agent。自由度更高，不可预测性也更高——第 07 节的所有刹车，都是为这一行字准备的。</p>
+        <p>为什么这件事最近两年才真正成立？2022 年 ReAct 论文给出「推理与行动交替」的经典循环；2023 年 6 月 OpenAI 给 API 加上 function calling，工具调用第一次有了标准接口；2024 年 11 月 Anthropic 开源 MCP 协议，工具生态开始互通；再加上 Claude Code、Codex 这类编程智能体把「循环+工具」打磨成了日用产品——四块地基同时就位，Agent 才从论文走进日常。</p>
+        <p>再泼一盆冷水：不是所有任务都该上 Agent。<b>步骤固定、追求稳定</b>的活（每天抓一次数据、固定格式翻译）用工作流更便宜、更可控；<b>步骤没法预先写死</b>的活（修一个还没定位的 bug、调研一个开放问题）才是 Agent 的主场。判断标准就一条：你能预先写出步骤清单吗？能，写工作流；不能，交给 Agent。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>组成公式</dt><dd>LLM + 工具 + 循环 + 目标</dd></div>
+          <div class="fact"><dt>标志性论文</dt><dd>ReAct（Yao et al., 2022 · ICLR 2023）</dd></div>
+          <div class="fact"><dt>工具调用标准</dt><dd>function calling：OpenAI 2023-06 引入；Anthropic 称 tool use</dd></div>
+          <div class="fact"><dt>工具互通协议</dt><dd>MCP：Anthropic 2024-11 开源</dd></div>
+          <div class="fact"><dt>代表编程智能体</dt><dd>Claude Code · Codex · Kimi Code · OpenCode</dd></div>
+          <div class="fact"><dt>与聊天机器人的区别</dt><dd>一次回答 vs 多步执行</dd></div>
+          <div class="fact"><dt>自主档位</dt><dd>从「每步审批」到「全自动」连续可调</dd></div>
+          <div class="fact"><dt>自我意识与自定目标</dt><dd class="no">没有。它只优化你给定的目标</dd></div>
+        </dl>
+
+        <div class="note"><b>先把四个词焊在脑子里：</b>大脑（LLM）决定下一步做什么，工具定义它<b>能</b>做什么，循环规定做到几时算完，目标说明为什么要做。本页后面每一个概念，都能挂回这四个词。</div>
+      </section>
+
+      <!-- ===== 02 准备环境 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>准备环境：三样东西，三条搭法</h2>
+        <p>要亲手拆 Agent，只需要 Python、一个官方 SDK、一把 API Key。三种搭法按投入程度选：想读懂本页所有代码选 A 或 B，只想先体验选 C。</p>
+
+        <div class="tabs" role="tablist" aria-label="准备方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">Anthropic SDK</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">OpenAI SDK（通用）</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">不写代码：先用现成的</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal · Python 3.9+</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 先建独立虚拟环境,别污染系统 Python</span>
+python3 -m venv .venv
+source .venv/bin/activate        <span class="c"># Windows: .venv\Scripts\activate</span>
+
+pip install anthropic
+export ANTHROPIC_API_KEY=<span class="g">"sk-ant-..."</span>   <span class="c"># 控制台创建;Windows 用 setx</span>
+
+<span class="c"># 验证</span>
+python3 -c <span class="g">"import anthropic; print(anthropic.__version__)"</span></pre>
+          </div>
+          <small>Anthropic 的工具结果以 <b>tool_result</b> 块回传，第 03 节演示；模型名以官方模型列表为准。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal · Python 3.9+</span><button class="copy" type="button">复制</button></div>
+<pre>python3 -m venv .venv
+source .venv/bin/activate
+
+pip install openai
+export OPENAI_API_KEY=<span class="g">"sk-..."</span>          <span class="c"># Windows: setx OPENAI_API_KEY "sk-..."</span>
+
+<span class="c"># 验证</span>
+python3 -c <span class="g">"import openai; print(openai.__version__)"</span></pre>
+          </div>
+          <small>大量厂商提供 OpenAI 兼容接口——学会这一套，换供应商只改 <b>base_url</b> 与模型名。第 06 节的最小 Agent 用这种写法。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>不写代码,先玩产品</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 编程智能体是最成熟的 Agent 产品,装一个直接体验:</span>
+<span class="c">#   Claude Code / Codex / Kimi Code / OpenCode …</span>
+<span class="c"># 安装与上手见本站对应专页:</span>
+<span class="c">#   claude-code.html · codex.html · kimi-code.html · opencode.html</span>
+<span class="c"># 观察它们的共同内核:思考 → 调工具 → 观察 → 继续</span></pre>
+          </div>
+          <small>先玩产品再拆原理，或者先拆原理再看产品——两条路在本页都铺好了。</small>
+        </div>
+
+        <div class="note warn"><b>Key 等同钱包，而且 Agent 会自动花：</b>一个失控的循环一晚上能烧掉不少额度。密钥只放环境变量，不进代码、不进 git；第 07 节专讲怎么省钱与止损。</div>
+        <p>三条路的共同前提只有一样：一把能用的 API Key（或一个已登录的终端 Agent）。环境就绪的标志是三件小事：Python 里 <code>import</code> 不报错、Key 在环境变量里、能用一句话换回模型的回答。</p>
+      </section>
+
+      <!-- ===== 03 第一次工具调用 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>第一次工具调用：模型点菜，你来炒菜</h2>
+        <p>Agent 与普通调用的全部区别，就在这一来一回：<b>模型永远不执行工具，它只输出「我想调哪个工具、带什么参数」；真正动手的，是你的代码。</b>先看 Anthropic 写法：</p>
+
+        <div class="code">
+          <div class="code-head"><span>one_round.py · 一次工具调用的完整往返（示意）</span><button class="copy" type="button">复制</button></div>
+<pre>import anthropic
+
+client = anthropic.Anthropic()
+
+<span class="c"># 1) 把"菜单"声明给模型:名字 + 描述 + 参数 JSON Schema</span>
+tools = [{
+    <span class="g">"name"</span>: <span class="g">"get_weather"</span>,
+    <span class="g">"description"</span>: <span class="g">"查询指定城市的当前天气"</span>,   <span class="c"># 这句是写给模型看的</span>
+    <span class="g">"input_schema"</span>: {
+        <span class="g">"type"</span>: <span class="g">"object"</span>,
+        <span class="g">"properties"</span>: {<span class="g">"city"</span>: {<span class="g">"type"</span>: <span class="g">"string"</span>}},
+        <span class="g">"required"</span>: [<span class="g">"city"</span>],
+    },
+}]
+
+messages = [{<span class="g">"role"</span>: <span class="g">"user"</span>, <span class="g">"content"</span>: <span class="g">"北京现在多少度?"</span>}]
+
+resp = client.messages.create(
+    model=<span class="g">"claude-sonnet-4-5"</span>,   <span class="c"># 以官方模型列表为准</span>
+    max_tokens=1024,
+    tools=tools,
+    messages=messages,
+)
+
+<span class="c"># 2) 模型只会"点菜",不会"炒菜"</span>
+print(resp.stop_reason)           <span class="c"># tool_use —— 它想调工具了</span>
+print(resp.content[0].name)       <span class="c"># get_weather</span>
+print(resp.content[0].input)      <span class="c"># {'city': '北京'}</span></pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>声明菜单</h4><p>把每个工具的名字、用途、参数 Schema 随请求发给模型。<code>description</code> 写得越清楚，模型点菜越准——它是写给模型看的接口文档。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>模型点菜</h4><p>返回里出现 <code>tool_use</code> 块：工具名 + 参数 JSON。注意此刻什么都没发生，模型只是「说」要调。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>你来执行</h4><p>你的代码真的去调天气接口，把结果包成 <code>tool_result</code>（带上 <code>tool_use_id</code>）追加进对话。工具报错也如实回传——模型能根据报错改道。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>循环到收工</h4><p>把更新后的 messages 再发给模型。它看完结果要么继续点菜，要么给出最终回答——<code>stop_reason</code> 变为 <code>end_turn</code>，循环结束。</p></div>
+          </li>
+        </ul>
+
+        <p>OpenAI 兼容写法做同一件事，字段名不同、流程同构：</p>
+        <div class="code">
+          <div class="code-head"><span>openai_style.py · 同构写法（节选示意）</span><button class="copy" type="button">复制</button></div>
+<pre>r   = client.chat.completions.create(model=MODEL, messages=messages, tools=tools)
+msg = r.choices[0].message
+
+if msg.tool_calls:                        <span class="c"># 模型点了菜</span>
+    messages.append(msg)
+    for call in msg.tool_calls:
+        args = json.loads(call.function.arguments)
+        result = get_weather(**args)      <span class="c"># 你来执行</span>
+        messages.append({<span class="g">"role"</span>: <span class="g">"tool"</span>,  <span class="c"># 回传结果</span>
+                         <span class="g">"tool_call_id"</span>: call.id,
+                         <span class="g">"content"</span>: result})</pre>
+        </div>
+
+        <p>两家的「菜名」对照着记，看任何框架源码都不慌：</p>
+        <table>
+          <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+          <thead><tr><th>角色</th><th>字段名（Anthropic / OpenAI 兼容）</th></tr></thead>
+          <tbody>
+            <tr><td class="k">声明工具</td><td>tools=... / tools=...（这一项两家几乎同名）</td></tr>
+            <tr><td class="k">调用意图</td><td>tool_use 块 / message.tool_calls</td></tr>
+            <tr><td class="k">参数包裹</td><td>block.input / call.function.arguments（都是 JSON）</td></tr>
+            <tr><td class="k">结果回传</td><td>tool_result 块（带 tool_use_id）/ role:"tool"（带 tool_call_id）</td></tr>
+            <tr><td class="k">收工信号</td><td>stop_reason="end_turn" / finish_reason="stop"</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note">还有一条容易忽略：不是每个任务都需要工具。「总结这段文字」就不要给模型任何工具——能力越多，跑偏的姿势越多。工具菜单按任务配，这是第 05 节设计原则的第一条。</div>
+      </section>
+
+      <!-- ===== 04 四大核心件 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>四大核心件：ReAct、工具调用、记忆、规划</h2>
+
+        <h3>4.1 ReAct：把「想」和「做」交替起来</h3>
+        <p>ReAct = Reasoning + Acting。这篇 2022 年论文的核心发现是：让模型把推理写成文字（Thought）、再决定行动（Action）、然后观察结果（Observation），比一口气直接猜答案准确得多。原因不难理解：把「想」写出来，等于强迫模型分步检查自己的判断；而「观察」把真实世界的反馈接回上下文，模型不必靠想象答题。今天几乎所有 Agent 的主循环都是它的后代——包括 Claude Code 每次说「我来看一下这个文件」的那一刻。</p>
+        <div class="code">
+          <div class="code-head"><span>react.log · 一次标准 ReAct 轨迹</span><button class="copy" type="button">复制</button></div>
+<pre>Thought: 用户要找"处理登录的函数",应该先搜索代码
+Action:  grep(pattern=<span class="g">"def login"</span>)
+Observation: auth/login.py:31  auth/oauth.py:88
+
+Thought: 先读 auth/login.py
+Action:  read_file(path=<span class="g">"auth/login.py"</span>)
+Observation: def login(user, pwd): ...
+
+Thought: 找到了,可以回答
+Answer: 登录逻辑在 auth/login.py 第 31 行,走的是表单校验……</pre>
+        </div>
+        <p><small>对照第 03 节的 API 调用：Thought 和 Answer 是模型的文本输出，Action 对应 <code>tool_use</code>，Observation 就是你回传的 <code>tool_result</code>。论文里的三步，落在 API 上就是一次往返。</small></p>
+
+        <h3>4.2 工具调用（function calling）怎么工作</h3>
+        <p>模型在训练时见过海量「对话中插入工具调用」的样本，所以它天生会点菜。工程上要抓牢三件事：第一，<b>工具由你执行</b>，模型只输出调用意图；第二，参数是 JSON，用 Schema 约束格式；第三，<b>工具描述是写给模型的接口文档</b>——文档烂，点菜就烂。工具宜少而精，几十个语义重叠的工具会互相干扰。</p>
+        <div class="code">
+          <div class="code-head"><span>descriptions.py · 同一个工具,两种文档</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 坏:模型猜不出什么时候用、参数什么格式</span>
+<span class="g">"description"</span>: <span class="g">"读文件"</span>
+
+<span class="c"># 好:说清用途、适用时机、限制、参数格式</span>
+<span class="g">"description"</span>: <span class="g">"读取本地文本文件内容。需要查看代码、配置或</span>
+<span class="g">    数据文件时使用;不支持列出目录;path 用相对路径"</span></pre>
+        </div>
+        <p>MCP（Model Context Protocol）把「怎么声明、发现、调用工具」标准化：工具方实现一次 MCP server，任何支持 MCP 的 Agent 都能用。你在本站各工具专页里看到的 MCP 配置，背后就是这个协议。</p>
+        <p>顺带认识两个进阶词：<b>并行工具调用</b>——模型一次点几道互不依赖的菜，代码并发执行能省一半时间；<b>结构化输出</b>——让模型按固定 JSON 格式作答，是「调工具」之外另一种受控输出。两者在各家 API 文档里都有专门章节。</p>
+
+        <h3>4.3 记忆：短期靠上下文，长期靠外存</h3>
+        <p>短期记忆就是上下文窗口：本轮对话、每一步工具结果全在里面——这也是为什么 Agent 越跑越慢、越跑越贵（每一步都带着全部历史重新发送）。窗口逼近上限就要压缩（很多 CLI 提供 <code>/compact</code> 类命令，摘要折叠旧内容）。</p>
+        <p>长期记忆靠外部存储：把结论写进文件、数据库或向量库，下次需要时用 RAG 检索回来。规律一句话：<b>上下文是易失的工作内存，文件与数据库才是持久的。</b></p>
+        <div class="code">
+          <div class="code-head"><span>memory.txt · 记忆的三种落点</span><button class="copy" type="button">复制</button></div>
+<pre>1. 上下文窗口    : 本会话有效;满了就压缩或截断
+2. 项目文件      : AGENTS.md / TODO.md —— 重启之后还在
+3. 向量库 + RAG  : 海量历史里按语义检索相关片段
+
+<span class="c"># 压缩示例(各 CLI 命令名略有差异):</span>
+<span class="prompt">&gt; </span>/compact 保留架构决策与未完成的 TODO</pre>
+        </div>
+        <p>工程上的对应物你已经见过：终端 Agent 的 <code>/compact</code> 是落点 1 的维护命令，<code>AGENTS.md</code> 是落点 2 的标准文件名，而落点 3 就是本站反复出现的 RAG——三个落点各管一段时效，混着用最稳。</p>
+
+        <h3>4.4 规划：把大目标拆成小步骤</h3>
+        <p>复杂任务直接开干容易翻车。主流做法是<b>先规划再执行</b>：让模型先产出步骤清单（写进 todo、或进入只读的 Plan 模式），人确认后再逐步执行，每完成一步更新状态。规划的本质，是把「一锤子买卖」变成「可检查的进度条」——错了能早发现，上下文也能省。</p>
+        <div class="code">
+          <div class="code-head"><span>plan.log · Plan 模式下的任务分解（示意）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>把认证模块从 session 换成 JWT
+计划: 1. 通读 auth/ 现有实现(只读)
+      2. 列出所有引用 session 的调用方
+      3. 设计 JWT 签发与校验中间件
+      4. 逐文件替换 + 补测试     ← 每步都要你点头才继续</pre>
+        </div>
+        <div class="note">四个零件合体：ReAct 是循环的骨架，工具调用是循环里唯一的「动作」，记忆决定每一步能看见什么，规划决定循环怎么分程。下一篇教程（ai-math.html）之外，本站各框架专页都是这四件事的不同封装。</div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：概念、循环、框架与设计原则</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘词就搜 <b>ReAct</b>、<b>压缩</b>、<b>审批</b>，选框架就搜 <b>多智能体</b>。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索概念、组件、框架，比如 循环 / MCP / 权限" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">核心概念</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">循环与组件</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">框架地图</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">设计原则</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>概念</th><th>一句话解释</th></tr></thead>
+              <tbody>
+                <tr><td class="k">Agent（智能体）</td><td>LLM + 循环 + 工具 + 目标：能多步自主干活的系统</td></tr>
+                <tr><td class="k">ReAct</td><td>思考—行动—观察交替的经典循环范式（2022 论文）</td></tr>
+                <tr><td class="k">Function Calling / Tool Use</td><td>模型输出结构化调用意图，由你的代码执行工具</td></tr>
+                <tr><td class="k">JSON Schema</td><td>描述工具参数的结构，约束模型输出的格式</td></tr>
+                <tr><td class="k">系统提示词</td><td>对话最前面定角色、立规矩的指令，用户不可见</td></tr>
+                <tr><td class="k">上下文窗口</td><td>一次能塞给模型的最大 token 数，Agent 的工作内存</td></tr>
+                <tr><td class="k">上下文压缩</td><td>会话变长时摘要折叠旧内容，常见命令如 /compact</td></tr>
+                <tr><td class="k">长期记忆</td><td>文件、数据库或向量库；需要时用 RAG 取回</td></tr>
+                <tr><td class="k">RAG 检索增强生成</td><td>先检索资料再生成，给 Agent 接上私有知识</td></tr>
+                <tr><td class="k">Plan 模式</td><td>只读探索 + 出计划，批准后才动手的执行档位</td></tr>
+                <tr><td class="k">Human-in-the-loop</td><td>关键步骤回交人类审批的设计</td></tr>
+                <tr><td class="k">Guardrails 护栏</td><td>限制动作范围、步数与权限的防护机制</td></tr>
+                <tr><td class="k">MCP</td><td>Anthropic 2024-11 开源的模型上下文协议，工具生态的「USB 接口」</td></tr>
+                <tr><td class="k">子代理（Subagent）</td><td>主 Agent 派出去的独立 Agent：各自带干净上下文干子任务</td></tr>
+                <tr><td class="k">上下文工程</td><td>决定「每一步让模型看见什么」的工程——比提示词工程更进一步</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>组件</th><th>在循环里的角色</th></tr></thead>
+              <tbody>
+                <tr><td class="k">目标（Goal）</td><td>循环的输入：一句可验证的任务描述</td></tr>
+                <tr><td class="k">主循环 while</td><td>反复：调模型 → 看要不要工具 → 执行 → 回传</td></tr>
+                <tr><td class="k">stop_reason / finish_reason</td><td>判断这一轮是「点菜」还是「收工」的信号</td></tr>
+                <tr><td class="k">tool_use / tool_calls</td><td>模型发出的调用意图（两家字段名不同）</td></tr>
+                <tr><td class="k">tool_result / role:"tool"</td><td>你回传给模型的执行结果</td></tr>
+                <tr><td class="k">工具注册表</td><td>名字 + 描述 + Schema 的清单，随请求发给模型</td></tr>
+                <tr><td class="k">终止条件</td><td>end_turn、最大步数、预算熔断或人工打断</td></tr>
+                <tr><td class="k">max_steps 上限</td><td>防循环失控的保险丝，写 Agent 必加</td></tr>
+                <tr><td class="k">错误回传</td><td>工具失败把报错文本喂回去，让模型自己改道</td></tr>
+                <tr><td class="k">观测 / 日志</td><td>记录每一步提示词与工具结果，出事能回放</td></tr>
+                <tr><td class="k">并行工具调用</td><td>模型一次点多道菜，无依赖的工具并发执行省时间</td></tr>
+                <tr><td class="k">流式输出</td><td>边生成边推送；Agent 里用它实时展示思考与工具进度</td></tr>
+                <tr><td class="k">重试与退避</td><td>限流/超时先退避再重试；工具级失败则把报错喂回模型</td></tr>
+                <tr><td class="k">工具白名单</td><td>按任务裁剪可用工具与目录，权限门的第一道闸</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>框架 / 产品</th><th>一句话定位（细节各有专页）</th></tr></thead>
+              <tbody>
+                <tr><td class="k">Claude Code（Anthropic）</td><td>终端编程智能体，Plan 模式与 Skills 生态，本站有专页</td></tr>
+                <tr><td class="k">Codex（OpenAI）</td><td>OpenAI 的编程智能体（CLI 与云端），本站有专页</td></tr>
+                <tr><td class="k">Kimi Code（月之暗面）</td><td>终端 Agent，可接多家模型，本站有专页</td></tr>
+                <tr><td class="k">OpenCode（开源）</td><td>开源终端编程 Agent，多模型可插拔，本站有专页</td></tr>
+                <tr><td class="k">LangChain / LangGraph</td><td>最流行的 LLM 应用编排框架，本站有专页</td></tr>
+                <tr><td class="k">OpenAI Agents SDK</td><td>OpenAI 官方的轻量 Agent 框架</td></tr>
+                <tr><td class="k">AutoGen（Microsoft）</td><td>多智能体对话式协作框架的代表</td></tr>
+                <tr><td class="k">CrewAI</td><td>角色分工式的多智能体框架</td></tr>
+                <tr><td class="k">Google ADK</td><td>Google 的 Agent 开发套件</td></tr>
+                <tr><td class="k">smolagents（Hugging Face）</td><td>极简的代码型 Agent 库</td></tr>
+                <tr><td class="k">MCP</td><td>工具协议：一套工具服务所有支持 MCP 的 Agent</td></tr>
+                <tr><td class="k">怎么选</td><td>学概念用裸 SDK；干活用编程智能体；组应用再看 LangChain / AutoGen</td></tr>
+                <tr><td class="k">本站开源智能体专页</td><td>hermes-agent / pi-agent / deepseek-harness：开源 Agent 实现逐一拆解</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>原则</th><th>为什么</th></tr></thead>
+              <tbody>
+                <tr><td class="k">从最简单的开始</td><td>一个模型 + 一个循环够用就别加架构；复杂度是成本</td></tr>
+                <tr><td class="k">工具即接口</td><td>description 与参数名是给模型的文档，文档质量=点菜质量</td></tr>
+                <tr><td class="k">工具少而清晰</td><td>语义重叠的工具让模型选错；先合并再精简</td></tr>
+                <tr><td class="k">错误信息说人话</td><td>报错写给模型看，它才能自我纠正而不是反复重试</td></tr>
+                <tr><td class="k">每一步可观测</td><td>记录提示词、调用与结果；排障与审计全靠它</td></tr>
+                <tr><td class="k">权限最小化</td><td>默认只读；写操作与 shell 要审批或沙箱</td></tr>
+                <tr><td class="k">步数与预算双上限</td><td>max_steps + token 预算，两道保险丝</td></tr>
+                <tr><td class="k">关键点要人点头</td><td>删除、发布、付款类动作永远 human-in-the-loop</td></tr>
+                <tr><td class="k">大任务先规划</td><td>先进 Plan / TODO 流程，可检查、可回退</td></tr>
+                <tr><td class="k">进度对人类可读</td><td>每一步打印「正在做什么」，否则没人敢放它跑长任务</td></tr>
+                <tr><td class="k">先跑通，再优化</td><td>最简版本先端到端跑通，再谈架构、并发与缓存</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「循环」「压缩」「权限」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 30 行最小 Agent ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：30 行写一个最小 Agent</h2>
+        <p>下面这个文件是所有 Agent 的共同骨架——看懂它，Claude Code 和 LangChain 对你都不再是黑盒。写法是 OpenAI 兼容风格；Anthropic 原生 SDK 把工具结果包成 tool_result 块（见第 03 节），流程完全同构。</p>
+
+        <h3>完整源码：mini_agent.py</h3>
+        <div class="code">
+          <div class="code-head"><span>mini_agent.py · 最小可用 Agent（示意）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 跑通思路用:OpenAI 兼容写法,MODEL 换成你有权限的模型</span>
+import json
+from openai import OpenAI
+
+client = OpenAI()          <span class="c"># 自动读环境变量 OPENAI_API_KEY</span>
+MODEL  = <span class="g">"gpt-4o-mini"</span>
+
+<span class="c"># 1) 工具:先给模型一份"菜单"</span>
+def read_file(path: str) -&gt; str:
+    <span class="g">"读取本地文本文件的前 2000 字符"</span>
+    return open(path, encoding=<span class="g">"utf-8"</span>).read()[:2000]
+
+TOOLS = [{
+    <span class="g">"type"</span>: <span class="g">"function"</span>,
+    <span class="g">"function"</span>: {
+        <span class="g">"name"</span>: <span class="g">"read_file"</span>,
+        <span class="g">"description"</span>: <span class="g">"读取本地文本文件内容;查看代码/配置时用,不支持列目录"</span>,
+        <span class="g">"parameters"</span>: {
+            <span class="g">"type"</span>: <span class="g">"object"</span>,
+            <span class="g">"properties"</span>: {<span class="g">"path"</span>: {<span class="g">"type"</span>: <span class="g">"string"</span>}},
+            <span class="g">"required"</span>: [<span class="g">"path"</span>],
+        },
+    },
+}]
+EXEC = {<span class="g">"read_file"</span>: read_file}          <span class="c"># 菜名 → 真正的函数</span>
+
+<span class="c"># 2) 主循环:模型 → 工具 → 观察 → 再问模型,直到它不要工具</span>
+def run(goal: str, max_steps: int = 8) -&gt; str:
+    messages = [{<span class="g">"role"</span>: <span class="g">"user"</span>, <span class="g">"content"</span>: goal}]
+    for _ in range(max_steps):             <span class="c"># 保险丝:防失控</span>
+        r = client.chat.completions.create(
+            model=MODEL, messages=messages, tools=TOOLS)
+        msg = r.choices[0].message
+        if not msg.tool_calls:             <span class="c"># 不要工具了 = 最终回答</span>
+            return msg.content
+        messages.append(msg)
+        for call in msg.tool_calls:        <span class="c"># 执行每个工具并回传</span>
+            fn = EXEC.get(call.function.name)
+            result = fn(**json.loads(call.function.arguments))
+            messages.append({<span class="g">"role"</span>: <span class="g">"tool"</span>,
+                             <span class="g">"tool_call_id"</span>: call.id,
+                             <span class="g">"content"</span>: result})
+    return <span class="g">"已达最大步数,强制停止。"</span>
+
+<span class="c"># 3) 下达目标</span>
+print(run(<span class="g">"读一下 README.md,用三句话总结这个项目是做什么的"</span>))</pre>
+        </div>
+
+        <p>数一数：去掉注释与空行，核心逻辑三十行上下——声明工具、主循环、保险丝、目标，一个不少。所有 Agent 框架做的，都是给这个骨架加壳。</p>
+
+        <h3>练手：五分钟给 Agent 装上第二只手</h3>
+        <p>只改三处，就能让模型学会「先看目录、再挑文件」的组合拳——亲眼看一次工具组合，胜过十篇原理文章：</p>
+        <div class="code">
+          <div class="code-head"><span>two_hands.py · 加一个 list_dir 工具（示意）</span><button class="copy" type="button">复制</button></div>
+<pre>import os
+
+def list_dir(path: str) -&gt; str:
+    <span class="g">"列出目录下的文件名,不递归"</span>
+    return <span class="g">"\n"</span>.join(os.listdir(path))
+
+<span class="c"># 1) TOOLS 里照抄一份 schema:name 换成 "list_dir",</span>
+<span class="c">#    description 写 "不知道文件名时先用我列目录"</span>
+<span class="c"># 2) EXEC 注册真函数:</span>
+EXEC = {<span class="g">"read_file"</span>: read_file, <span class="g">"list_dir"</span>: list_dir}
+<span class="c"># 3) 换个更开放的目标:</span>
+print(run(<span class="g">"这个项目是干什么的?自己找入口文件研究"</span>))
+<span class="c"># 你会在日志里看到:先 list_dir,再 read_file(它挑中的那个)</span></pre>
+        </div>
+        <div class="note">加完跑一次：模型自己决定「先看目录、再挑文件读」，而你没有写任何一行 <code>if</code> 去安排这个顺序——这就是「步骤由模型现场决定」的体感。</div>
+
+        <h3>拆解：循环里的三个关键点</h3>
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>声明工具</h4><p><code>TOOLS</code> 里那段 JSON Schema 是给模型的接口文档：<code>name</code> 见名知义，<code>description</code> 写「何时该用我、有什么限制」。<code>EXEC</code> 把菜单名映射到真函数——菜单和后厨分开。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>主循环</h4><p>create → 有 tool_calls 就执行并回传 → 再 create。模型不再要工具时返回 <code>content</code>，循环结束。整页第 04 节的 ReAct，落到代码里就是这个 <code>for</code> 循环。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>加保险丝</h4><p><code>max_steps=8</code> 防死循环。生产代码还要补：异常捕获、token 统计、每步日志——第 07 节逐条展开。</p></div>
+          </li>
+        </ul>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 跑起来</span><button class="copy" type="button">复制</button></div>
+<pre>$ python3 mini_agent.py
+<span class="c"># 第 1 轮:模型点菜 read_file(README.md) → 你执行回传</span>
+<span class="c"># 第 2 轮:模型读完内容,不再点菜,输出三句话总结</span>
+这是一个面向初学者的 AI 教程站,共 21 门课程,按五大分类组织。
+它提供终端实操风格的中文教程,附带可复制的命令与速查表。
+内容依据官方文档整理,强调动手验证。</pre>
+        </div>
+        <p><small>输出是示意口径——真实回答随模型与 README 内容而变；关键是过程：两轮循环、一次工具调用、零行 if-else 由你编写。</small></p>
+
+        <div class="note warn"><b>这是教学示意：</b>它没有权限控制（能读你磁盘上任何路径）、没有重试、没有并发。真实产品至少要加目录白名单与敏感操作审批——这正是下一节的主题。</div>
+      </section>
+
+      <!-- ===== 07 局限与风险 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>局限与风险：四个必须预装的「刹车」</h2>
+        <p>Agent 的自由度比聊天机器人高一个数量级，出事的方式也多一个数量级。四个坑，每个都要在写第一行代码之前就想好刹车在哪。</p>
+
+        <h3>坑一：循环失控</h3>
+        <p>模型可能对同一个失败工具反复重试，或在两个工具之间来回打转；每转一圈，全部历史都重新发送一遍——错得越久，烧得越多。</p>
+        <div class="code">
+          <div class="code-head"><span>brakes.py · 给循环上三道保险（节选）</span><button class="copy" type="button">复制</button></div>
+<pre>for step in range(max_steps):            <span class="c"># 1. 步数上限</span>
+    ...
+    if usage.total_tokens &gt; budget:      <span class="c"># 2. 预算熔断</span>
+        raise BudgetExceeded(...)
+    ...
+<span class="c"># 3. 工具报错返回"可读"信息,引导模型换路而不是原路重试</span>
+return {<span class="g">"error"</span>: <span class="g">"文件不存在;检查路径,或改用 list_dir 查看目录"</span>}</pre>
+        </div>
+
+        <h3>坑二：权限过大</h3>
+        <p>Agent 拿到 shell 就等于拿到你的机器：删文件、改配置、外发数据都可能发生。默认最小权限——只读放行，写入与命令要审批；不可信任务跑在容器或沙箱里。各家 CLI 的 <code>--yolo</code> / <code>--auto</code> 档位都是「把判断权交出去」，用之前先 <code>git status</code> 看一眼，确保有退路。权限门的最小实现思路，其实只有一个白名单加一道人工闸：</p>
+        <div class="code">
+          <div class="code-head"><span>perm.py · 权限门的最小实现思路（示意）</span><button class="copy" type="button">复制</button></div>
+<pre>ALLOW_READ = {<span class="g">"./src"</span>, <span class="g">"./docs"</span>}          <span class="c"># 只读白名单目录</span>
+
+def guard(tool: str, args: dict) -&gt; bool:
+    if tool == <span class="g">"read_file"</span>:
+        return args[<span class="g">"path"</span>].startswith(tuple(ALLOW_READ))
+    <span class="c"># 写入与 shell:一律回交人类审批</span>
+    return ask_human(f<span class="g">"允许 {tool}({args}) 吗? [y/N]"</span>)</pre>
+        </div>
+        <p><small>把 <code>guard()</code> 插在第 06 节主循环「执行工具」之前，两行代码完成接入——所有成熟的 Agent 产品里，都有这个函数的复杂版本。</small></p>
+        <div class="note warn"><b>一条硬线：</b>凡是全自动档，都等于授权模型替你做「能不能改」的判断。仓库有未提交改动、或脚本会碰线上环境时，退回「每步审批」。</div>
+
+        <h3>坑三：成本失控</h3>
+        <p>Agent 每一步都把「全部历史 + 工具结果」重新发给模型：上下文随步数增长，成本近似平方级爬升。长任务要压缩上下文、粗活用小模型、每步打印 usage。</p>
+        <div class="note">省钱三招：粗活小模型、精活大模型（同一任务分程用不同模型）；每步打印 <code>usage</code>，心里有数；长会话勤压缩——省下来的都是真金白银。</div>
+        <div class="code">
+          <div class="code-head"><span>cost.log · 一次 10 步任务的 token 体感（示意）</span><button class="copy" type="button">复制</button></div>
+<pre>第 1 步  请求约 2k tokens
+第 5 步  请求约 15k tokens
+第 10 步 请求约 30k tokens
+<span class="c"># 整轮成本 ≈ Σ(每步全量上下文) —— 由"步数 × 上下文"决定</span></pre>
+        </div>
+
+        <h3>坑四：盲目信任执行结果</h3>
+        <p>幻觉在 Agent 里没有消失，只是换了一身衣服：工具没搜到不代表不存在，网页内容错了模型会「自信地」接着编。对策三层：终稿必审 diff；关键事实让它给出处；重要任务导出会话留档。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 收工三连</span><button class="copy" type="button">复制</button></div>
+<pre>git diff                 <span class="c"># 1. 人工过一遍它到底改了什么</span>
+git add -p               <span class="c"># 2. 认可一块收一块,不整包吞下</span>
+<span class="c"># 3. 会话导出留档(如 Kimi Code 的 /export-md,见本站专页)</span></pre>
+        </div>
+        <div class="note warn"><b>执行结果 ≠ 事实：</b>grep 没搜到，可能只是关键词不对。人工看 diff 是最后一道、也是最便宜的一道防线。</div>
+      </section>
+
+      <!-- ===== 08 多智能体与资源 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶：多智能体协作，与精选资源</h2>
+
+        <h3>多智能体：把一个大脑变成一个团队</h3>
+        <p>当单 Agent 的工具太多、上下文太挤时，可以把任务分给多个角色化 Agent：一个规划者拆解任务，几个执行者各管一段，一个审查者复核产出，最后由协调者汇总交差。AutoGen、CrewAI 把这套模式产品化；LangGraph 用「图」来编排这类流程。</p>
+        <div class="code">
+          <div class="code-head"><span>team.log · 多智能体消息流（示意）</span><button class="copy" type="button">复制</button></div>
+<pre>用户目标 → 规划者拆成 3 个子任务
+  ├─ 执行者 A: 写代码     → 产出 patch
+  ├─ 执行者 B: 写文档     → 产出 docs
+  └─ 审查者 C: 复核 A/B   → 通过 / 打回
+协调者汇总 → 交用户审批</pre>
+        </div>
+        <dl class="facts">
+          <div class="fact"><dt>规划者</dt><dd>拆任务、定每步的验收标准</dd></div>
+          <div class="fact"><dt>执行者</dt><dd>干活；一人一域，工具集按角色裁剪</dd></div>
+          <div class="fact"><dt>审查者</dt><dd>复核产出，敢于打回而不是放行</dd></div>
+          <div class="fact"><dt>协调者</dt><dd>维护共享上下文，对外交差</dd></div>
+        </dl>
+        <p>但要泼一盆冷水：<b>多智能体不是免费午餐</b>——通信本身消耗 token，一个角色的错误会顺着消息流向下游放大。Anthropic 在《Building Effective Agents》里的建议是：能用单 Agent + 好工具解决的，就别上多 Agent；确要上，先让每个单 Agent 都可靠。什么信号说明值得上？任务能按专业域干净切分、单 Agent 上下文装不下、且各段之间只需要少量交接信息。</p>
+
+        <h3>顺手指一条路：怎么读框架源码</h3>
+        <p>任何框架、任何产品，先找主循环：在仓库里搜 <code>stop_reason</code>、<code>finish_reason</code>、<code>tool_calls</code> 这三个词，找到「调模型—判停—执行—回传」四步，剩下都是外围。第 03 节的同构对照表，就是你的寻宝图。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 在任意框架仓库里定位主循环</span><button class="copy" type="button">复制</button></div>
+<pre>grep -rn <span class="g">"stop_reason\|finish_reason\|tool_calls"</span> src/ | head -20
+<span class="c"># 命中的那几行,就是整个框架黑盒的开关</span></pre>
+        </div>
+
+        <h3>精选资源（真实链接）</h3>
+        <ul>
+          <li>Anthropic《Building Effective Agents》（必读的方法论）——<a href="https://www.anthropic.com/research/building-effective-agents" rel="noopener">anthropic.com/research/building-effective-agents</a></li>
+          <li>Anthropic 工具使用官方文档——<a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview" rel="noopener">platform.claude.com/docs · tool use</a></li>
+          <li>OpenAI Function Calling 指南——<a href="https://platform.openai.com/docs/guides/function-calling" rel="noopener">platform.openai.com/docs/guides/function-calling</a></li>
+          <li>Model Context Protocol 官网——<a href="https://modelcontextprotocol.io" rel="noopener">modelcontextprotocol.io</a></li>
+          <li>LangChain 文档——<a href="https://python.langchain.com/docs/introduction/" rel="noopener">python.langchain.com/docs</a></li>
+          <li>Microsoft AutoGen——<a href="https://microsoft.github.io/autogen/" rel="noopener">microsoft.github.io/autogen</a></li>
+        </ul>
+        <div class="note"><b>下一步去哪：</b>去 <b>ai-math.html</b> 补数学地基；想直接上手产品，从 <b>claude-code.html</b> 或 <b>kimi-code.html</b> 开始；想组 LLM 应用再去 <b>langchain.html</b>。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>能背出 Agent 公式（LLM+循环+工具+目标），并说清它与聊天机器人的区别</span></label>
+          <label><input type="checkbox" data-key="c2"><span>读懂了第 03 节的往返流程：tool_use / tool_result（或 tool_calls / role:"tool"）</span></label>
+          <label><input type="checkbox" data-key="c3"><span>跑通或读懂了第 06 节的最小 Agent，并指出 max_steps 在哪</span></label>
+          <label><input type="checkbox" data-key="c4"><span>能说出一条工具 description 里「写给模型看」的部分，并动手改好过一次</span></label>
+          <label><input type="checkbox" data-key="c5"><span>说得出三大风险（循环失控 / 权限过大 / 成本失控）及各自的刹车</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+        <div class="note">五个全勾，就进 <b>ai-math.html</b> 补地基；想边玩边学，开一个终端 Agent 对照本页第 04 节观察它的每一次「思考—行动—观察」。</div>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="ai.html"><span>← 上一篇</span><b>AI（人工智能）教程</b></a>
+        <a class="next" href="ai-math.html"><span>下一篇 →</span><b>AI 数学基础教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 Anthropic（Tool use、《Building Effective Agents》）与 OpenAI（Function Calling）官方文档，以及 LangChain、AutoGen 等开源框架 README 整理；代码为教学示意，API 形态以官方文档为准，2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 框架迭代极快，具体参数与命令以各官方文档为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Codex 教程 · AI Code Study</title>
+<meta name="description" content="Codex CLI 上手指南：安装与 ChatGPT 登录、沙箱与审批模型、AGENTS.md 项目约定、config.toml 配置、斜杠命令速查、云端任务与避坑清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/codex.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Codex 教程 · AI Code Study">
+<meta property="og:description" content="Codex CLI 上手指南：安装与 ChatGPT 登录、沙箱与审批模型、AGENTS.md 项目约定、config.toml 配置、斜杠命令速查、云端任务与避坑清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/codex.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Codex 教程 · AI Code Study">
+<meta name="twitter:description" content="Codex CLI 上手指南：安装与 ChatGPT 登录、沙箱与审批模型、AGENTS.md 项目约定、config.toml 配置、斜杠命令速查、云端任务与避坑清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Codex：OpenAI 的终端与云端编码 Agent",
+  "description": "Codex CLI 上手指南：安装与 ChatGPT 登录、沙箱与审批模型、AGENTS.md 项目约定、config.toml 配置、斜杠命令速查、云端任务与避坑清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/codex.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="codex">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools" class="on">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-tools">AI 编程工具</a><span>/</span>
+      <b>Codex</b>
+    </nav>
+    <p class="eyebrow">CODING TOOLS · <b>CODEX</b> · OpenAI 的编码 Agent</p>
+    <h1>Codex：OpenAI 的<em>终端与云端</em>编码 Agent</h1>
+    <p class="lede">开源、Rust 写的官方 CLI，配 ChatGPT 账号就能用。这一页讲清楚它的招牌设计——沙箱与审批：命令先在沙箱里跑，需要越界才问你。安装、AGENTS.md、速查表、云端任务，一路走完。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/my-project</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">npm install -g @openai/codex</span></div>
+        <div class="term-line"><span class="out">added 1 package in 4s</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">codex</span></div>
+        <div class="term-line"><span class="out">Sign in with <span class="ok">ChatGPT</span> — 浏览器授权后进入 TUI</span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">/init</span></div>
+        <div class="term-line"><span class="ok">AGENTS.md created — 项目约定已写入仓库根目录</span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">给 utils/date.ts 补上边界情况的测试并跑通</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装</a>
+        <a href="#s3"><span class="idx">03</span>登录与首次运行</a>
+        <a href="#s4"><span class="idx">04</span>沙箱与核心概念</a>
+        <a href="#s5"><span class="idx">05</span>命令速查</a>
+        <a href="#s6"><span class="idx">06</span>实战流程</a>
+        <a href="#s7"><span class="idx">07</span>避坑指南</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="kimi-code.html">Kimi Code CLI</a>
+        <a href="claude-code.html">Claude Code</a>
+        <a href="opencode.html">OpenCode</a>
+        <a href="index.html#cat-tools">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装</a>
+          <a href="#s3"><span class="idx">03</span>登录与首次运行</a>
+          <a href="#s4"><span class="idx">04</span>沙箱与核心概念</a>
+          <a href="#s5"><span class="idx">05</span>命令速查</a>
+          <a href="#s6"><span class="idx">06</span>实战流程</a>
+          <a href="#s7"><span class="idx">07</span>避坑指南</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>它是什么：本地沙箱优先，云端随时补位</h2>
+        <p>Codex CLI 是 OpenAI 官方的编码 Agent，源码在 github.com/openai/codex、Apache-2.0 协议，核心用 Rust 写成单个本地二进制。它和本站其他终端 Agent 最大的差异在设计哲学上：<b>先沙箱，后审批</b>——命令默认关进操作系统级的沙箱里跑（macOS 用 Seatbelt，Linux 用 bubblewrap + seccomp），沙箱内的读操作不打扰你；一旦要写文件、要联网这种越界动作，才弹出来问你。</p>
+        <p>Codex 不只是 CLI。同一套能力铺开成一个家族：终端里的 <code>codex</code>（TUI 与脚本两用）、IDE 扩展、桌面 App（<code>codex app</code>），以及 chatgpt.com/codex 上的 Codex Web——在网页或 GitHub 上派任务，云端环境跑完把 diff 拉回本地。CLI 里的 <code>codex cloud</code> 和 <code>codex apply</code> 就是这条云端通道的本地入口。</p>
+        <p>开源这件事对使用者也很实际：changelog 公开可查、issue 区能看到真实反馈、CI 里可以钉死某个版本避免「昨晚升级后行为变了」。用官方工具的同时保留了对它的可见性。</p>
+        <p>计费走 ChatGPT 订阅：Plus、Pro、Business、Edu、Enterprise 都含 Codex 额度，首次启动用 ChatGPT 账号登录即可；也可以改用 API key 按量付费（需要额外配置）。</p>
+        <ul>
+          <li><b>适合：</b>信任沙箱模型、想让 Agent 少打扰你的日常开发；脚本与 CI 里的非交互任务；把独立任务派给云端并行跑；跨工具共享 AGENTS.md 约定。</li>
+          <li><b>不适合：</b>网络完全隔离的受限环境（沙箱联网要显式配置）；对审批弹窗有强依赖的流程（它的哲学是沙箱兜底而非步步确认）。</li>
+        </ul>
+        <p>还有一个容易忽略的点：Codex 提供 <code>/import</code> 命令，可以直接迁移 Claude Code 的配置、项目文件和近期会话。从别家迁移过来的成本，比想象中低得多。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>开发商</dt><dd>OpenAI（官方 CLI）</dd></div>
+          <div class="fact"><dt>开源协议</dt><dd>Apache-2.0（github.com/openai/codex）</dd></div>
+          <div class="fact"><dt>实现语言</dt><dd>Rust，发布为单一二进制</dd></div>
+          <div class="fact"><dt>版本节奏</dt><dd>0.16x（2026-10 底），发布极快，以 npm 页为准</dd></div>
+          <div class="fact"><dt>平台</dt><dd>macOS 12+ · Linux</dd></div>
+          <div class="fact"><dt>原生 Windows</dt><dd class="no">实验支持，建议 WSL2</dd></div>
+          <div class="fact"><dt>登录</dt><dd>ChatGPT 账号或 API key</dd></div>
+          <div class="fact"><dt>项目约定</dt><dd>AGENTS.md（开放标准，工具间通用）</dd></div>
+        </dl>
+
+        <div class="note"><b>和 Claude Code 怎么选：</b>两家都强。Codex 的沙箱让你敢于把审批阈值调低——它跑不了出格的事；Claude Code 的权限弹窗更细。AGENTS.md 是跨工具的开放标准，Claude Code 近年版本也能读它，约定文件写一份两边受益。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：npm 一条命令，或官方脚本拿二进制</h2>
+        <p>推荐 npm 方式——npm 包里带的是预编译好的 Rust 二进制，装完就能跑。不碰 Node 的机器走官方安装脚本，macOS 也可以 Homebrew。</p>
+        <p>系统要求不高：macOS 12+、Ubuntu 20.04+ / Debian 10+，Windows 11 建议 WSL2；内存 4GB 起步（8GB 更稳）；Git 2.23+ 可选但强烈建议装——内置的 PR 助手和 diff 能力都依赖它。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">npm（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">官方脚本</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">Homebrew</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 需要 npm/Node 在 PATH 里（二进制本身是 Rust，不依赖 Node 运行）</span>
+npm install -g @openai/codex
+
+<span class="c"># 验证 + 以后升级</span>
+codex --version
+npm install -g @openai/codex@latest</pre>
+          </div>
+          <small>用 nvm 的机器先切到新版本 Node 再装（npm 只是分发渠道，codex 本体是 Rust 二进制）。全局 bin 目录不在 PATH 会 command not found。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># macOS / Linux：下载独立二进制 + 校验</span>
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+
+<span class="c"># Windows（PowerShell）</span>
+powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"
+
+<span class="c"># 装完重开终端验证</span>
+codex --version</pre>
+          </div>
+          <small>脚本默认从 releases.openai.com 下载，失败会回落到 GitHub Releases。装完<b>重开终端</b>。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># macOS（cask 形式）</span>
+brew install --cask codex
+
+<span class="c"># 内置的自更新命令也认 brew 安装</span>
+codex update</pre>
+          </div>
+          <small>brew 装到 /opt/homebrew/bin。Windows 用户建议 WSL2 里走脚本或 npm，原生 Windows 目前仍属实验支持。</small>
+        </div>
+
+        <div class="note warn"><b>装完先体检：</b>跑一次 <code>codex doctor</code>，它会检查安装、配置、登录态和沙箱运行环境。Linux 上沙箱依赖 user namespaces，受限容器里跑不动时 doctor 会告诉你原因。</div>
+
+        <h3>升级与卸载</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 升级与卸载</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 内置自更新（各安装渠道都认）</span>
+codex update
+
+<span class="c"># npm 安装的：重装最新版 / 卸载</span>
+npm install -g @openai/codex@latest
+npm uninstall -g @openai/codex
+
+<span class="c"># brew 安装的：</span>
+brew upgrade --cask codex
+brew uninstall --cask codex</pre>
+        </div>
+        <small>Codex 发布节奏很快，隔一阵就升级一次；配置和会话都在 ~/.codex/，重装不丢。</small>
+
+        <h3>装好了却 command not found：先查 PATH</h3>
+        <p>三种渠道的可执行文件落在不同位置，新装的路径往往要重开终端才进 PATH。逐一定位：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 定位与临时验证</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 找到它装在哪</span>
+which codex
+npm config get prefix          <span class="c"># npm 装的：全局 bin 在 $(prefix)/bin</span>
+
+<span class="c"># PATH 里有没有这些目录</span>
+echo $PATH | tr <span class="g">':'</span> <span class="g">'\n'</span> | grep -E <span class="g">'npm|homebrew'</span>
+
+<span class="c"># 不改配置，直接用绝对路径验证能跑</span>
+/opt/homebrew/bin/codex --version</pre>
+        </div>
+        <small>确认能跑后，把缺的目录补进 shell 配置文件的 PATH，或重开终端让它自动生效。</small>
+      </section>
+
+      <!-- ===== 03 登录与首次运行 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>登录与首次运行：ChatGPT 授权，然后信任这个目录</h2>
+        <p>第一次敲 <code>codex</code> 会让你选登录方式：<b>Sign in with ChatGPT</b>（推荐，订阅额度）或 API key。浏览器里授权一次，凭证存在本地。之后每个新仓库第一次启动还会问你是否<b>信任该目录</b>——这是沙箱体系的门口岗哨。</p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 首次运行的完整动线</span><button class="copy" type="button">复制</button></div>
+<pre><span class="pr">$ </span><span class="cmd">cd ~/your-project &amp;&amp; codex</span>
+<span class="out">选择登录方式 → Sign in with ChatGPT → 浏览器完成授权</span>
+<span class="out">该目录首次运行 → 确认信任，进入 TUI</span>
+<span class="pr">&gt; </span><span class="cmd">/status</span>
+<span class="ok">model / approval policy / writable roots / token 用量 一屏可见</span></pre>
+        </div>
+        <p><small>信任确认只针对目录，做过一次就记住。换了新仓库会再问一次——这不是烦人，是它在替你守门。</small></p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 登录管理</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 浏览器授权登录（订阅用户）</span>
+codex login
+
+<span class="c"># 命令行方式（设备码 / API key）也有</span>
+codex logout      <span class="c"># 共用机器上记得清凭证</span>
+codex login status</pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>进仓库启动</h4><p><code>cd ~/your-project &amp;&amp; codex</code>。工作目录就是它的工作区边界，跟 Claude Code、Kimi Code 同一戒律。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>跑一次 /init</h4><p>生成 <b>AGENTS.md</b> 脚手架，把构建命令、目录结构、代码风格写进去并提交到 git，全队共享。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>观察沙箱如何工作</h4><p>让它「读一遍 src 并总结」——只读操作全程无弹窗；再让它「建个文件」——写操作会被沙箱拦下或请求审批。这两步看完，你就理解 Codex 了。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>用 /status 核对状态</h4><p>当前模型、审批策略、可写目录、token 余量一屏看全，不确定就先看它。</p></div>
+          </li>
+        </ul>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 三种常用启动姿势</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 交互 TUI（默认）</span>
+codex
+
+<span class="c"># 非交互：一条任务跑完拿结果就走</span>
+codex exec <span class="g">"解释 build 脚本做了什么，输出到 stdout"</span>
+
+<span class="c"># 恢复上次会话（--last 直接接最近一次）</span>
+codex resume --last</pre>
+        </div>
+
+        <div class="note">退出 TUI 用 <b>/quit</b> 或 <b>/exit</b>。会话默认落盘，<code>codex resume</code> 随时能翻旧会话接着干，<code>codex fork</code> 还能把旧会话复制一份分头探索。</div>
+
+        <h3>从 Claude Code 迁移过来：/import</h3>
+        <p>已经在用 Claude Code？不用从零开始。会话里跑 <code>/import</code>，它会把 Claude Code 的配置、项目文件和近期会话列出来，你勾选哪些要迁移，它负责搬进 Codex 的配置目录和本地文件。AGENTS.md 和 CLAUDE.md 的写法高度相通，约定文件基本可以照搬。</p>
+        <div class="code">
+          <div class="code-head"><span>TUI</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>/import
+<span class="c"># 选择要迁移的配置 / 项目文件 / 历史会话</span>
+<span class="c"># 注意：任务运行中不可用，需在本地 TUI 会话里执行</span></pre>
+        </div>
+
+        <h3>会话管理：分叉、归档与压缩</h3>
+        <div class="code">
+          <div class="code-head"><span>TUI · 会话操作</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>/fork            <span class="c"># 复制当前对话为新线程，试另一条思路</span>
+<span class="prompt">&gt; </span>/side 顺便确认这个方案有没有明显的安全问题
+                   <span class="c"># 临时支线提问，不打断主任务</span>
+<span class="prompt">&gt; </span>/compact         <span class="c"># 长对话先压缩，留住关键结论</span>
+<span class="prompt">&gt; </span>/archive        <span class="c"># 归档并退出；codex unarchive 可恢复</span></pre>
+        </div>
+        <p><small>注意区分：<b>/new</b> 开新对话但不清屏，<b>/clear</b> 清屏并开新对话，<b>Ctrl-L</b> 只清屏不动对话。归档用 /archive，删除用 /delete——后者不可恢复，还连带删掉派生的子会话。</small></p>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：沙箱、AGENTS.md、分层配置、云端</h2>
+
+        <h3>沙箱与审批：两层独立旋钮</h3>
+        <p>Codex 的安全模型是两个独立设置的组合。<b>沙箱模式</b>管「命令能碰什么」：<code>read-only</code>（默认，只能读）、<code>workspace-write</code>（可写工作区 + 临时目录）、<code>danger-full-access</code>（无沙箱）。<b>审批策略</b>管「什么时候问你」：默认 <code>on-request</code>（模型自己判断何时请求审批），也可设 <code>never</code>（从不问，失败直接返回给模型）。会话里用 <code>/permissions</code> 随时切预设（如 <b>Read Only</b>、<b>Auto</b>），配置层面写进 config.toml 持久化。</p>
+        <p>两档怎么搭：日常在别人仓库里围观，read-only 就够；自己的项目开 workspace-write，写文件不打扰你，只有联网、写工作区之外这类越界动作才会请求审批。审批弹出来时看清命令再放行——沙箱挡住了 90%，剩下 10% 的判断权在你。</p>
+        <p>特别注意：<code>workspace-write</code> 下<b>网络默认是关的</b>——npm install 装不上依赖多半是这个原因，解锁方式见第 07 节。</p>
+
+        <div class="code">
+          <div class="code-head"><span>config.toml · 最常用的一段</span><button class="copy" type="button">复制</button></div>
+<pre>model = <span class="g">"gpt-5.3-codex"</span>          <span class="c"># 模型名以 /model 列表为准</span>
+approval_policy = <span class="g">"on-request"</span>
+sandbox_mode = <span class="g">"workspace-write"</span>
+
+<span class="c"># workspace-write 的细则（可选）</span>
+[sandbox_workspace_write]
+network_access = <span class="g">true</span>            <span class="c"># 放行沙箱内联网，默认 false</span>
+<span class="c"># writable_roots = ["~/logs"]</span></pre>
+        </div>
+
+        <h3>AGENTS.md：一份写、处处用的项目约定</h3>
+        <p><code>/init</code> 在当前目录生成 AGENTS.md 脚手架。它是开放标准（agents.md），不止 Codex 读。层级从上往下合并：全局的 <b>~/.codex/AGENTS.md</b>、仓库根的 <b>AGENTS.md</b>、再到子目录里的 AGENTS.md——越靠近你工作文件的约定优先级越高。内容写法与 CLAUDE.md 同理：命令化、条目化，别写散文。</p>
+
+        <div class="code">
+          <div class="code-head"><span>AGENTS.md 的层级</span><button class="copy" type="button">复制</button></div>
+<pre>~/.codex/AGENTS.md                <span class="c"># 全局个人约定，所有项目生效</span>
+~/your-project/AGENTS.md          <span class="c"># 仓库根，随 git 提交，全队共享</span>
+~/your-project/src/AGENTS.md      <span class="c"># 模块级，处理该目录时优先生效</span></pre>
+        </div>
+
+        <h3>config.toml 分层与排查</h3>
+        <p>配置在 <b>~/.codex/config.toml</b>，支持 profiles（<code>[profiles.xxx]</code> 配 <code>--profile</code> 切换）。企业托管场景还有更高优先级的 requirements.toml 层。搞不清「为什么这个设置没生效」时，<code>/debug-config</code> 会把每一层的优先级和来源打印出来。</p>
+
+        <h3>MCP 与云端任务</h3>
+        <p>MCP 服务器配在 config.toml 的 <code>[mcp_servers.*]</code> 段，<code>/mcp</code> 查看会话里可用的外部工具。云端侧：chatgpt.com/codex 派发的任务跑在云端环境里，本地用 <code>codex cloud</code> 浏览、用 <code>codex apply</code> 把云端 agent 产出的 diff 以 git apply 方式落到工作区；GitHub 上的 PR 也能让 Codex 自动做 code review。</p>
+
+        <div class="code">
+          <div class="code-head"><span>config.toml · 接一个 MCP 服务器</span><button class="copy" type="button">复制</button></div>
+<pre>[mcp_servers.docs]
+command = <span class="g">"npx"</span>
+args = [<span class="g">"-y"</span>, <span class="g">"@modelcontextprotocol/server-filesystem"</span>, <span class="g">"/tmp/docs"</span>]
+
+<span class="c"># 会话里用 /mcp 查看是否连上、有哪些工具</span></pre>
+        </div>
+        <small>服务器包名与参数以你要接的 MCP 服务器自己的文档为准。</small>
+
+        <div class="note"><b>审批预设怎么选：</b>陌生仓库用默认（read-only + on-request）；自己的常维护仓库给 workspace-write + Auto 预设，写操作顺畅但越界仍拦；<code>danger-full-access</code> 和 <code>--dangerously-bypass-approvals-and-sandbox</code> 只留给容器与一次性虚拟机。</div>
+      </section>
+
+      <!-- ===== 05 命令速查 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：子命令、斜杠命令、沙箱、配置</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了某个命令叫什么，直接搜 <b>沙箱</b>、<b>审批</b>、<b>恢复</b> 之类的关键词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索命令、模式、配置项，比如 exec / sandbox / AGENTS.md" aria-label="搜索命令">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">启动参数</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">斜杠命令</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">沙箱与审批</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">配置文件</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">codex</td><td>交互 TUI 会话（默认入口）</td></tr>
+                <tr><td class="k">codex "&lt;任务&gt;"</td><td>进入 TUI 并附带一句开场任务</td></tr>
+                <tr><td class="k">codex exec "&lt;任务&gt;"</td><td>非交互执行，输出完退出；提示词可用 stdin 传入</td></tr>
+                <tr><td class="k">codex exec --json</td><td>事件流以 JSONL 输出，供脚本消费</td></tr>
+                <tr><td class="k">codex exec --output-last-message &lt;file&gt;</td><td>把最终回复写入指定文件，CI 里好用</td></tr>
+                <tr><td class="k">codex resume [--last]</td><td>恢复历史会话；--last 直接接最近一次</td></tr>
+                <tr><td class="k">codex fork</td><td>复制旧会话为新线程，分头探索不破坏原记录</td></tr>
+                <tr><td class="k">codex review</td><td>非交互跑一次代码评审</td></tr>
+                <tr><td class="k">codex apply</td><td>把 Codex agent（云端）产出的 diff 以 git apply 落地</td></tr>
+                <tr><td class="k">codex cloud</td><td>浏览 Codex Cloud 任务并取回本地（实验特性）</td></tr>
+                <tr><td class="k">codex login / logout</td><td>登录（浏览器/设备码/API key）与登出</td></tr>
+                <tr><td class="k">codex mcp</td><td>管理外部 MCP 服务器</td></tr>
+                <tr><td class="k">codex doctor</td><td>体检：安装、配置、登录态、沙箱运行环境</td></tr>
+                <tr><td class="k">codex sandbox</td><td>在 Codex 提供的沙箱里直接跑一条命令调试</td></tr>
+                <tr><td class="k">codex agents</td><td>打开 Agent 中心，浏览与切换各会话线程</td></tr>
+                <tr><td class="k">codex app</td><td>启动桌面 App（未装会引导安装）</td></tr>
+                <tr><td class="k">codex update / completion</td><td>自更新 / 生成 shell 补全脚本</td></tr>
+                <tr><td class="k">codex --sandbox &lt;模式&gt;</td><td>启动时指定沙箱模式（read-only 等，exec 也认）</td></tr>
+                <tr><td class="k">codex -C &lt;目录&gt;</td><td>指定工作目录再启动</td></tr>
+                <tr><td class="k">codex --worktree</td><td>在托管的新 git worktree 里开工，改动隔离</td></tr>
+                <tr><td class="k">codex --add-dir &lt;目录&gt;</td><td>额外可写目录（跨仓库任务）</td></tr>
+                <tr><td class="k">codex -i &lt;图片&gt;</td><td>附带截图/设计稿作为输入（可逗号分隔多张）</td></tr>
+                <tr><td class="k">codex --profile &lt;名&gt;</td><td>套用 config.toml 里定义的整组配置</td></tr>
+                <tr><td class="k">codex exec --skip-git-repo-check</td><td>允许在非 git 目录里跑非交互任务</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">/init</td><td>在当前目录生成 AGENTS.md 脚手架</td></tr>
+                <tr><td class="k">/model</td><td>切换模型与推理力度</td></tr>
+                <tr><td class="k">/permissions</td><td>切审批预设（如 Read Only / Auto）</td></tr>
+                <tr><td class="k">/plan [任务]</td><td>切到计划模式，先出方案再动手</td></tr>
+                <tr><td class="k">/review</td><td>让它审查当前工作区改动</td></tr>
+                <tr><td class="k">/diff</td><td>显示 git diff（含未跟踪的新文件）</td></tr>
+                <tr><td class="k">/mention &lt;路径&gt;</td><td>把文件/目录明确附进对话</td></tr>
+                <tr><td class="k">/status</td><td>模型、审批策略、可写根、token 用量</td></tr>
+                <tr><td class="k">/usage</td><td>账户 token 用量与限额重置</td></tr>
+                <tr><td class="k">/compact</td><td>总结压缩历史对话，释放上下文</td></tr>
+                <tr><td class="k">/new</td><td>同一 CLI 里开新对话（不清屏）</td></tr>
+                <tr><td class="k">/resume</td><td>从会话列表挑一个恢复</td></tr>
+                <tr><td class="k">/fork</td><td>把当前对话克隆成新线程</td></tr>
+                <tr><td class="k">/mcp [verbose]</td><td>列出会话可用的 MCP 工具</td></tr>
+                <tr><td class="k">/skills</td><td>浏览并套用本地 skills</td></tr>
+                <tr><td class="k">/goal &lt;目标&gt;</td><td>给线程挂一个持续追踪的任务目标</td></tr>
+                <tr><td class="k">/approve</td><td>对自动评审拦下的操作放行重试一次</td></tr>
+                <tr><td class="k">/debug-config</td><td>打印配置分层与生效来源，排配置问题</td></tr>
+                <tr><td class="k">/clear</td><td>清屏并开新对话（Ctrl-L 只清屏不清对话）</td></tr>
+                <tr><td class="k">/archive</td><td>归档当前会话并退出（不删记录，可恢复）</td></tr>
+                <tr><td class="k">/memories</td><td>开关记忆的注入与生成</td></tr>
+                <tr><td class="k">/agent</td><td>切换到某个子代理线程查看/继续其工作</td></tr>
+                <tr><td class="k">/raw</td><td>原始滚动模式，方便选中复制长输出</td></tr>
+                <tr><td class="k">/copy</td><td>复制最近一次完整回复（快捷键 Ctrl-O）</td></tr>
+                <tr><td class="k">/ps /stop</td><td>查看 / 停止后台终端任务</td></tr>
+                <tr><td class="k">/fast</td><td>开关模型的 Fast 服务档（视目录而定）</td></tr>
+                <tr><td class="k">/statusline /title /theme</td><td>自定义状态栏、终端标题、高亮主题</td></tr>
+                <tr><td class="k">/ide</td><td>把 IDE 打开的文件与选区带进下一条提示</td></tr>
+                <tr><td class="k">/vim /keymap</td><td>Vim 编辑模式 / 自定义 TUI 快捷键映射</td></tr>
+                <tr><td class="k">/apps /plugins</td><td>浏览连接器（以 $slug 引用）/ 管理插件</td></tr>
+                <tr><td class="k">/hooks</td><td>查看并信任生命周期钩子</td></tr>
+                <tr><td class="k">/quit /exit</td><td>退出 CLI</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>设置 / 值</th><th>含义</th></tr></thead>
+              <tbody>
+                <tr><td class="k">sandbox_mode = "read-only"</td><td>默认档。可读可执行，写文件必须过审批</td></tr>
+                <tr><td class="k">sandbox_mode = "workspace-write"</td><td>可写工作区与临时目录；联网默认关闭</td></tr>
+                <tr><td class="k">sandbox_mode = "danger-full-access"</td><td>无沙箱。只留给隔离环境</td></tr>
+                <tr><td class="k">[sandbox_workspace_write] network_access</td><td>true 时放行沙箱内网络，默认 false</td></tr>
+                <tr><td class="k">[sandbox_workspace_write] writable_roots</td><td>额外可写目录白名单</td></tr>
+                <tr><td class="k">[sandbox_workspace_write] exclude_slash_tmp</td><td>true 时把 /tmp 排除出可写范围</td></tr>
+                <tr><td class="k">approval_policy = "on-request"</td><td>默认。模型自行决定何时请求你审批</td></tr>
+                <tr><td class="k">approval_policy = "never"</td><td>从不询问，失败直接回给模型处理</td></tr>
+                <tr><td class="k">/permissions 预设</td><td>会话内一键切 Read Only / Auto 等预设</td></tr>
+                <tr><td class="k">default_permissions = ":workspace"</td><td>新版权限档案：:read-only / :workspace / :danger-full-access</td></tr>
+                <tr><td class="k">[permissions.&lt;名&gt;.network.domains]</td><td>按域名允许/拒绝联网，最小化放行</td></tr>
+                <tr><td class="k">--approve-for-me</td><td>自动评审代你放行（workspace-write + 自动审批），别名 not-so-yolo</td></tr>
+                <tr><td class="k">--dangerously-bypass-approvals-and-sandbox</td><td>全关。别名 --yolo，只在容器里用</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>文件 / 配置项</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">~/.codex/config.toml</td><td>主配置：模型、审批、沙箱、MCP、profiles</td></tr>
+                <tr><td class="k">model / model_provider</td><td>默认模型与供应商（可接第三方）</td></tr>
+                <tr><td class="k">[profiles.&lt;名&gt;]</td><td>配置组，codex --profile 切换整套设定</td></tr>
+                <tr><td class="k">[mcp_servers.&lt;名&gt;]</td><td>MCP 服务器：command + args 启动方式</td></tr>
+                <tr><td class="k">AGENTS.md（仓库根）</td><td>项目约定，/init 生成，随 git 共享</td></tr>
+                <tr><td class="k">~/.codex/AGENTS.md</td><td>全局个人约定，对所有项目生效</td></tr>
+                <tr><td class="k">子目录 AGENTS.md</td><td>模块级约定，离工作文件越近优先级越高</td></tr>
+                <tr><td class="k">tui.vim_mode_default = true</td><td>编辑器默认 Vim 模式（会话内 /vim 临时切）</td></tr>
+                <tr><td class="k">tui.keymap / tui.theme</td><td>自定义快捷键映射 / 高亮主题（/keymap /theme）</td></tr>
+                <tr><td class="k">requirements.toml</td><td>企业托管层，优先级高于个人配置</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的内容。换个词试试，比如「沙箱」「审批」「恢复」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：本地修 bug + 云端派任务，两条路各走一遍</h2>
+        <p>先走本地 TUI 闭环，再把一个独立任务扔给云端，最后把结果拉回来。</p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 本地：计划 → 执行 → 审查</span><button class="copy" type="button">复制</button></div>
+<pre>cd ~/your-project
+codex
+
+<span class="prompt">&gt; </span>/init                <span class="c"># 首次：生成 AGENTS.md 并按团队习惯改好</span>
+<span class="prompt">&gt; </span>/plan 把订单导出从同步改成异步任务，评估影响面
+<span class="c"># 它产出方案与文件清单，你确认后退出 plan 模式开干</span>
+
+<span class="prompt">&gt; </span>按方案实施，改完跑测试
+<span class="prompt">&gt; </span>/diff               <span class="c"># 亲眼过一遍每个改动</span>
+<span class="prompt">&gt; </span>/review             <span class="c"># 让另一个视角再查一遍</span></pre>
+        </div>
+
+        <h3>并行：--worktree 隔离开工</h3>
+        <p>大改动不想弄脏工作区，让 Codex 在托管的新 git worktree 里干活——改动隔离在独立目录，主工作区保持干净，完成后自己决定合不合：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>codex --worktree
+<span class="prompt">&gt; </span>重构 orders 模块的状态机，保持测试全绿</pre>
+        </div>
+
+        <h3>评审先行：/review 与 codex review</h3>
+        <p>提交前让它换一个视角看一遍改动。TUI 里 <code>/review</code> 审当前工作区；脚本化场景用非交互的 <code>codex review</code>，把评审意见直接产出成文本。它默认用会话模型评审，也可以在 config.toml 里用 <code>review_model</code> 单独指定。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 两种评审入口</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># TUI 里：审完 /diff 逐条核对</span>
+<span class="prompt">&gt; </span>/review
+
+<span class="c"># 脚本里：非交互评审，结论直接打到 stdout</span>
+codex review</pre>
+        </div>
+
+        <h3>非交互：塞进脚本与 CI</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · codex exec</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 一条任务：改完自动跑测试，最终结论写进文件</span>
+codex exec <span class="g">"修复 issue #42 描述的空指针，跑 npm test 验证"</span> \
+  --output-last-message /tmp/result.md
+
+<span class="c"># 事件流接程序，或从 stdin 喂长任务</span>
+codex exec --json <span class="g">"统计 TODO 数量并按模块分组输出"</span>
+cat task.md | codex exec -</pre>
+        </div>
+
+        <h3>云端：派出去，拉回来</h3>
+        <p>云端任务的完整循环：在 chatgpt.com/codex 上选好环境（绑定你的 GitHub 仓库）派任务，云端 Agent 在隔离环境里自己跑构建和测试，完成后你会得到一个可审阅的 diff。本地两条命令接住它：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 云端任务回本地</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 1) 在 chatgpt.com/codex 或 GitHub 上派发任务（选好环境）</span>
+<span class="c"># 2) 云端跑完后，本地浏览并取回</span>
+codex cloud
+codex apply          <span class="c"># 把云端 diff 以 git apply 落到工作区</span></pre>
+        </div>
+        <p>GitHub 侧的协作也值得一用：仓库连上 Codex 后，PR 可以交给它自动做 code review，评审意见直接留在 PR 里。人负责决策，它负责把每个 PR 先过一遍眼。</p>
+
+        <h3>把常用设定固化成 profile</h3>
+        <div class="code">
+          <div class="code-head"><span>config.toml · 双档位</span><button class="copy" type="button">复制</button></div>
+<pre>[profiles.safe]
+sandbox_mode = <span class="g">"read-only"</span>
+approval_policy = <span class="g">"on-request"</span>
+
+[profiles.fast]
+sandbox_mode = <span class="g">"workspace-write"</span>
+approval_policy = <span class="g">"on-request"</span>
+
+<span class="c"># 用法：codex --profile fast</span></pre>
+        </div>
+
+        <h3>配套文件长什么样：一份能直接抄的 AGENTS.md</h3>
+        <div class="code">
+          <div class="code-head"><span>AGENTS.md · 起步模板</span><button class="copy" type="button">复制</button></div>
+<pre># 项目：订单服务（Node 20 + pnpm）
+
+## 常用命令
+- 安装依赖：pnpm install
+- 跑测试：pnpm test（改 src/ 后必须跑）
+- 本地启动：pnpm dev
+
+## 约定
+- 包管理只用 pnpm，禁止 npm install
+- 提交信息用中文，格式：模块: 动作
+- src/orders/ 是核心域逻辑，改动前先读 src/orders/README.md</pre>
+        </div>
+        <p><small>按你仓库的真实命令改，别照抄。提交进 git 让全队共享——这是 AGENTS.md 和个人笔记最大的区别。</small></p>
+
+        <div class="note"><b>云端任务的正确用法：</b>派给云端的是「定义清楚、可离线验证」的任务（写模块、补测试、跑迁移）；需要来回讨论、看真实运行环境的活留本地。apply 之前先 <b>git status</b> 确认工作区干净，再让云端 diff 落地——混着本地未提交改动是灾难配方。两边用同一个 git 仓库衔接。</div>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个高频翻车点</h2>
+        <p>Codex 的坑大多和它的沙箱哲学有关：系统在替你守门，你得知道门在哪。</p>
+
+        <h3>坑一：命令被沙箱拦下 / npm install 失败</h3>
+        <p>症状：写文件成功但 <code>npm install</code> 报网络错误、测试跑不起来。原因几乎总是 <b>workspace-write 下网络默认关闭</b>。三种解法，按胆量递增：当场在审批里放行这一次；临时用 <code>/permissions</code> 切到更宽的预设；在 config.toml 里对信任的目录开 <code>[sandbox_workspace_write] network_access = true</code>。别忘了重启会话让配置生效。</p>
+        <div class="code">
+          <div class="code-head"><span>config.toml · 只对该放行的域名放行</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 新版权限档案可以按域名精细化（beta）</span>
+default_permissions = <span class="g">"dev-net"</span>
+
+[permissions.dev-net.filesystem]
+<span class="g">":minimal"</span> = <span class="g">"read"</span>
+
+[permissions.dev-net.filesystem.<span class="g">":workspace_roots"</span>]
+<span class="g">"."</span> = <span class="g">"write"</span>
+
+[permissions.dev-net.network]
+enabled = <span class="g">true</span>
+
+[permissions.dev-net.network.domains]
+<span class="g">"registry.npmjs.org"</span> = <span class="g">"allow"</span></pre>
+        </div>
+
+        <h3>坑二：AGENTS.md 死活不生效</h3>
+        <p>自查四件事：文件名必须是 <b>AGENTS.md</b>，全大写，没有后缀；位置要在<b>仓库根或当前工作目录</b>，放错层级读不到；修改后要<b>开新会话</b>，旧会话不会热加载；<code>/init</code> 生成的只是脚手架，里面的注释没删、约定没填，等于没写。用 <code>/status</code> 和 <code>/debug-config</code> 核对它到底加载了哪几层。</p>
+        <ul>
+          <li>文件名拼成 agents.md / AGENT.md / AGENTS.MD——都不行，标准就是全大写 AGENTS.md。</li>
+          <li>放在仓库根上一级或 home 下以为「全局生效」——全局层在 <b>~/.codex/AGENTS.md</b>，不是随便哪个上级目录。</li>
+          <li>写完忘了 git add——队友拉不到，CI 环境也读不到。</li>
+          <li>在一个会话里改了 AGENTS.md 就指望立刻生效——重新 <code>/new</code> 或重启会话。</li>
+        </ul>
+        <div class="note warn"><b>层级优先级：</b>子目录的 AGENTS.md 覆盖仓库根的同类约定，仓库根覆盖全局 ~/.codex/AGENTS.md。想让某条规则绝对生效，写在离工作文件最近的层级。</div>
+
+        <h3>坑三：非 git 目录跑不了 exec</h3>
+        <p><code>codex exec</code> 出于安全默认要求 git 仓库（改动可追溯）。临时在乱目录跑个只读任务，加 <code>--skip-git-repo-check</code>；但正经任务永远该在 git 仓库里跑——沙箱 + 可回滚的 diff 是它的安全底线。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 在非 git 目录跑一次性任务（仅限只读场景）</span>
+codex exec --skip-git-repo-check --sandbox read-only \
+  <span class="g">"分析 ~/logs/app.log 里的报错分布，输出 TOP 5"</span></pre>
+        </div>
+        <p><small>更简单的做法：临时 <b>git init</b> 一下。沙箱模式用 read-only 时它也不会写任何文件。</small></p>
+
+        <h3>坑四：从 Claude Code 过来的心智错位</h3>
+        <p>四点差异提前打好预防针：<b>安全模型</b>——Codex 先沙箱后审批，Claude Code 靠权限模式弹窗，所以别在 Codex 里找 <code>--dangerously-skip-permissions</code> 的等价焦虑，先看沙箱档位；<b>记忆文件</b>——AGENTS.md 是开放标准、按层级合并，CLAUDE.md 是 Claude 生态的名字（Codex 甚至提供 <code>/import</code> 迁移 Claude Code 的配置）；<b>会话操作</b>——Codex 的 /new 不清屏、/clear 清屏且开新对话，跟直觉略反；<b>审批词表</b>——这里叫 /permissions 与审批预设，不叫 permission modes。记不住就 /status，一屏看清当前档位。</p>
+        <p>反过来从 Codex 回 Claude Code 也一样会错位：那边写 CLAUDE.md、弹权限审批、快捷键是 Shift+Tab 轮换模式。两个工具各守各的约定，别指望肌肉记忆无缝迁移——这正是本站把它们各写一页的原因。</p>
+      </section>
+
+      <!-- ===== 08 进阶资源 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与官方资源</h2>
+        <ul>
+          <li><a href="https://developers.openai.com/codex" target="_blank" rel="noopener">developers.openai.com/codex</a> — 官方文档总站：快速上手、CLI 参考、斜杠命令、配置指南。</li>
+          <li><a href="https://developers.openai.com/codex/cli/slash-commands" target="_blank" rel="noopener">CLI 斜杠命令清单</a> — 全部内置命令的官方说明（本页速查表底本）。</li>
+          <li><a href="https://github.com/openai/codex" target="_blank" rel="noopener">github.com/openai/codex</a> — 开源仓库：源码、changelog、issue 区。</li>
+          <li><a href="https://www.npmjs.com/package/@openai/codex" target="_blank" rel="noopener">npmjs.com/package/@openai/codex</a> — npm 包页：最新版本号与安装命令。</li>
+          <li><a href="https://developers.openai.com/codex/guides/agents-md" target="_blank" rel="noopener">AGENTS.md 指南</a> — 项目约定文件的层级与写法。</li>
+          <li><a href="https://developers.openai.com/codex/config-reference" target="_blank" rel="noopener">config.toml 参考</a> — 全量配置键说明（配合 config-basic / config-advanced）。</li>
+          <li><a href="https://chatgpt.com/codex" target="_blank" rel="noopener">chatgpt.com/codex</a> — Codex Web：云端任务、环境配置、GitHub 集成。</li>
+        </ul>
+        <div class="note"><b>学完本页去哪：</b>先在本节实战里把本地闭环走通，再挑一个独立任务试云端。然后去读 <a href="https://developers.openai.com/codex/config-reference" target="_blank" rel="noopener">config.toml 完整参考</a>，把 profile 用起来；最后用 <a href="claude-code.html">Claude Code 教程</a> 对照着补齐另一派的用法，再看 <a href="opencode.html">OpenCode</a>——开源可接多模型的终端 Agent，思路又不一样。三家对比着用一周，你会形成自己的工具观。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>装完重开了终端，<b>codex --version</b> 与 <b>codex doctor</b> 都正常</span></label>
+          <label><input type="checkbox" data-key="c2"><span>用 ChatGPT 账号（或 API key）完成登录，知道自己的额度来源</span></label>
+          <label><input type="checkbox" data-key="c3"><span>跑过一次 <b>/init</b>，AGENTS.md 里写进了构建与测试的真实命令</span></label>
+          <label><input type="checkbox" data-key="c4"><span>亲眼见过沙箱拦截写操作，并用 <b>/permissions</b> 切过预设</span></label>
+          <label><input type="checkbox" data-key="c5"><span>跑过一次 <b>codex exec</b> 非交互任务，或用 <b>codex apply</b> 拉回过云端 diff</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="claude-code.html"><span>← 上一篇</span><b>Claude Code 教程</b></a>
+        <a class="next" href="opencode.html"><span>下一篇 →</span><b>OpenCode 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 Codex 官方文档（developers.openai.com/codex：CLI 指南、斜杠命令、权限与沙箱、配置参考）与 npmjs.com/package/@openai/codex 包页整理，更新至 2026-11。版本迭代极快，具体命令与默认值以 <b>codex --help</b>、<b>/help</b> 与官方文档当前版本为准。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 本页为独立学习笔记，与 OpenAI 无隶属关系。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

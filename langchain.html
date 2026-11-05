@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LangChain 教程 · AI Code Study</title>
+<meta name="description" content="LangChain 1.x 上手指南：安装与密钥、create_agent 与 init_chat_model、消息与工具调用、最小 RAG 实战、API 速查与避坑清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/langchain.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LangChain 教程 · AI Code Study">
+<meta property="og:description" content="LangChain 1.x 上手指南：安装与密钥、create_agent 与 init_chat_model、消息与工具调用、最小 RAG 实战、API 速查与避坑清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/langchain.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LangChain 教程 · AI Code Study">
+<meta name="twitter:description" content="LangChain 1.x 上手指南：安装与密钥、create_agent 与 init_chat_model、消息与工具调用、最小 RAG 实战、API 速查与避坑清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "LangChain：把 LLM 拼成真正的应用",
+  "description": "LangChain 1.x 上手指南：安装与密钥、create_agent 与 init_chat_model、消息与工具调用、最小 RAG 实战、API 速查与避坑清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/langchain.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="langchain">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml" class="on">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-ml">机器学习框架</a><span>/</span>
+      <b>LangChain</b>
+    </nav>
+    <p class="eyebrow">MACHINE LEARNING · <b>LANGCHAIN</b> · 编排 LLM 应用</p>
+    <h1>LangChain：把 LLM 拼成<em>真正的应用</em></h1>
+    <p class="lede">单独调一次模型 API 谁都会，难的让它查资料、调工具、记住上下文。这页按 LangChain 1.x 现行 API（2025 年 10 月发布 v1 之后的主线）带你从一行调用走到一个能检索问答的小 RAG。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/rag-demo</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">pip install -U langchain langchain-openai</span></div>
+        <div class="term-line"><span class="out">Successfully installed langchain-1.4.9 langchain-openai-1.x langgraph-1.x</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">export OPENAI_API_KEY=sk-****   <span class="warn"># key 走环境变量，别写进代码</span></span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">python rag_demo.py "LangChain 1.x 用什么构建智能体？"</span></div>
+        <div class="term-line"><span class="out">[检索] 命中 2 段知识库文本 → 作为上下文交给模型</span></div>
+        <div class="term-line"><span class="ok">答：create_agent() —— 1.x 的核心入口，底层由 LangGraph 驱动。</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>是什么与生态</a>
+        <a href="#s2"><span class="idx">02</span>安装与密钥</a>
+        <a href="#s3"><span class="idx">03</span>快速上手</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>API 速查</a>
+        <a href="#s6"><span class="idx">06</span>实战：最小 RAG</a>
+        <a href="#s7"><span class="idx">07</span>避坑指南</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="machine-learning.html">机器学习教程</a>
+        <a href="scikit-learn.html">Scikit-learn 教程</a>
+        <a href="tensorflow.html">TensorFlow 教程</a>
+        <a href="pytorch.html">PyTorch 教程</a>
+        <a href="index.html#cat-ml">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>是什么与生态</a>
+          <a href="#s2"><span class="idx">02</span>安装与密钥</a>
+          <a href="#s3"><span class="idx">03</span>快速上手</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>API 速查</a>
+          <a href="#s6"><span class="idx">06</span>实战：最小 RAG</a>
+          <a href="#s7"><span class="idx">07</span>避坑指南</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>LangChain 是什么：LLM 应用开发框架</h2>
+        <p>直接用 OpenAI、Anthropic 的官方 SDK，你能完成「发一段话、拿回一段回答」。但真实的应用要做的远不止这些：让模型<b>调用你的函数</b>查库存、<b>检索文档</b>再回答、<b>记住前几轮对话</b>、按步骤走完一个多环节流程。LangChain 把这些通用件做成了标准组件——你负责拼装，而不是手写循环、解析工具调用、管理状态。</p>
+        <p>2025 年 10 月发布的 <b>v1.0</b> 是一次大重写：核心入口收敛到 <code>create_agent</code>（构建智能体）和 <code>init_chat_model</code>（初始化任意厂商的模型），旧版的 <code>LLMChain</code>、<code>AgentExecutor</code> 等全部退场。如果你看过 0.x 时代的老教程，先默认它过时，以官方文档为准。</p>
+        <p>落到场景上：客服与文档问答（RAG）、让模型调用内部接口干活的自动化流、从非结构化文本里抽取字段（结构化输出）、给已有产品加一个「会查资料的助手」——这些是 LangChain 的主场。反过来，如果只是一次性问答或文本处理，直接调 SDK 反而更轻。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>当前主线</dt><dd>langchain 1.x（写本页时最新 1.4.9，2026-11 查 PyPI）</dd></div>
+          <div class="fact"><dt>1.0 发布</dt><dd>2025-10（API 大版本重写）</dd></div>
+          <div class="fact"><dt>语言</dt><dd>Python / JavaScript（本页讲 Python）</dd></div>
+          <div class="fact"><dt>协议</dt><dd>MIT</dd></div>
+          <div class="fact"><dt>Python 要求</dt><dd>≥ 3.10</dd></div>
+          <div class="fact"><dt>核心入口</dt><dd>create_agent / init_chat_model</dd></div>
+          <div class="fact"><dt>智能体运行时</dt><dd>LangGraph（持久化、流式、human-in-the-loop）</dd></div>
+          <div class="fact"><dt>0.x 旧 API</dt><dd class="no">已移出主包，搬进 langchain-classic</dd></div>
+        </dl>
+
+        <div class="note"><b>生态分工一张图：</b><code>langchain</code> 是编排主包（create_agent、中间件）；<code>langchain-core</code> 是抽象层（消息、向量库接口等基础类型）；<code>langgraph</code> 负责复杂状态图与多智能体；各厂商模型走独立集成包 <code>langchain-openai</code>、<code>langchain-anthropic</code> 等。装主包时这些依赖会自动带上，但你得知道谁是谁，报错才好定位。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：两个包 + 一把钥匙</h2>
+        <p>主包和模型集成包一起装，再把 API 密钥配进环境变量，就绪。建议先建一个干净的虚拟环境。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">pip（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">其他厂商与 uv</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">验证安装</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 主包 + OpenAI 集成一起装（会自动带上 langchain-core、langgraph）</span>
+pip install -U langchain langchain-openai
+
+<span class="c"># 把密钥写进环境变量（当前终端生效）</span>
+export OPENAI_API_KEY=sk-...        <span class="c"># macOS / Linux</span>
+setx OPENAI_API_KEY <span class="g">"sk-..."</span>        <span class="c"># Windows（新开终端生效）</span></pre>
+          </div>
+          <small>密钥从各厂商控制台申请。写成环境变量而不是硬编码在代码里，是避免把 key 提交进 Git 的第一道保险。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 换 Anthropic / Google，就换对应的集成包</span>
+pip install -U langchain langchain-anthropic
+pip install -U langchain langchain-google-genai
+
+<span class="c"># 本地跑开源模型（Ollama）</span>
+pip install -U langchain langchain-ollama
+
+<span class="c"># 用 uv 的话，也可以用 extras 一条装完</span>
+uv add <span class="g">"langchain[openai]"</span></pre>
+          </div>
+          <small>每种集成的环境变量名不同：OpenAI 用 <b>OPENAI_API_KEY</b>，Anthropic 用 <b>ANTHROPIC_API_KEY</b>，以对应集成包文档为准。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 版本对不对？</span>
+pip show langchain
+
+<span class="c"># 导入不报错就 OK</span>
+python -c <span class="g">"import langchain, langchain_openai; print('imports ok')"</span></pre>
+          </div>
+          <small>注意 <b>import 的名字是 langchain</b>，pip 包名也是 langchain；看到 langchain_core、langgraph 的报错也别慌，它们是随主包一起装的依赖。</small>
+        </div>
+
+        <div class="note warn"><b>密钥安全：</b>不要把 API key 写进源码、Notebook 或提交到仓库。用环境变量或 <code>.env</code> 文件（配 python-dotenv 的 <code>load_dotenv()</code>），并把 <b>.env</b> 加进 .gitignore。泄露的 key 会被扫库脚本秒捡，账单是真的。</div>
+      </section>
+
+      <!-- ===== 03 快速上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>快速上手：先调通模型，再让它动手</h2>
+
+        <div class="code">
+          <div class="code-head"><span>Python · hello_lc.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 第一步：用 init_chat_model 拿到模型，「厂商:模型名」一个字符串就够</span>
+<span class="c"># 模型名换成你账号可用的任何型号即可，以各服务商控制台为准</span>
+from langchain.chat_models import init_chat_model
+
+model = init_chat_model(<span class="g">"openai:gpt-5.5"</span>, temperature=0)
+print(model.invoke(<span class="g">"用一句话说明什么是 LLM 应用编排"</span>).text)</pre>
+        </div>
+
+        <p>能跑通上面三行，说明包和密钥都没问题。第二步，把一个会调工具的智能体立起来——这是 LangChain 1.x 的主角 <code>create_agent</code>：</p>
+
+        <div class="code">
+          <div class="code-head"><span>Python · 第一个智能体</span><button class="copy" type="button">复制</button></div>
+<pre>from langchain.agents import create_agent
+
+def get_word_count(text: str) -&gt; int:
+    <span class="g">"""统计一段文本去掉空格后的字数。"""</span>
+    return len(text.replace(<span class="g">" "</span>, <span class="g">""</span>))
+
+agent = create_agent(
+    model=<span class="g">"openai:gpt-5.5"</span>,          <span class="c"># 也能传 init_chat_model 的返回值</span>
+    tools=[get_word_count],           <span class="c"># 函数列表，模型自己决定何时调用</span>
+    system_prompt=<span class="g">"你是文字助手，需要统计字数时调用工具。"</span>,
+)
+
+result = agent.invoke(
+    {<span class="g">"messages"</span>: [{<span class="g">"role"</span>: <span class="g">"user"</span>, <span class="g">"content"</span>: <span class="g">"数一数这句有多少字：大模型应用落地"</span>}]}
+)
+print(result[<span class="g">"messages"</span>][-1].text)    <span class="c"># 取最后一条消息，就是最终回答</span></pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>配好密钥再跑</h4><p>首次运行最常见的报错就是没读到 API key。先 <code>export</code>（或写 .env），确认当前终端能 <code>echo $OPENAI_API_KEY</code> 打印出来。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>用「厂商:模型名」换模型</h4><p><code>init_chat_model("anthropic:claude-sonnet-4-6")</code>、<code>"ollama:llama3.3"</code>——换厂商只换字符串和对应集成包，业务代码不动。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>工具就是带 docstring 的函数</h4><p>模型靠 docstring 判断这个工具干什么、什么时候用。描述写得越清楚，调用越准。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>结果从 messages 里取</h4><p><code>agent.invoke</code> 返回完整消息历史，最后一条是回答；想看过程就把整个列表打出来，能看到模型的工具调用记录。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">模型名是唯一「会过时」的参数：不同账号可用的型号不同，报 model not found 就去服务商控制台核对，别照抄别人的代码。</div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：消息、工具、RAG 与记忆</h2>
+
+        <h3>消息与角色：对话的通用语言</h3>
+        <p>一切交互都是消息列表，角色只有几种：system（设定人设与规则）、user（用户输入）、assistant / AI（模型回答）、tool（工具执行结果）。1.x 里消息类统一从 <code>langchain.messages</code> 导入，也支持直接传 OpenAI 风格的字典。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 消息</span><button class="copy" type="button">复制</button></div>
+<pre>from langchain.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage
+
+messages = [
+    SystemMessage(<span class="g">"你是一名严谨的技术编辑。"</span>),
+    HumanMessage(<span class="g">"用一句话解释什么是 RAG。"</span>),
+]
+reply = model.invoke(messages)   <span class="c"># 返回 AIMessage</span>
+print(reply.text)                <span class="c"># .text 是纯文本</span>
+print(reply.content_blocks)      <span class="c"># 标准化内容块，兼容各厂商的推理/引用等信息</span></pre>
+        </div>
+
+        <h3>结构化输出与工具调用</h3>
+        <p>两个高频需求：<b>让模型返回程序能用的对象</b>（接数据库、接表单），以及<b>让模型决定调用你的函数</b>。前者用 <code>with_structured_output</code> 套一个 Pydantic 模型；后者最低层是 <code>bind_tools</code>，最高层就是 create_agent 帮你把「调用—执行—回填」的循环全包了。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 结构化输出</span><button class="copy" type="button">复制</button></div>
+<pre>from pydantic import BaseModel
+
+class BookReview(BaseModel):
+    title: str
+    score: int        <span class="c"># 1-10</span>
+    reason: str
+
+review = model.with_structured_output(BookReview).invoke(
+    <span class="g">"给《三体》写一条 30 字短评"</span>
+)
+print(review.title, review.score)    <span class="c"># 已经是 Python 对象，不是字符串</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Python · 工具定义与绑定</span><button class="copy" type="button">复制</button></div>
+<pre>from langchain.tools import tool
+
+@tool
+def get_weather(city: str) -&gt; str:
+    <span class="g">"""查询一个城市今天的天气。"""</span>
+    return f<span class="g">"{city}：晴，26°C"</span>       <span class="c"># 真实项目里换成调用天气 API</span>
+
+resp = model.bind_tools([get_weather]).invoke(<span class="g">"北京天气怎么样？"</span>)
+print(resp.tool_calls)   <span class="c"># 模型说：想调 get_weather，参数是……执行权在你手上</span></pre>
+        </div>
+
+        <h3>RAG 三件套：加载、切分、检索</h3>
+        <p>模型不知道你的私有资料，RAG 的思路是「先检索、后生成」：把文档<b>加载</b>进来，<b>切分</b>成小块并向量化存进向量库，提问时按相似度捞出最相关的几段，塞进提示词交给模型。组件全部可替换——换 loader 不动切分，换向量库不动业务逻辑。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · RAG 三件套</span><button class="copy" type="button">复制</button></div>
+<pre>from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_core.vectorstores import InMemoryVectorStore
+
+docs = TextLoader(<span class="g">"notes.txt"</span>, encoding=<span class="g">"utf-8"</span>).load()
+chunks = RecursiveCharacterTextSplitter(
+    chunk_size=500, chunk_overlap=50,
+).split_documents(docs)
+
+store = InMemoryVectorStore.from_documents(chunks, OpenAIEmbeddings())
+print(store.similarity_search(<span class="g">"部署要点"</span>, k=3))   <span class="c"># 直接检索试一下</span>
+retriever = store.as_retriever(search_kwargs={<span class="g">"k"</span>: 3})  <span class="c"># 或包成检索器接进链里</span></pre>
+        </div>
+
+        <h3>记忆、会话与 LangSmith 观测</h3>
+        <p>默认情况下每次 invoke 都是失忆的。给 agent 配一个 <b>checkpointer</b>（存档器），再用 <code>thread_id</code> 区分会话，它就能记住同一会话里说过的内容——这是 LangGraph 提供的能力，1.x 的 create_agent 直接暴露了参数。调试阶段强烈建议打开 LangSmith：官方观测平台，每次调用的提示词、工具轨迹、token 花费全部可查。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 会话记忆</span><button class="copy" type="button">复制</button></div>
+<pre>from langgraph.checkpoint.memory import InMemorySaver
+
+agent = create_agent(
+    model=<span class="g">"openai:gpt-5.5"</span>,
+    tools=[get_weather],
+    system_prompt=<span class="g">"你是可靠的助手。"</span>,
+    checkpointer=InMemorySaver(),     <span class="c"># 生产可换持久化实现</span>
+)
+cfg = {<span class="g">"configurable"</span>: {<span class="g">"thread_id"</span>: <span class="g">"user-42"</span>}}   <span class="c"># 同一个 id = 同一个会话</span>
+agent.invoke({<span class="g">"messages"</span>: [{<span class="g">"role"</span>: <span class="g">"user"</span>, <span class="g">"content"</span>: <span class="g">"我叫小林"</span>}]}, cfg)
+agent.invoke({<span class="g">"messages"</span>: [{<span class="g">"role"</span>: <span class="g">"user"</span>, <span class="g">"content"</span>: <span class="g">"我叫什么？"</span>}]}, cfg)</pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 打开 LangSmith 记录</span><button class="copy" type="button">复制</button></div>
+<pre>export LANGSMITH_TRACING=true
+export LANGSMITH_API_KEY=lsv2_...
+<span class="c"># 之后所有调用自动上报到 smith.langchain.com，先注册拿 key</span></pre>
+        </div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：1.x 高频 API 与生态包</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了某个 API 叫什么，直接搜 <b>agent</b>、<b>检索</b>、<b>结构化</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索 API、用途，比如 智能体 / 检索 / 结构化" aria-label="搜索 API">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="API 分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">核心 API</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">消息与输出</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">RAG 组件</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">生态包</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">init_chat_model("openai:gpt-5.5")</td><td>按「厂商:模型名」字符串初始化对话模型，参数如 temperature 透传</td></tr>
+                <tr><td class="k">init_chat_model(m, model_provider="google-genai")</td><td>模型名不带前缀时，显式指定厂商</td></tr>
+                <tr><td class="k">from langchain.chat_models</td><td>init_chat_model 所在模块</td></tr>
+                <tr><td class="k">model.invoke(messages)</td><td>单次调用，传字符串、字典列表或消息对象都行</td></tr>
+                <tr><td class="k">model.stream(...)</td><td>流式输出，逐段拿结果</td></tr>
+                <tr><td class="k">model.bind_tools([fn])</td><td>低层工具绑定：模型返回 tool_calls，执行循环自己写</td></tr>
+                <tr><td class="k">model.with_structured_output(Schema)</td><td>按 Pydantic 模型返回结构化对象</td></tr>
+                <tr><td class="k">create_agent(model=, tools=)</td><td>1.x 核心入口：构建会自动调工具的智能体，另支持 system_prompt、checkpointer、middleware</td></tr>
+                <tr><td class="k">from langchain.agents</td><td>create_agent 所在模块</td></tr>
+                <tr><td class="k">agent.invoke({"messages": [...]})</td><td>运行智能体，返回完整消息历史</td></tr>
+                <tr><td class="k">result["messages"][-1]</td><td>取最后一条消息即最终回答，.text 拿纯文本</td></tr>
+                <tr><td class="k">agent.stream(...)</td><td>流式执行，逐步产出中间与最终状态</td></tr>
+                <tr><td class="k">@tool</td><td>把普通函数变成工具，docstring 就是给模型看的说明书</td></tr>
+                <tr><td class="k">create_agent(checkpointer=...)</td><td>接入会话记忆，配合 thread_id 区分会话</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>写法</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">from langchain.messages import …</td><td>1.x 的消息导入路径（HumanMessage、SystemMessage 等）</td></tr>
+                <tr><td class="k">SystemMessage("…")</td><td>系统消息：人设、规则，一般放列表开头</td></tr>
+                <tr><td class="k">HumanMessage("…")</td><td>用户输入</td></tr>
+                <tr><td class="k">AIMessage</td><td>模型回答；.text 取纯文本，.tool_calls 看工具调用</td></tr>
+                <tr><td class="k">ToolMessage(content, tool_call_id)</td><td>回填工具执行结果，id 必须对上模型的调用请求</td></tr>
+                <tr><td class="k">{"role": "user", "content": "…"}</td><td>OpenAI 风格字典，等价写法，invoke 直接收</td></tr>
+                <tr><td class="k">response.content_blocks</td><td>1.x 标准化内容块，统一各厂商的文本/推理等类型</td></tr>
+                <tr><td class="k">model.invoke("一句话")</td><td>只发一句的快捷方式，内部转成 HumanMessage</td></tr>
+                <tr><td class="k">response.tool_calls</td><td>模型想调的工具列表：name、args、id</td></tr>
+                <tr><td class="k">response.response_metadata / usage_metadata</td><td>厂商原始返回信息 / token 用量统计</td></tr>
+                <tr><td class="k">result["messages"]</td><td>完整消息轨迹，遍历可复盘模型每一步做了什么</td></tr>
+                <tr><td class="k">RemoveMessage</td><td>在历史中删除指定消息（管理长会话用）</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>组件</th><th>来源与作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">TextLoader</td><td>langchain_community.document_loaders：读本地文本文件</td></tr>
+                <tr><td class="k">WebBaseLoader</td><td>langchain_community.document_loaders：抓网页正文</td></tr>
+                <tr><td class="k">PyPDFLoader</td><td>langchain_community.document_loaders：读 PDF</td></tr>
+                <tr><td class="k">RecursiveCharacterTextSplitter</td><td>langchain_text_splitters：按段落/句子递归切分，chunk_size + chunk_overlap</td></tr>
+                <tr><td class="k">CharacterTextSplitter</td><td>同包的另一常用切分器：按指定分隔符切块</td></tr>
+                <tr><td class="k">OpenAIEmbeddings</td><td>langchain_openai：文本向量化，检索的基础</td></tr>
+                <tr><td class="k">InMemoryVectorStore</td><td>langchain_core.vectorstores：内存向量库，原型期最省事</td></tr>
+                <tr><td class="k">store.add_documents(docs)</td><td>向量化并入库</td></tr>
+                <tr><td class="k">store.similarity_search(q, k=3)</td><td>按相似度检索，返回 Document 列表</td></tr>
+                <tr><td class="k">store.as_retriever(search_kwargs={"k": 3})</td><td>包装成检索器，可直接接进链或工具</td></tr>
+                <tr><td class="k">retriever.invoke("问题")</td><td>检索器的统一调用入口</td></tr>
+                <tr><td class="k">Chroma / PGVector 等</td><td>生产向量库走对应集成包（langchain-chroma、langchain-postgres…）</td></tr>
+                <tr><td class="k">d.page_content / d.metadata</td><td>Document 的正文与元数据（来源页码、文件名等）</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>包</th><th>定位</th></tr></thead>
+              <tbody>
+                <tr><td class="k">langchain</td><td>编排主包：create_agent、中间件、业务层抽象</td></tr>
+                <tr><td class="k">langchain-core</td><td>抽象基础层：消息、向量库接口、Runnable 协议</td></tr>
+                <tr><td class="k">langgraph</td><td>复杂状态图与多智能体：持久化、human-in-the-loop、自定义工作流</td></tr>
+                <tr><td class="k">langchain-openai</td><td>OpenAI 模型与嵌入的集成</td></tr>
+                <tr><td class="k">langchain-anthropic 等</td><td>其他厂商集成包，命名规律 langchain-厂商</td></tr>
+                <tr><td class="k">langchain-ollama</td><td>本地跑开源模型的集成，模型字符串用 "ollama:模型名"</td></tr>
+                <tr><td class="k">langchain-community</td><td>社区贡献的 loader、工具大合集</td></tr>
+                <tr><td class="k">langchain-text-splitters</td><td>文档切分器独立包</td></tr>
+                <tr><td class="k">langchain-classic</td><td class="no">0.x 旧 API（LLMChain、AgentExecutor）收容所，新项目别用</td></tr>
+                <tr><td class="k">langsmith</td><td>官方观测与评估平台，LANGSMITH_TRACING=true 开启</td></tr>
+                <tr><td class="k">deepagents</td><td>官方扩展：内置规划、文件系统工具与子智能体的 deep agent</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的 API。换个词试试，比如「智能体」「检索」「消息」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：30 行的最小 RAG 问答</h2>
+        <p>不建数据库、不跑服务：知识库就是几段文本，向量库用内存版，检索出来的片段拼进提示词再调模型。整个脚本 30 多行，跑通后把它换成真实文档就是能用的原型。<b>需要有效的 OPENAI_API_KEY，会产生少量调用费用。</b></p>
+
+        <h3>第 1 步：建知识库并入库</h3>
+        <div class="code">
+          <div class="code-head"><span>Python · rag_demo.py（上）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 运行前：pip install -U langchain langchain-openai</span>
+<span class="c"># 密钥：export OPENAI_API_KEY=sk-...</span>
+from langchain_core.vectorstores import InMemoryVectorStore
+from langchain_openai import OpenAIEmbeddings
+
+texts = [
+    <span class="g">"LangChain 1.x 的核心入口是 create_agent，智能体底层由 LangGraph 驱动。"</span>,
+    <span class="g">"init_chat_model 用「厂商:模型名」字符串初始化任意厂商的对话模型。"</span>,
+    <span class="g">"RAG 三件套：文档加载、切分、向量库与检索器，检索结果作为上下文交给模型。"</span>,
+    <span class="g">"LangSmith 是官方观测平台，设置 LANGSMITH_TRACING=true 即可记录每次调用。"</span>,
+]
+
+<span class="c"># 向量化并写入内存向量库；真实项目里 texts 换成 loader 读出的文档切分结果</span>
+store = InMemoryVectorStore.from_texts(texts, embedding=OpenAIEmbeddings())</pre>
+        </div>
+
+        <h3>第 2 步：组装「检索 → 填模板 → 生成」的链</h3>
+        <div class="code">
+          <div class="code-head"><span>Python · rag_demo.py（中）</span><button class="copy" type="button">复制</button></div>
+<pre>from langchain.chat_models import init_chat_model
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+
+retriever = store.as_retriever(search_kwargs={<span class="g">"k"</span>: 2})   <span class="c"># 每次取最相关的 2 段</span>
+llm = init_chat_model(<span class="g">"openai:gpt-5.5"</span>, temperature=0)
+
+prompt = ChatPromptTemplate.from_template(
+    <span class="g">"仅根据下面的资料回答问题；资料里没有的就直说不知道。\n\n"</span>
+    <span class="g">"资料：\n{context}\n\n问题：{question}"</span>
+)
+
+def format_docs(docs):
+    return <span class="g">"\n\n"</span>.join(d.page_content for d in docs)
+
+chain = (
+    {<span class="g">"context"</span>: retriever | format_docs, <span class="g">"question"</span>: RunnablePassthrough()}
+    | prompt
+    | llm
+)</pre>
+        </div>
+        <p><small>这条链的读法：输入的问题一路透传；同时 retriever 拿回文档、format_docs 拼成一段文本；两路汇进模板填空，最后交给模型。LCEL 用 <code>|</code> 把组件串成管道，每一段都能单独测试。</small></p>
+
+        <h3>第 3 步：提问运行</h3>
+        <div class="code">
+          <div class="code-head"><span>Python · rag_demo.py（下）</span><button class="copy" type="button">复制</button></div>
+<pre>if __name__ == <span class="g">"__main__"</span>:
+    while True:
+        q = input(<span class="g">"\n问题（直接回车退出）&gt; "</span>).strip()
+        if not q:
+            break
+        print(chain.invoke(q).text)</pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>$ python rag_demo.py
+
+问题（直接回车退出）&gt; 1.x 用什么构建智能体？
+1.x 通过 create_agent() 构建智能体，底层由 LangGraph 驱动，支持持久化与流式。</pre>
+        </div>
+
+        <h3>第 4 步：把原型换成真实知识库</h3>
+        <p>骨架不动，只换两处：texts 换成 loader 读出的切分结果，内存库换成可持久化的向量库：</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 只换入库这一段</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># pip install langchain-community langchain-chroma</span>
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_chroma import Chroma
+
+docs = PyPDFLoader(<span class="g">"handbook.pdf"</span>).load()          <span class="c"># 换 loader</span>
+chunks = RecursiveCharacterTextSplitter(
+    chunk_size=500, chunk_overlap=50,
+).split_documents(docs)
+
+store = Chroma.from_documents(                       <span class="c"># 换向量库，落盘</span>
+    chunks, OpenAIEmbeddings(), persist_directory=<span class="g">"./db"</span>
+)
+retriever = store.as_retriever(search_kwargs={<span class="g">"k"</span>: 2})
+<span class="c"># 下面的 prompt、chain 原样复用——组件可替换正是分层的好处</span></pre>
+        </div>
+
+        <div class="note"><b>下一步把原型变真：</b>texts 换成 TextLoader/WebBaseLoader 读真实文档；InMemoryVectorStore 换成 Chroma 等持久向量库；再用第 05 节的生态包表对照升级。结构不用变，只换组件。</div>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个最常见的坑</h2>
+
+        <h3>坑一：照 0.x 老教程写，import 直接报错</h3>
+        <p>v1 是破坏性重写。<code>from langchain.chains import LLMChain</code>、<code>AgentExecutor</code>、<code>initialize_agent</code> 在主包里都没有了；网上 2024 年及更早的教程基本全是旧写法。对照检查：<b>create_agent</b>（替代 create_react_agent / AgentExecutor）在 <code>langchain.agents</code>，消息从 <code>langchain.messages</code> 导入。确需维护旧项目，官方提供了 <code>langchain-classic</code> 包收容旧 API。</p>
+        <div class="note warn"><b>判断教程新旧的最快方法：</b>看到 <b>LLMChain</b>、<b>AgentExecutor</b>、<b>create_react_agent</b> 这几个词，直接关掉，找以 <b>create_agent</b> 开头的资料，或只看 docs.langchain.com。</div>
+
+        <h3>坑二：AuthenticationError / model not found</h3>
+        <p>九成是密钥没配对或模型名写错。排查顺序：当前终端 <code>echo $OPENAI_API_KEY</code> 有值吗？key 是不是对应厂商的？模型字符串里的厂商前缀和型号在服务商控制台存在吗？</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 三连检查</span><button class="copy" type="button">复制</button></div>
+<pre>echo $OPENAI_API_KEY            <span class="c"># 有输出才算配上了</span>
+pip show langchain langchain-openai | grep -E <span class="g">'Name|Version'</span>
+python -c <span class="g">"from dotenv import load_dotenv; load_dotenv(); import os; print(bool(os.getenv('OPENAI_API_KEY')))"</span></pre>
+        </div>
+        <p><small>用 .env 文件时，load_dotenv() 必须在构造模型之前执行；export 只对当前终端会话生效，换窗口要重配。</small></p>
+
+        <h3>坑三：RAG 答非所问，先怪检索再怪模型</h3>
+        <p>检索增强类应用不准，问题大多出在检索端：切分太大（一片塞进多个主题）、没有 overlap（句子被拦腰切断）、取的 k 太小。先脱离模型单独测，人眼看捞回来的片段对不对——检索不对，调提示词是白费劲。中文语料记得给切分器留意标点，必要时换按句子切分的策略。</p>
+        <div class="code">
+          <div class="code-head"><span>Python · 检索体检：不经过模型直接看结果</span><button class="copy" type="button">复制</button></div>
+<pre>hits = store.similarity_search(<span class="g">"1.x 用什么构建智能体？"</span>, k=2)
+for d in hits:
+    print(<span class="g">"---"</span>)
+    print(d.page_content[:120])      <span class="c"># 捞回来的片段对不对，肉眼判断</span></pre>
+        </div>
+
+        <h3>坑四：什么时候不该上框架</h3>
+        <p>LangChain 是编排工具，不是必需品。判断标准很简单：<b>只是一次问答</b>——用 init_chat_model 甚至厂商官方 SDK 就够；<b>要模型反复调工具、走多步流程</b>——用 create_agent；<b>多个角色协作、复杂状态机、要人工审批节点</b>——上 LangGraph。给 hello world 套全家桶，只会让调试链路变长。</p>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与资源</h2>
+        <ul>
+          <li><a href="https://docs.langchain.com/oss/python/" rel="noopener">LangChain 官方文档（Python）</a>——1.x 的权威入口，本页所有写法以这里为准。</li>
+          <li><a href="https://reference.langchain.com/python/langchain" rel="noopener">Python API 参考</a>——按类与函数查参数细节。</li>
+          <li><a href="https://github.com/langchain-ai/langchain" rel="noopener">langchain-ai/langchain</a>——源码仓库，issue 区能查到大量报错的先例。</li>
+          <li><a href="https://docs.langchain.com/oss/python/langgraph/overview" rel="noopener">LangGraph 文档</a>——多智能体、持久化、human-in-the-loop 的下一站。</li>
+          <li><a href="https://smith.langchain.com" rel="noopener">LangSmith</a>——调试与评估平台，跑复杂 agent 前先把追踪打开。</li>
+          <li><a href="https://academy.langchain.com" rel="noopener">LangChain Academy</a>——官方免费课程，含 LangGraph 系统课。</li>
+        </ul>
+        <div class="note"><b>学完本页去哪：</b>把第 06 节的 RAG 接上你自己的文档（PDF、网页都行），再给 create_agent 加两三个真实业务工具（查库、发请求、写文件）。两个都稳了，去 LangGraph 学状态图——那是从「会用」到「能设计」的分水岭。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>装好 langchain 与 langchain-openai，<b>import</b> 不报错，pip show 能看到 1.x 版本</span></label>
+          <label><input type="checkbox" data-key="c2"><span>API key 配进环境变量，用 <b>init_chat_model</b> 成功调通一次模型</span></label>
+          <label><input type="checkbox" data-key="c3"><span>用 <b>@tool</b> 定义过工具，<b>create_agent</b> 能自己决定调用它</span></label>
+          <label><input type="checkbox" data-key="c4"><span>跑通第 06 节的最小 RAG，问题能答上知识库里的内容</span></label>
+          <label><input type="checkbox" data-key="c5"><span>知道 0.x 老 API 已搬去 langchain-classic，报错会先查官方迁移指南</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="pytorch.html"><span>← 上一篇</span><b>PyTorch 教程</b></a>
+        <a class="next" href="opencv.html"><span>下一篇 →</span><b>OpenCV 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 LangChain 官方文档（docs.langchain.com/oss/python，即 python.langchain.com）、langchain PyPI 页面与 LangChain 官方博客（v1.0 发布于 2025-10）整理，更新于 2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · LangChain 迭代很快，具体参数与模型名以官方文档和你账号的实际可用项为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 编码 Agent 选型对比：Claude Code / Codex / Kimi Code / OpenCode / Pi · AI Code Study</title>
+<meta name="description" content="2026 年主流 AI 编码 Agent 横向对比：Claude Code、Codex、Kimi Code、OpenCode、Pi 哪家适合你？按场景、价格、模型、权限一次说清，附选型决策树。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/ai-coding-agents-compare.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI 编码 Agent 选型对比：Claude Code / Codex / Kimi Code / OpenCode / Pi · AI Code Study">
+<meta property="og:description" content="2026 年主流 AI 编码 Agent 横向对比：Claude Code、Codex、Kimi Code、OpenCode、Pi 哪家适合你？按场景、价格、模型、权限一次说清，附选型决策树。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/ai-coding-agents-compare.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI 编码 Agent 选型对比：Claude Code / Codex / Kimi Code / OpenCode / Pi · AI Code Study">
+<meta name="twitter:description" content="2026 年主流 AI 编码 Agent 横向对比：Claude Code、Codex、Kimi Code、OpenCode、Pi 哪家适合你？按场景、价格、模型、权限一次说清，附选型决策树。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Claude Code、Codex、Kimi Code、OpenCode、Pi哪款适合你？",
+  "description": "2026 年主流 AI 编码 Agent 横向对比：Claude Code、Codex、Kimi Code、OpenCode、Pi 哪家适合你？按场景、价格、模型、权限一次说清，附选型决策树。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/ai-coding-agents-compare.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="ai-coding-agents-compare">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools" class="on">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-tools">AI 编程工具</a><span>/</span>
+      <b>编码 Agent 选型</b>
+    </nav>
+    <p class="eyebrow">COMPARE · <b>AI CODING AGENTS</b> · 2026 横向对比</p>
+    <h1>Claude Code、Codex、Kimi Code、OpenCode、Pi<br><em>哪款适合你？</em></h1>
+    <p class="lede">五款主流终端编码 Agent，从模型能力、价格策略、权限控制到上手门槛一次拆清楚。读完你会有一张选型表、一条决策树，以及一个明确的下一步。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/agents</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">ls agents/</span></div>
+        <div class="term-line"><span class="out">claude-code  codex  kimi-code  opencode  pi</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">which-agent --for me</span></div>
+        <div class="term-line"><span class="ok">看场景、看预算、看模型偏好 → 答案在正文里</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>编码 Agent 是什么</a>
+        <a href="#s2"><span class="idx">02</span>五款一句话定位</a>
+        <a href="#s3"><span class="idx">03</span>横向对比表</a>
+        <a href="#s4"><span class="idx">04</span>按场景推荐</a>
+        <a href="#s5"><span class="idx">05</span>每款深入</a>
+        <a href="#s6"><span class="idx">06</span>安装上手门槛</a>
+        <a href="#s7"><span class="idx">07</span>常见误区</a>
+        <a href="#s8"><span class="idx">08</span>选型决策树</a>
+        <a href="#s9"><span class="idx">09</span>下一步</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="claude-code.html">Claude Code 教程</a>
+        <a href="codex.html">Codex 教程</a>
+        <a href="kimi-code.html">Kimi Code CLI 教程</a>
+        <a href="opencode.html">OpenCode 教程</a>
+        <a href="pi-agent.html">Pi Agent 教程</a>
+        <a href="ai-agent.html">AI Agent 入门</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>编码 Agent 是什么</a>
+          <a href="#s2"><span class="idx">02</span>五款一句话定位</a>
+          <a href="#s3"><span class="idx">03</span>横向对比表</a>
+          <a href="#s4"><span class="idx">04</span>按场景推荐</a>
+          <a href="#s5"><span class="idx">05</span>每款深入</a>
+          <a href="#s6"><span class="idx">06</span>安装上手门槛</a>
+          <a href="#s7"><span class="idx">07</span>常见误区</a>
+          <a href="#s8"><span class="idx">08</span>选型决策树</a>
+          <a href="#s9"><span class="idx">09</span>下一步</a>
+        </nav>
+      </details>
+
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>先统一认知：编码 Agent 到底在做什么</h2>
+        <p>编码 Agent 不是“更聪明的代码补全”，而是一个<b>能读仓库、能改文件、能跑命令、能自我纠错</b>的终端助手。你给它一个自然语言任务，它会自己拆解步骤、调用工具、观察结果、继续迭代，直到完成。</p>
+        <p>它和传统 IDE 插件（如 Copilot）的核心区别是<b>主动性</b>：Copilot 等你敲代码时给建议；Agent 会主动执行 <code>git diff</code>、<code>pytest</code>、<code>pip install</code> 等命令，并基于反馈继续改。你更像一个项目经理，而不是一个打字员。</p>
+        <dl class="facts">
+          <div class="fact"><dt>核心能力</dt><dd>读目录、读文件、写文件、执行命令、调用外部工具</dd></div>
+          <div class="fact"><dt>关键循环</dt><dd>思考 → 行动 → 观察 → 再思考（ReAct / Agent Loop）</dd></div>
+          <div class="fact"><dt>安全机制</dt><dd>权限模式、审批确认、沙箱执行、只读模式</dd></div>
+          <div class="fact"><dt>选型关键</dt><dd>模型质量 × 上下文窗口 × 工具链 × 价格 × 隐私/合规</dd></div>
+        </dl>
+      </section>
+
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>五款工具一句话定位</h2>
+        <ul class="steps">
+          <li class="step">
+            <span class="n">A</span>
+            <div><h4>Claude Code</h4><p>Anthropic 官方出品，Claude 模型加持，代码理解强、上下文长、文档编辑稳，适合中大型项目与复杂重构。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">B</span>
+            <div><h4>Codex</h4><p>OpenAI 的编码 Agent，与 ChatGPT 生态打通，云端任务与本地 CLI 并行，适合已在使用 OpenAI 服务的团队。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">C</span>
+            <div><h4>Kimi Code</h4><p>国产终端编码 Agent，中文体验好、国内访问稳、长文本是强项，适合中文开发者与国内企业场景。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">D</span>
+            <div><h4>OpenCode</h4><p>开源、模型无关，可自托管、可换任意模型，适合想掌控数据、想自定义 Agent 行为的技术团队。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">E</span>
+            <div><h4>Pi Agent</h4><p>极简内核 + 强扩展设计，小到能读完源码，适合想深度定制、学习 Agent 架构的开发者。</p></div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>横向对比表：一眼看清差异</h2>
+        <p>下面这张表是选型的核心依据。价格以官方公开定价为参考，实际以各平台当前页面为准；权限模式决定了它在你的仓库里能走多远。</p>
+        <table>
+          <colgroup><col style="width:22%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:14%"></colgroup>
+          <thead><tr><th>维度</th><th>Claude Code</th><th>Codex</th><th>Kimi Code</th><th>OpenCode</th><th>Pi</th></tr></thead>
+          <tbody>
+            <tr><td class="k">出品方</td><td>Anthropic</td><td>OpenAI</td><td>Moonshot / 月之暗面</td><td>社区开源</td><td>社区开源</td></tr>
+            <tr><td class="k">默认模型</td><td>Claude 系列</td><td>GPT / o 系列</td><td>Kimi 系列</td><td>可配任意</td><td>可配任意</td></tr>
+            <tr><td class="k">开源程度</td><td>闭源</td><td>闭源</td><td>闭源</td><td>开源</td><td>开源</td></tr>
+            <tr><td class="k">运行位置</td><td>本地 CLI</td><td>本地 CLI + 云端任务</td><td>本地 CLI</td><td>本地 CLI / 自托管</td><td>本地 CLI</td></tr>
+            <tr><td class="k">中文体验</td><td>优秀</td><td>优秀</td><td>原生中文优化</td><td>取决于模型</td><td>取决于模型</td></tr>
+            <tr><td class="k">上下文窗口</td><td>大（200K+）</td><td>大（128K+）</td><td>大（长文本是卖点）</td><td>取决于模型</td><td>取决于模型</td></tr>
+            <tr><td class="k">权限控制</td><td>多档权限模式</td><td>审批 + 沙箱</td><td>权限配置</td><td>可自定义</td><td>可自定义</td></tr>
+            <tr><td class="k">上手门槛</td><td>中</td><td>中</td><td>低</td><td>中高</td><td>中</td></tr>
+            <tr><td class="k">最佳场景</td><td>复杂重构、大仓</td><td>OpenAI 生态</td><td>中文、国内、长文本</td><td>私有化、定制化</td><td>学习、轻量定制</td></tr>
+          </tbody>
+        </table>
+        <div class="note"><b>一句话总结：</b>要闭源最强综合体验选 Claude Code 或 Codex；要中文/国内体验选 Kimi Code；要可控/自托管选 OpenCode；要极简学习选 Pi。</div>
+      </section>
+
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>按场景推荐：别只看参数，看你要干什么</h2>
+
+        <h3>场景一：日常写代码、改 Bug、跑测试</h3>
+        <p>这是最常见的需求。你不需要最强的模型，但需要<b>稳定、响应快、不会乱改</b>。Claude Code 和 Kimi Code 在这类任务上都很稳；如果你已经买了 ChatGPT Plus，Codex 也能无缝接入。</p>
+        <div class="code">
+          <div class="code-head"><span>推荐组合</span><button class="copy" type="button">复制</button></div>
+<pre>个人日常开发    → Claude Code 或 Kimi Code
+国内网络环境    → Kimi Code
+已用 OpenAI     → Codex
+预算敏感        → OpenCode + 本地/低价模型</pre>
+        </div>
+
+        <h3>场景二：大型代码库重构</h3>
+        <p>大仓需要 Agent 能读很多文件、记住跨文件关系、一次性改多处。Claude Code 的长上下文和文件编辑能力在这里优势明显；Kimi Code 的长文本能力也能覆盖大仓。</p>
+
+        <h3>场景三：企业 / 私有代码</h3>
+        <p>如果代码不能出内网，闭源云方案直接出局。OpenCode 或 Pi 配合本地模型（Ollama / vLLM）是合规路径。OpenCode 的模型无关和可扩展性更适合企业定制。</p>
+
+        <h3>场景四：学习 Agent 原理</h3>
+        <p>想搞清楚 Agent 循环、工具调用、记忆系统怎么实现？Pi 的极简内核最适合当教材；读完源码再去看 Claude Code / OpenCode 的高级抽象会轻松很多。</p>
+
+        <h3>场景五：教学、写教程、做 demo</h3>
+        <p>需要可复现、可解释的步骤。Claude Code 的“思考过程”展示和 Kimi Code 的中文输出都比较适合录屏；OpenCode 则适合展示“自定义 Agent”的可能性。</p>
+      </section>
+
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>每款深入：适合谁，不适合谁</h2>
+
+        <h3>Claude Code</h3>
+        <p>优势是<b>代码理解深度</b>和<b>长上下文</b>。处理复杂需求、跨文件重构、写测试用例时，输出质量通常很高。权限模式成熟，可以让它只读、审批后执行、或全权限。</p>
+        <p>劣势是依赖 Anthropic 服务，国内访问需要网络条件；价格按模型 token 计费，重度使用成本不低。</p>
+        <div class="note">适合：海外开发者、中大型项目、愿意为好模型付费的团队。</div>
+
+        <h3>Codex</h3>
+        <p>OpenAI 把 Codex 做成了<b>云端任务 + 本地 CLI</b>的双形态。你可以把一整个需求丢给云端让它慢慢跑，也能在终端里即时交互。和 ChatGPT、GitHub Copilot 账号体系打通是最大便利。</p>
+        <p>劣势是黑盒程度高，沙箱与审批机制有时会让简单任务多一步确认。</p>
+        <div class="note">适合：OpenAI 生态用户、需要云端长任务、团队协作。</div>
+
+        <h3>Kimi Code</h3>
+        <p>长文本是 Kimi 的招牌，放到编码 Agent 里就是能<b>一次性吞下更多上下文</b>，对大文件、多文件任务友好。中文指令理解自然，国内网络无压力。</p>
+        <p>劣势是生态还在快速迭代中，部分高级功能（如复杂审批流、沙箱）可能不如海外成熟产品丰富。</p>
+        <div class="note">适合：中文开发者、国内公司、长文档/大仓场景。</div>
+
+        <h3>OpenCode</h3>
+        <p>最大卖点是<b>开源 + 模型无关</b>。你可以接 OpenAI、Claude、Kimi、本地 Llama/Qwen/DeepSeek，甚至自己微调的模型。AGENTS.md 项目约定和 MCP 扩展让它在企业场景很有想象空间。</p>
+        <p>劣势是需要自己配置模型和权限，文档和社区支持相对年轻，出问题得多看源码。</p>
+        <div class="note">适合：技术团队、私有化部署、想自定义 Agent 行为的用户。</div>
+
+        <h3>Pi Agent</h3>
+        <p>Pi 的哲学是<b>小内核、大扩展</b>。核心代码量不大，但插件/技能/模板/主题都能扩展。它更像一个“可读的 Agent 框架”，而不是一个开箱即用的大而全产品。</p>
+        <p>劣势是功能不如商业产品完备，需要你自己搭积木。</p>
+        <div class="note">适合：想学习 Agent 架构、喜欢自己动手的开发者。</div>
+      </section>
+
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>安装上手门槛：从 0 到第一次对话</h2>
+        <p>五款工具的安装都不算复杂，但依赖环境略有不同。下面是最简路径：</p>
+        <table>
+          <colgroup><col style="width:22%"><col style="width:78%"></colgroup>
+          <thead><tr><th>工具</th><th>最简安装</th></tr></thead>
+          <tbody>
+            <tr><td class="k">Claude Code</td><td><code>npm install -g @anthropic-ai/claude-code</code>，然后 <code>claude</code> 登录 Anthropic 账号</td></tr>
+            <tr><td class="k">Codex</td><td><code>npm install -g @openai/codex</code>，配置 OpenAI API Key</td></tr>
+            <tr><td class="k">Kimi Code</td><td>按官方 CLI 指引安装，登录 Kimi 账号</td></tr>
+            <tr><td class="k">OpenCode</td><td>克隆仓库 / 安装包，配置模型 provider 与 API Key</td></tr>
+            <tr><td class="k">Pi</td><td>克隆仓库，安装依赖，配置模型后即可 <code>pi</code></td></tr>
+          </tbody>
+        </table>
+        <div class="note warn"><b>通用提醒：</b>所有工具都不要把 API Key 写进代码，统一放环境变量；企业内网使用前确认合规。</div>
+      </section>
+
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>常见误区：选型时别踩这些坑</h2>
+        <ul>
+          <li><b>误区 1：参数最强的就是最适合自己的。</b>大模型能力强，但响应慢、价格高。日常改 Bug 用中等模型反而更划算。</li>
+          <li><b>误区 2：开源等于免费。</b>开源工具省的是授权费，但模型调用、服务器、维护人力都要算成本。</li>
+          <li><b>误区 3：一个工具走天下。</b>不同任务可以换不同工具；比如用 Claude Code 做复杂重构，用 Kimi Code 快速中文问答。</li>
+          <li><b>误区 4：给了全权限就不管了。</b>再强的 Agent 也会幻觉、也会误删文件。审批模式和 git 提交是底线。</li>
+          <li><b>误区 5：只看首屏价格。</b>编码 Agent 的账单按 token 走，重度使用下价格差异会放大，先估算自己的调用量。</li>
+        </ul>
+      </section>
+
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>选型决策树：三步定案</h2>
+        <div class="code">
+          <div class="code-head"><span>decision-tree.txt</span><button class="copy" type="button">复制</button></div>
+<pre>1. 代码能不能出内网 / 能不能用海外服务？
+   是 → 继续看 2
+   否 → OpenCode 或 Pi + 本地模型
+
+2. 更看重中文体验还是海外生态？
+   中文 / 国内 → Kimi Code
+   海外 / 已有 OpenAI/Anthropic 账号 → 继续看 3
+
+3. 主要做复杂重构、大仓，还是日常任务？
+   复杂重构 / 大仓 → Claude Code
+   日常 / 云端长任务 / OpenAI 生态 → Codex
+
+4. 想学习 Agent 原理或深度定制？
+   → Pi 或 OpenCode</pre>
+        </div>
+        <div class="note">这张决策树不是唯一答案。最好的方式是：按你的真实项目跑一遍同样的任务，看哪个 Agent 的完成度和你的满意度最高。</div>
+      </section>
+
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>下一步：点开对应教程动手</h2>
+        <p>对比只是第一步，真正形成判断需要亲手用。我们给五款工具都写了详细上手教程，包含安装、登录、权限、命令速查和第一个实战任务。</p>
+        <ul>
+          <li><a href="claude-code.html">Claude Code 教程</a>：安装、CLAUDE.md、权限模式与实战流程</li>
+          <li><a href="codex.html">Codex 教程</a>：OpenAI 编码 Agent 的本地与云端用法</li>
+          <li><a href="kimi-code.html">Kimi Code CLI 教程</a>：国产终端编码 Agent 上手指南</li>
+          <li><a href="opencode.html">OpenCode 教程</a>：开源可换模型的编码 Agent</li>
+          <li><a href="pi-agent.html">Pi Agent 教程</a>：极简内核与扩展设计</li>
+        </ul>
+        <div class="note">如果你还不清楚“Agent 到底是什么”，建议先去 <a href="ai-agent.html">AI Agent 入门教程</a>把循环、工具调用、记忆三个概念补齐。</div>
+      </section>
+
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="index.html"><span>← 返回</span><b>AI Code Study 首页</b></a>
+        <a class="next" href="ai-agent.html"><span>下一篇 →</span><b>AI Agent（智能体）入门</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据各工具公开文档与社区实践整理；功能与价格快速迭代，具体以官方文档为准，更新于 2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 + 工具对比</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

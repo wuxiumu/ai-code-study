@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skills（技能）教程 · AI Code Study</title>
+<meta name="description" content="Agent Skills 教程：SKILL.md 开放格式、渐进披露三级加载、存放位置、与 MCP 的区别，手把手写一个周报生成技能。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/skills.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Skills（技能）教程 · AI Code Study">
+<meta property="og:description" content="Agent Skills 教程：SKILL.md 开放格式、渐进披露三级加载、存放位置、与 MCP 的区别，手把手写一个周报生成技能。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/skills.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Skills（技能）教程 · AI Code Study">
+<meta name="twitter:description" content="Agent Skills 教程：SKILL.md 开放格式、渐进披露三级加载、存放位置、与 MCP 的区别，手把手写一个周报生成技能。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Skills：用一份 SKILL.md 给 Agent 加技能",
+  "description": "Agent Skills 教程：SKILL.md 开放格式、渐进披露三级加载、存放位置、与 MCP 的区别，手把手写一个周报生成技能。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/skills.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="skills">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools" class="on">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-tools">AI 编程工具</a><span>/</span>
+      <b>Skills（技能）</b>
+    </nav>
+    <p class="eyebrow">CODING TOOLS · <b>AGENT SKILLS</b> · 教 Agent 一门手艺</p>
+    <h1>Skills：用一份 <em>SKILL.md</em> 给 Agent 加技能</h1>
+    <p class="lede">每次开工都要重贴一遍的流程、模板、检查清单——把它们写进一个文件夹里的 SKILL.md，Agent 就永远学会了。这一页讲清格式、加载机制和存放位置，最后手写一个能用的周报技能。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/work（Claude Code 里触发一个技能）</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">claude</span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">/pdf-report 把 ~/data 里的季度数据整理成 PDF 报告</span></div>
+        <div class="term-line"><span class="out">读取技能 pdf-report（SKILL.md）…</span></div>
+        <div class="term-line"><span class="out">按技能步骤执行：收集数据 → 套用 references 模板 → 生成</span></div>
+        <div class="term-line"><span class="ok">已生成 q3-report.pdf（12 页），存放在 ./output/</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>环境准备</a>
+        <a href="#s3"><span class="idx">03</span>第一个技能</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战</a>
+        <a href="#s7"><span class="idx">07</span>避坑</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="kimi-code.html">Kimi Code CLI</a>
+        <a href="claude-code.html">Claude Code</a>
+        <a href="codex.html">Codex 教程</a>
+        <a href="index.html#cat-tools">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>环境准备</a>
+          <a href="#s3"><span class="idx">03</span>第一个技能</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战</a>
+          <a href="#s7"><span class="idx">07</span>避坑</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 它是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>它是什么：一份说明书，一门可移植的手艺</h2>
+        <p>你大概有过这种经历：同一个流程——「按这个模板写周报」「用这套规范提交代码」「按这五步排查线上问题」——每隔几天就要往聊天框里重贴一遍。Agent Skills 解决的就是这件事：<b>把流程知识打包成一个文件夹</b>，里面一份 SKILL.md 写清元数据和步骤，需要时再附上脚本、模板、参考文档。Agent 平时只「记得有这么门手艺」，活儿对上了才翻说明书。</p>
+        <p>格式由 Anthropic 发起、以开放标准发布（agentskills.io），一家写好的技能可以在多家 Agent 之间复用——目前多家开源 Agent 已支持这一格式。它不是插件系统，没有代码接口：一份技能就是「Markdown 写的说明书」加上可选的附带文件，版本控制、代码评审、跨团队共享全部沿用你现有的 Git 流程。</p>
+        <p>它和上一页的 vibe coding 是绝配：vibe coding 里「每次都要重复交代」的那部分——验收标准、提交规范、复盘格式——写进 SKILL.md 就从「每次口述」变成「永久生效」。技能也是 Agent 使用习惯里迁移成本最低的一环：学会了就是学会了，换一家支持该格式的 Agent 依然带着走。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>格式</dt><dd>一个文件夹 + SKILL.md</dd></div>
+          <div class="fact"><dt>规范站点</dt><dd>agentskills.io（开放标准）</dd></div>
+          <div class="fact"><dt>发起方</dt><dd>Anthropic，已开放生态采用</dd></div>
+          <div class="fact"><dt>必填字段</dt><dd>name、description（YAML frontmatter）</dd></div>
+          <div class="fact"><dt>启动成本</dt><dd>每技能约百 token（只有元数据）</dd></div>
+          <div class="fact"><dt>附带内容</dt><dd>scripts/ references/ assets/ 按需加载</dd></div>
+          <div class="fact"><dt>与 MCP 关系</dt><dd>互补：MCP 接系统，Skills 传方法</dd></div>
+          <div class="fact"><dt>附带代码</dt><dd class="no">无运行时、无接口——纯 Markdown</dd></div>
+        </dl>
+
+        <div class="note"><b>什么时候该写一个技能：</b>你发现自己「又在把同一段指令贴进对话」。判断口诀：贴了第二遍，就该进 SKILL.md 了。反过来，一次性任务不值得打包——那是普通提示词的活。</div>
+      </section>
+
+      <!-- ===== 02 环境准备 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>环境准备：让 Agent 认识技能目录</h2>
+        <p>Skills 不是独立软件，它跑在 Agent 里。本页以 Claude Code 为主要演示环境（个人技能目录、项目技能目录、插件技能都支持）；OpenCode 等其他支持 Agent Skills 格式的工具，目录约定以各自官方文档为准——<b>SKILL.md 本身是通用的</b>，换工具通常只是换存放位置。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">官方脚本（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">npm</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">验证与建目录</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># macOS / Linux：下载独立二进制 + 校验，无需 Node</span>
+curl -fsSL https://claude.ai/install.sh | bash
+
+<span class="c"># 装完重开终端验证</span>
+claude --version</pre>
+          </div>
+          <small>详细安装与登录见本站 <a href="claude-code.html">Claude Code 教程</a>。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 需要 Node.js ≥ 18</span>
+npm install -g @anthropic-ai/claude-code
+
+<span class="c"># 以后升级也走 npm</span>
+npm update -g @anthropic-ai/claude-code
+
+claude --version</pre>
+          </div>
+          <small>用 nvm 的机器先切好 Node 版本再装，全局 bin 目录要在 PATH 里。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal · 把两个技能目录先建好</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 个人技能：跟着你走，所有项目可用</span>
+mkdir -p ~/.claude/skills
+
+<span class="c"># 项目技能：进某个仓库时再建，随仓库共享给全队</span>
+mkdir -p ~/your-project/.claude/skills
+
+<span class="c"># 验证：启动后技能会被自动发现</span>
+claude</pre>
+          </div>
+          <small>Claude Code 会监视技能目录，改完 SKILL.md 存盘即生效，不用重启。</small>
+        </div>
+
+        <div class="note warn"><b>目录名有讲究：</b>技能放在「一个以技能名命名的文件夹」里，且 SKILL.md 的 <b>name</b> 字段要与文件夹名一致（规范要求）。路径形如 <b>~/.claude/skills/weekly-report/SKILL.md</b>——直接把 SKILL.md 散放在 skills/ 根下是不对的。</div>
+      </section>
+
+      <!-- ===== 03 快速上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>快速上手：五分钟写第一个技能</h2>
+        <p>照官方 quickstart 抄一个最小的：让 Claude 汇总最近的改动。整个技能只有一个 SKILL.md，连脚本都不用。</p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 创建技能</span><button class="copy" type="button">复制</button></div>
+<pre>mkdir -p ~/.claude/skills/summarize-changes</pre>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>~/.claude/skills/summarize-changes/SKILL.md</span><button class="copy" type="button">复制</button></div>
+<pre>---
+name: summarize-changes
+description: 汇总当前仓库最近的 git 改动，输出面向团队的变更摘要。当用户提到「总结改动」「写变更摘要」「这次改了什么」时使用。
+---
+
+# 变更摘要
+
+1. 运行 git log --oneline -20 与 git diff HEAD~5 --stat
+2. 按功能分组归纳，不逐条罗列 commit
+3. 每组写一句「影响面」：动了数据结构、接口还是纯样式
+4. 结尾单列一段「需要测试的点」
+5. 全程只读，不修改任何文件</pre>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 两种触发方式</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 方式一：直接点名（斜杠 + 技能名）</span>
+<span class="prompt">&gt; </span>/summarize-changes
+
+<span class="c"># 方式二：自然语言命中 description，Claude 自动调用</span>
+<span class="prompt">&gt; </span>帮我总结一下这周的改动，要在站会上讲</pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>建目录、写 SKILL.md</h4><p>frontmatter 只有 name 和 description 两行；正文是给 Agent 看的步骤。存盘即生效——Claude Code 在监视技能目录，不用重启会话。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>description 写「做什么 + 何时用」</h4><p>它是自动触发的唯一依据。把用户会说的词写进去（总结改动 / 变更摘要），命中率远高于一句干巴巴的「帮助总结代码」。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>两种方式都试一遍</h4><p>斜杠点名验证技能被发现；自然语言验证 description 是否写得够准。两种都通，这个技能才算上线。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>不满意就改，改完立刻生效</h4><p>技能就是 Markdown，改步骤、补一条「常见坑」、加一个示例，都是即时热更。好技能是迭代出来的。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">没有把握时记住最小可用形态：<b>frontmatter 两行 + 正文五步</b>。先把流程跑通，再考虑加脚本和模板——过度设计是技能夭折的第一大原因。</div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：解剖、加载、位置、边界</h2>
+
+        <h3>SKILL.md 的解剖：frontmatter + 正文</h3>
+        <p>每个技能由两部分组成。<b>YAML frontmatter</b>（两条 --- 之间）是给 Agent 看的元数据：<code>name</code> 与 <code>description</code> 必填，另有 license、metadata、allowed-tools 等可选字段。<b>Markdown 正文</b>是给 Agent 看的说明书：步骤、示例、边界情况，格式不限。按规范，name 只能小写字母、数字和连字符，最长 64 字符且必须与目录名一致；description 最长 1024 字符，要同时说明「做什么」和「什么时候用」。</p>
+        <div class="code">
+          <div class="code-head"><span>SKILL.md · 带注解的骨架</span><button class="copy" type="button">复制</button></div>
+<pre>---
+<span class="c"># 元数据：启动时常驻，决定「何时想起这个技能」</span>
+name: my-skill            <span class="c"># 与目录名一致，小写+连字符</span>
+description: 做什么 + 何时用 + 用户会说的关键词
+---
+
+<span class="c"># 正文：被激活时整份加载，是「怎么做」的说明书</span>
+## 步骤          <span class="c"># 可执行的命令与顺序</span>
+## 示例          <span class="c"># 一组输入输出，锚定行为</span>
+## 边界          <span class="c"># 什么不做、何时追问</span></pre>
+        </div>
+
+        <h3>渐进披露：三级加载，省上下文</h3>
+        <p>这是 Skills 设计里最聪明的一点。Agent 不是把所有技能全文塞进上下文，而是分三级：</p>
+        <div class="code">
+          <div class="code-head"><span>三级加载（渐进披露）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 第一级：启动时</span>
+只加载每个技能的 name + description ≈ 每技能约 100 token
+
+<span class="c"># 第二级：任务匹配时</span>
+读入完整 SKILL.md 正文（建议 &lt; 5000 token / 500 行以内）
+
+<span class="c"># 第三级：执行中按需</span>
+正文里引用的 references/、scripts/ 文件，用到哪个读哪个</pre>
+        </div>
+        <p>装 30 个技能，常驻成本也只有约 3000 token 的目录索引——这就是「Agent 手里一摞说明书，干活前只翻用得上的那本」。写技能时也要顺着这个机制来：正文保持精炼，细节拆进 references/，别把一切塞进主文件。</p>
+        <p>这个机制还有一层容错：长会话发生自动压缩后，Claude Code 会按预算重新挂载技能（每个保留开头约 5000 token、总预算 25000 token），技能不会因为压缩而「失忆」。</p>
+
+        <h3>存放位置：个人、项目、插件三层</h3>
+        <div class="code">
+          <div class="code-head"><span>Claude Code 技能目录</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 个人技能：所有项目可用，不进 Git</span>
+~/.claude/skills/&lt;技能名&gt;/SKILL.md
+
+<span class="c"># 项目技能：随仓库提交，全队共享</span>
+.claude/skills/&lt;技能名&gt;/SKILL.md
+
+<span class="c"># 插件技能：插件包内，命名空间化调用</span>
+&lt;插件名&gt;:技能名
+
+<span class="c"># 企业托管目录：管理员统一下发，优先级最高</span>
+（由组织管理设置指定）</pre>
+        </div>
+        <p>同名冲突时优先级为<b>企业 &gt; 个人 &gt; 项目</b>。早期的 <code>.claude/commands/</code> 自定义命令已并入技能体系：commands 目录里的 deploy.md 与 skills/deploy/SKILL.md 都注册为 /deploy，同名时技能优先。插件带来的技能调用时带命名空间前缀（<code>/插件名:技能名</code>），和你的自有技能不抢名字。</p>
+
+        <h3>与 MCP 的区别：接系统 vs 传方法</h3>
+        <p>两个概念经常被放在一起比，其实分工清晰：<b>MCP 是接口</b>——它让 Agent 连上外部系统（数据库、工单、浏览器），拿到「能调用的工具」；<b>Skills 是方法</b>——它教 Agent「怎么把一件事做对」，给的是流程、规范和判断标准。不是二选一，是分工协作。</p>
+
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>MCP 解决的问题</dt><dd style="color:var(--ink-2)">让 Agent「够得着」外部系统：数据库、工单、浏览器、内部 API</dd></div>
+          <div class="fact"><dt>Skills 解决的问题</dt><dd style="color:var(--ink-2)">让 Agent「做得对」内部流程：模板、规范、检查清单、口径</dd></div>
+          <div class="fact"><dt>组合用法</dt><dd style="color:var(--ink-2)">周报技能接 Jira MCP：MCP 拉数据，Skill 按团队格式组织成周报</dd></div>
+        </dl>
+
+        <div class="note"><b>一个判断口径：</b>如果你的需求是「Agent 能操作 X 系统」，找 MCP 或写配置；如果是「Agent 每次都按同一个流程做 X」，写 Skill。大多数「每次都要重复交代」的痛点，都属于后者。</div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：格式、字段、位置、原则</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。搜 <b>frontmatter</b>、<b>触发</b>、<b>上下文</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索字段、目录、原则，比如 name / 渐进披露 / 项目" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">目录结构</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">frontmatter 字段</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">存放位置</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">设计原则</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>路径</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">my-skill/</td><td>技能根目录，目录名 = 技能名 = frontmatter 的 name</td></tr>
+                <tr><td class="k">SKILL.md</td><td>必需。YAML frontmatter + Markdown 指令正文</td></tr>
+                <tr><td class="k">scripts/</td><td>可选。可执行代码（Python / Bash / JS），Agent 按需运行</td></tr>
+                <tr><td class="k">references/</td><td>可选。参考文档，正文链接过去，Agent 按需再读</td></tr>
+                <tr><td class="k">assets/</td><td>可选。模板、图片、数据文件等静态资源</td></tr>
+                <tr><td class="k">references/REFERENCE.md</td><td>惯例：详细技术参考，正文保持精炼时往这里拆</td></tr>
+                <tr><td class="k">相对路径引用</td><td>正文引用附带文件用相对路径，一层为宜，避免套娃</td></tr>
+                <tr><td class="k">其他任意文件</td><td>规范不限制目录里放什么——但命名要自解释</td></tr>
+                <tr><td class="k">skills-ref validate</td><td>官方参考库命令，校验 frontmatter 与命名规范</td></tr>
+                <tr><td class="k">/skill-doctor（CC）</td><td>逐技能报告上下文开销与使用情况，瘦身前先体检</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>字段</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">name（必填）</td><td>1-64 字符；小写字母、数字、连字符；不许 -- 连串、不许首尾连字符；必须与目录名一致</td></tr>
+                <tr><td class="k">description（必填）</td><td>1-1024 字符；写清「做什么 + 何时用」，带上用户会说的关键词</td></tr>
+                <tr><td class="k">license（可选）</td><td>许可证名称，或指向随附的许可文件</td></tr>
+                <tr><td class="k">compatibility（可选）</td><td>≤500 字符；仅在有环境要求时写（依赖包、网络等）</td></tr>
+                <tr><td class="k">metadata（可选）</td><td>字符串键值对；键名起得独特些，避免冲突</td></tr>
+                <tr><td class="k">allowed-tools（可选）</td><td>空格分隔的预授权工具列表；实验性，支持程度因 Agent 而异</td></tr>
+                <tr><td class="k">正文（Markdown）</td><td>格式不限；推荐结构：步骤 → 示例 → 边界情况</td></tr>
+                <tr><td class="k">user-invocable（CC 扩展）</td><td>设 false 则用户不能斜杠调用，只由 Claude 自动触发</td></tr>
+                <tr><td class="k">正文长度建议</td><td>SKILL.md 500 行以内；超了拆到 references/，按需加载</td></tr>
+                <tr><td class="k">when_to_use（CC 扩展）</td><td>补充触发语境，与 description 合并生效（截断于 1536 字符）</td></tr>
+                <tr><td class="k">disable-model-invocation</td><td>Claude Code 扩展；设 true 则只能斜杠手动调用</td></tr>
+                <tr><td class="k">argument-hint（CC 扩展）</td><td>参数提示；配合 $ARGUMENTS、$1、命名参数做占位替换</td></tr>
+                <tr><td class="k">model / effort（CC 扩展）</td><td>本次调用临时覆盖模型与思考强度，下一条消息恢复</td></tr>
+                <tr><td class="k">context: fork（CC 扩展）</td><td>让技能跑在子代理里，不占用主会话上下文</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>位置（Claude Code）</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">~/.claude/skills/</td><td>个人技能，跨项目可用，不进 Git</td></tr>
+                <tr><td class="k">.claude/skills/</td><td>项目技能，随仓库提交，全队共享</td></tr>
+                <tr><td class="k">嵌套目录 .claude/skills/</td><td>子目录里的项目也能识别到</td></tr>
+                <tr><td class="k">插件 &lt;plugin&gt;/skills/</td><td>插件自带技能，调用时带命名空间</td></tr>
+                <tr><td class="k">企业托管目录</td><td>组织统一下发，优先级最高</td></tr>
+                <tr><td class="k">--add-dir</td><td>把额外目录挂进来作为技能来源</td></tr>
+                <tr><td class="k">~/.claude/skills/synced/</td><td>claude.ai 同步下载的技能；synced 是保留名，勿手放</td></tr>
+                <tr><td class="k">优先级</td><td>企业 &gt; 个人 &gt; 项目；技能覆盖同名 commands 文件</td></tr>
+                <tr><td class="k">调用方式</td><td>/技能名 直接调用；或 description 命中后自动调用</td></tr>
+                <tr><td class="k">其他 Agent</td><td>OpenCode 等支持 Agent Skills 格式的工具，目录以各自文档为准</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>原则</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">description 是索引</td><td>自动触发只看它；写「做什么 + 何时用」+ 用户口中的关键词</td></tr>
+                <tr><td class="k">渐进披露优先</td><td>正文 &lt; 500 行；细节拆 references/，用哪条读哪条</td></tr>
+                <tr><td class="k">一个技能一件事</td><td>「周报生成」和「git 提交规范」分开写，别做大杂烩</td></tr>
+                <tr><td class="k">步骤可执行</td><td>写命令而不是写意图：「运行 npm test」优于「注意质量」</td></tr>
+                <tr><td class="k">给示例和边界</td><td>一组输入输出样例 + 三个常见坑，胜过十条抽象原则</td></tr>
+                <tr><td class="k">声明只读或可写</td><td>审查类技能明确「不修改文件」，把约束写进正文</td></tr>
+                <tr><td class="k">脚本能独立运行</td><td>scripts/ 里的脚本自带依赖说明和报错信息</td></tr>
+                <tr><td class="k">迭代而非一次写完</td><td>用两周改一轮：把每次手动补的话沉淀回 SKILL.md</td></tr>
+                <tr><td class="k">进 Git、过 review</td><td>项目技能是团队资产，改动走和代码一样的评审流程</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「字段」「目录」「触发」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：手写一个「周报生成」技能</h2>
+        <p>做一个真实可用的团队技能：输入一堆零散的工作记录，按你团队的模板输出周报。它同时演示了三个要素——SKILL.md 正文、references/ 模板、按需加载。</p>
+
+        <h3>第 1 步：建目录</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 团队共享：放进某个仓库的 .claude/skills/</span>
+cd ~/your-project
+mkdir -p .claude/skills/weekly-report/references
+
+<span class="c"># 个人使用则改为：mkdir -p ~/.claude/skills/weekly-report/references</span></pre>
+        </div>
+
+        <h3>第 2 步：写 SKILL.md</h3>
+        <div class="code">
+          <div class="code-head"><span>.claude/skills/weekly-report/SKILL.md</span><button class="copy" type="button">复制</button></div>
+<pre>---
+name: weekly-report
+description: 把本周零散的工作记录整理成团队周报，按 references/TEMPLATE.md 模板输出。当用户提到「写周报」「本周总结」「weekly report」时使用。
+---
+
+# 周报生成
+
+## 输入
+用户提供本周的工作记录（对话里直接给，或指定一个文件路径）。
+记录零散、口语化都没关系，不要要求用户重写。
+
+## 步骤
+1. 读取 references/TEMPLATE.md，按模板结构组织内容
+2. 把记录归纳到「本周完成 / 进行中 / 下周计划 / 风险与需要的支持」四栏
+3. 每条产出用一句话 + 可验证的结果（数字、链接、PR 号），不写形容词
+4. 语气克制：不用「圆满」「顺利」，用事实说话
+5. 输出 Markdown；结尾附一行「数据截止时间」
+
+## 边界
+- 记录不足时，列出缺口并追问，不要编造内容
+- 不修改任何项目文件，只输出周报文本
+- 模板若被用户临时覆盖（给出新格式），以用户为准</pre>
+        </div>
+
+        <h3>第 3 步：附上模板文件</h3>
+        <div class="code">
+          <div class="code-head"><span>.claude/skills/weekly-report/references/TEMPLATE.md</span><button class="copy" type="button">复制</button></div>
+<pre># 周报 · YYYY-MM-DD ~ YYYY-MM-DD · 姓名
+
+## 本周完成
+- 做成了什么（结果 + 数据 / 链接）
+
+## 进行中
+- 事项（当前进度 X%，下一步是什么）
+
+## 下周计划
+- 事项（预期产出）
+
+## 风险与需要的支持
+- 风险 / 阻塞（需要谁做什么）</pre>
+        </div>
+
+        <h3>第 4 步：触发与验收</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 跑一遍</span><button class="copy" type="button">复制</button></div>
+<pre>claude
+<span class="prompt">&gt; </span>/weekly-report
+  输入：本周修了支付回调的 bug（PR #214），
+  给 WC 组件加了暗色模式（完成 80%），
+  下周做埋点迁移。
+
+<span class="c"># 验收：四栏结构齐、含 PR 号、没有编造条目、只输出了文本</span>
+<span class="c"># 满意后提交进仓库，全队共用：</span>
+git add .claude/skills &amp;&amp; git commit -m <span class="g">"feat: 周报生成技能"</span></pre>
+        </div>
+
+        <h3>第 5 步：迭代与版本化</h3>
+        <p>好技能是改出来的：每次你手动补了一句说明（「记得附上数据截止时间」），回头就把它写进 SKILL.md。技能随仓库走 Git，改模板、调步骤都有提交记录可回溯——这也是把技能放项目目录而非个人目录的理由：<b>它是团队资产，值得被 review</b>。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 一次典型的技能迭代</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 用了两周，发现总要在对话里补一句「别写形容词」</span>
+vim .claude/skills/weekly-report/SKILL.md   <span class="c"># 把这句沉淀进步骤 3</span>
+git add -A &amp;&amp; git commit -m <span class="g">"chore(skill): 周报禁用形容词表述"</span></pre>
+        </div>
+
+        <div class="note"><b>验收标准：</b>四步做完，<code>/weekly-report</code> 出现在斜杠菜单里；自然语言说「写周报」也能触发；换一个同样装了这个仓库的同事，技能开箱即用。做到这三条，它就是一份合格的团队资产——下一步该照方抓药，把「git 提交规范」「发布检查单」也各写一份。</div>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个最常见的坑</h2>
+
+        <h3>坑一：description 写得含糊，技能「从不触发」</h3>
+        <div class="code">
+          <div class="code-head"><span>对比：坏与好的 description</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 坏：Agent 不知道什么时候该用它</span>
+description: 处理周报相关的事。
+
+<span class="c"># 好：做什么 + 何时用 + 用户会说的词</span>
+description: 把本周零散工作记录整理成团队周报，按模板输出。
+当用户提到「写周报」「本周总结」「weekly report」时使用。</pre>
+        </div>
+        <p><small>自动触发的唯一依据就是 description。写得像好文档一样具体，技能才会「该出手时就出手」。</small></p>
+
+        <h3>坑二：name 与目录名不一致</h3>
+        <div class="note warn"><b>规范硬性要求：</b><b>name 必须与技能目录名完全一致</b>，且只允许小写字母、数字和连字符。目录叫 <b>Weekly_Report</b>、frontmatter 写 <b>weekly-report</b>，直接违反规范；大写、下划线、连续连字符都是非法 name。拿不准就跑一遍官方的 <b>skills-ref validate</b> 校验。</div>
+
+        <h3>坑三：正文越写越长，上下文被吃光</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 体检与瘦身</span><button class="copy" type="button">复制</button></div>
+<pre>wc -l ~/.claude/skills/weekly-report/SKILL.md
+<span class="c"># 超过 500 行就该拆了：</span>
+<span class="c">#   详细规范 → references/SPEC.md</span>
+<span class="c">#   示例合集 → references/EXAMPLES.md</span>
+<span class="c">#   正文里只留一句链接，按需加载</span></pre>
+        </div>
+        <p><small>SKILL.md 正文在技能被激活时<b>整份</b>进上下文。把每个细节都塞正文，等于给每次调用都上全量税——拆文件不是洁癖，是成本控制。Claude Code 里可以用 <b>/skill-doctor</b> 逐技能查看上下文开销，数字比感觉可靠。</small></p>
+
+        <h3>坑四：同名覆盖，一层压一层</h3>
+        <p>技能的解析顺序是<b>企业 &gt; 个人 &gt; 项目</b>，同名技能只有最上层生效。你在项目里写的 <code>commit-helper</code> 没反应？先检查个人目录里是不是也有一个同名的旧版本。另外早期的 commands 文件与技能同名时技能优先，迁移旧命令时留意。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 排查同名冲突</span><button class="copy" type="button">复制</button></div>
+<pre>ls ~/.claude/skills/        <span class="c"># 个人层的同名旧版本？</span>
+ls .claude/skills/          <span class="c"># 项目层放对位置了吗？</span>
+grep -r <span class="g">'name: commit-helper'</span> ~/.claude/skills .claude/skills</pre>
+        </div>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与资源</h2>
+        <ul>
+          <li><a href="https://agentskills.io/" target="_blank" rel="noopener">Agent Skills 官网</a>——开放标准的总入口，quickstart、规范、客户端列表都在这。</li>
+          <li><a href="https://agentskills.io/specification.md" target="_blank" rel="noopener">完整规范（Specification）</a>——frontmatter 每个字段的约束条件，写技能前值得通读一遍。</li>
+          <li><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">Claude Code Skills 文档</a>——目录、优先级、触发规则的权威来源，本页的主要依据。</li>
+          <li><a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">GitHub：agentskills/agentskills</a>——规范仓库与 skills-ref 校验工具，欢迎提 issue 参与。</li>
+          <li><a href="https://agentskills.io/clients.md" target="_blank" rel="noopener">客户端列表（Client Showcase）</a>——看看还有哪些 Agent 支持了这个格式。</li>
+          <li><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">官方 skill-creator 插件</a>——在 Claude Code 里 <b>/plugin install skill-creator@claude-plugins-official</b>，用它半自动起草与评测技能。</li>
+        </ul>
+        <div class="note"><b>学完本页去哪：</b>先把你最常重贴的那段流程写成技能（s3 的五分钟最小版足够起步）。然后回 <a href="claude-code.html">Claude Code 教程</a> 看权限与 hooks，把技能和自动化串起来；或在 <a href="opencode.html">OpenCode 教程</a> 里看看支持 Skills 格式的另一家 Agent 怎么玩，同一份技能两边通用。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>装好了一个支持技能的 Agent，<b>~/.claude/skills/</b> 与 <b>.claude/skills/</b> 目录已建</span></label>
+          <label><input type="checkbox" data-key="c2"><span>写过一个最小技能（两行 frontmatter + 五步正文），斜杠点名能触发</span></label>
+          <label><input type="checkbox" data-key="c3"><span>description 写了「做什么 + 何时用」，自然语言也能命中</span></label>
+          <label><input type="checkbox" data-key="c4"><span>手写过 s6 的 weekly-report：SKILL.md + references/TEMPLATE.md 齐活</span></label>
+          <label><input type="checkbox" data-key="c5"><span>能说清渐进披露三级加载，以及 Skills 和 MCP 的分工</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="vibe-coding.html"><span>← 上一篇</span><b>Vibe Coding 教程</b></a>
+        <a class="next" href="ollama.html"><span>下一篇 →</span><b>Ollama 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 Agent Skills 开放规范（agentskills.io，含 Specification 与 Quickstart）与 Claude Code 官方文档（code.claude.com/docs/en/skills）整理；2026-11 校对。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 规范仍在演进，字段与目录约定以 agentskills.io 与各 Agent 官方文档为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

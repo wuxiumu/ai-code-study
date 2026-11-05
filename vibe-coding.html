@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibe Coding 教程 · AI Code Study</title>
+<meta name="description" content="Vibe Coding 方法论教程：概念起源、适用边界、工具链地图、提示词迭代循环、小步提交与质量控制，附提示词模板与风险清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/vibe-coding.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vibe Coding 教程 · AI Code Study">
+<meta property="og:description" content="Vibe Coding 方法论教程：概念起源、适用边界、工具链地图、提示词迭代循环、小步提交与质量控制，附提示词模板与风险清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/vibe-coding.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Vibe Coding 教程 · AI Code Study">
+<meta name="twitter:description" content="Vibe Coding 方法论教程：概念起源、适用边界、工具链地图、提示词迭代循环、小步提交与质量控制，附提示词模板与风险清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Vibe Coding：把想法聊成产品的方法论",
+  "description": "Vibe Coding 方法论教程：概念起源、适用边界、工具链地图、提示词迭代循环、小步提交与质量控制，附提示词模板与风险清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/vibe-coding.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="vibe-coding">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools" class="on">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-tools">AI 编程工具</a><span>/</span>
+      <b>Vibe Coding</b>
+    </nav>
+    <p class="eyebrow">CODING TOOLS · <b>VIBE CODING</b> · 用自然语言做产品</p>
+    <h1>Vibe Coding：把想法<em>聊成</em>产品的方法论</h1>
+    <p class="lede">这一页不绑定任何工具，教你的是那套通用的打法：怎么提需求、怎么迭代、什么时候该刹车。读完你可以在任何编码 Agent 上复现一遍完整流程——从一句话想法到能跑、能测、能回滚的小产品。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/md-stats（一次典型的提示词迭代）</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">做一个 CLI：传入 md 文件，输出字数和预计阅读时长</span></div>
+        <div class="term-line"><span class="out">… 生成 wc-md.js 和测试，装好了依赖</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">node wc-md.js README.md</span></div>
+        <div class="term-line"><span class="warn">Error: ENOENT, 统计结果为空 —— 代码块被算成了普通文本</span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">围栏代码块不计数，先过测试再回来，贴运行结果</span></div>
+        <div class="term-line"><span class="out">… 补了一个用例，改了解析逻辑</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">node --test &amp;&amp; node wc-md.js README.md</span></div>
+        <div class="term-line"><span class="ok">2 tests pass — 812 词，约 4 分钟</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>概念起源</a>
+        <a href="#s2"><span class="idx">02</span>搭工作台</a>
+        <a href="#s3"><span class="idx">03</span>第一次 vibe</a>
+        <a href="#s4"><span class="idx">04</span>核心方法</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战</a>
+        <a href="#s7"><span class="idx">07</span>避坑</a>
+        <a href="#s8"><span class="idx">08</span>延伸资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="kimi-code.html">Kimi Code CLI</a>
+        <a href="claude-code.html">Claude Code</a>
+        <a href="codex.html">Codex 教程</a>
+        <a href="index.html#cat-tools">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>概念起源</a>
+          <a href="#s2"><span class="idx">02</span>搭工作台</a>
+          <a href="#s3"><span class="idx">03</span>第一次 vibe</a>
+          <a href="#s4"><span class="idx">04</span>核心方法</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战</a>
+          <a href="#s7"><span class="idx">07</span>避坑</a>
+          <a href="#s8"><span class="idx">08</span>延伸资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 概念起源 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>概念起源：一条推文引爆的编程方式</h2>
+        <p>2025 年 2 月 2 日，Andrej Karpathy（OpenAI 联合创始人、前 Tesla AI 总监）在 X 上发了一条推文：<b>「有一种新的编程方式，我称之为 vibe coding——完全交给感觉，拥抱指数增长，忘记代码的存在。」</b>原话里有半开玩笑的成分（他自嘲连 try-except 都懒得看、把报错直接截图丢回给模型），但这个词准确命中了正在发生的事：当模型强到能独立写出能跑的程序时，<b>你贡献的不再是语法，而是意图与判断</b>。</p>
+        <p>几个月内这个词从梗变成了行业通用词：媒体用、工具厂商用、Wikipedia 收了词条。它的内涵也分化出两个层次——<b>狭义的 vibe coding</b> 是 Karpathy 原始版本：不看代码、只看结果，快乐至上；<b>广义的工作流</b> 则是今天大多数人的用法：用自然语言驱动 Agent 干活，但保留 review、测试和版本控制。本页教的是后者——前者只适合玩具，后者才拿得出手。</p>
+        <p>它也一直伴随批评：批评者说这个词在鼓励「不读代码就上线」。两种理解都对了一半——vibe coding 的风险不在「用 AI 写代码」，而在<b>跳过验证</b>。这一页的整个方法论，本质上就是把 Karpathy 的快乐原教旨主义，改造成能对结果负责的工程实践。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>提出者</dt><dd>Andrej Karpathy</dd></div>
+          <div class="fact"><dt>提出时间</dt><dd>2025-02-02（X 平台推文）</dd></div>
+          <div class="fact"><dt>原话关键词</dt><dd>give in to the vibes / forget the code</dd></div>
+          <div class="fact"><dt>本质</dt><dd>自然语言驱动，意图即接口</dd></div>
+          <div class="fact"><dt>最适用</dt><dd>原型 / 个人工具 / 一次性脚本</dd></div>
+          <div class="fact"><dt>不适用</dt><dd class="no">生产核心系统裸上（无 review）</dd></div>
+          <div class="fact"><dt>前置条件</dt><dd>一个编码 Agent + Git 仓库</dd></div>
+          <div class="fact"><dt>本页立场</dt><dd>交出键盘，不交出判断</dd></div>
+        </dl>
+
+        <div class="note"><b>一句话定位：</b>vibe coding 不是「不用学编程」的魔法，而是把工程师的角色从「写代码的人」换成「定义问题、验收结果的人」。定义得越清楚，vibe 得越远；定义得含糊，AI 会替你做出一连串你根本不想要的决定。</div>
+      </section>
+
+      <!-- ===== 02 搭工作台 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>搭工作台：能跑、能测、能回滚，一个都不能少</h2>
+        <p>vibe coding 对环境只有三个硬要求：<b>改动可回滚（Git）</b>、<b>结果可验证（能跑起来 / 有测试）</b>、<b>有个听得懂人话的 Agent</b>。前两条没有，后面全部方法作废；第三条三选一装一个就够——本站都有对应教程，命令如下。</p>
+
+        <div class="tabs" role="tablist" aria-label="终端 Agent 安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">Claude Code</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">Codex</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">Kimi Code</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 官方脚本：下载独立二进制，不依赖 Node</span>
+curl -fsSL https://claude.ai/install.sh | bash
+
+<span class="c"># 或 npm（需要 Node ≥ 18）</span>
+npm install -g @anthropic-ai/claude-code
+
+claude --version</pre>
+          </div>
+          <small>详细配置见本站 <a href="claude-code.html">Claude Code 教程</a>。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># npm（包内是预编译 Rust 二进制）</span>
+npm install -g @openai/codex
+
+<span class="c"># 或官方脚本</span>
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+
+codex --version</pre>
+          </div>
+          <small>详细配置见本站 <a href="codex.html">Codex 教程</a>。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 官方脚本（macOS / Linux）</span>
+curl -fsSL https://code.kimi.com/kimi-code/install.sh | bash
+
+<span class="c"># 或 Homebrew</span>
+brew install kimi-code
+
+kimi --version</pre>
+          </div>
+          <small>详细配置见本站 <a href="kimi-code.html">Kimi Code CLI 教程</a>。</small>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 三个硬要求的最后两件</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 1. 每个新项目都从 Git 开始——这是你的后悔药</span>
+mkdir ~/my-idea &amp;&amp; cd ~/my-idea
+git init &amp;&amp; git commit --allow-empty -m <span class="g">"baseline"</span>
+
+<span class="c"># 2. 先想好「怎么跑起来」：网页就留个 index.html，</span>
+<span class="c">#    脚本就留个入口文件，Node 项目就 npm init -y</span>
+node --version  <span class="c"># 或 python3 --version，跑什么都行</span></pre>
+        </div>
+
+        <p>三个硬要求之外，还有一个软性的选型口径：<b>在真仓库里干活选终端 Agent</b>（改的是你已有的代码，需要读写文件、跑测试的完整能力）；<b>局部修补、边写边补选 AI IDE</b>；<b>从零起一个界面原型选网页生成器</b>。选错的代价不是做不出来，而是来回搬运上下文——工具跟场景匹配，迭代才不累。</p>
+
+        <div class="note warn"><b>没有 Git 就别开 vibe：</b>「能回滚」是这套方法论的地板。空仓库先打一个 baseline 提交（<b>git commit --allow-empty</b>），之后每一轮迭代都清清楚楚——AI 改砸了，<b>git checkout .</b> 一秒回到上一版，你才敢让它放开了试。</div>
+      </section>
+
+      <!-- ===== 03 快速上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>第一次 vibe：从一个想法到能跑的东西</h2>
+        <p>以「做一个统计 Markdown 字数的小工具」为例，第一次完整走一遍循环：<b>说清楚 → 让它做 → 跑起来 → 反馈 → 验收</b>。工具就用 s2 装好的任意一个，下面以终端 Agent 通用流程演示。</p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 第一次迭代</span><button class="copy" type="button">复制</button></div>
+<pre>cd ~/my-idea
+git status          <span class="c"># 干净的基线，随时能回滚</span>
+
+<span class="c"># 启动你的 Agent（claude / codex / kimi 任一）</span>
+
+<span class="prompt">&gt; </span>用 Node 写一个 CLI 工具 wc-md.js：
+  1. 传入 markdown 文件路径，输出词数和预计阅读时长（按 200 词/分钟）
+  2. 用 node:test 写两个测试：中文、中英混排
+  3. 跑通测试后把输出贴给我
+
+<span class="c"># 它写完代码、跑完测试、报告结果后：</span>
+node --test
+node wc-md.js README.md
+
+<span class="c"># 验收通过，立刻落袋为安</span>
+git add -A &amp;&amp; git commit -m <span class="g">"feat: wc-md 统计工具第一版"</span></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>同一个需求的三种问法（由差到好）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 差：愿望式，输出全凭运气</span>
+<span class="prompt">&gt; </span>做个字数统计工具
+
+<span class="c"># 中：给了实现路径，但没给验收</span>
+<span class="prompt">&gt; </span>用 Node 写个脚本统计 markdown 字数
+
+<span class="c"># 好：路径 + 验收 + 边界，一次对齐</span>
+<span class="prompt">&gt; </span>用 Node 写 wc-md.js：传文件路径，输出词数和阅读时长。
+  代码块不计入；空文件不报错；用 node:test 覆盖这两条；
+  零依赖；跑通测试后贴输出给我。</pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>需求说成「可验收」的话</h4><p>「做个字数统计」是愿望；「传入文件路径，输出词数和阅读时长，测试覆盖中文和混排」才是任务。把输出格式、边界情况写进提示词，返工次数直接减半。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>让它跑，别只让它写</h4><p>明确要求「跑通后贴运行结果」。Agent 自己跑过一遍，你拿到的就不是「应该能跑」的代码，而是验证过的结果。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>反馈要具体，一次一个问题</h4><p>报错就贴报错，不对就描述期望与实际的差距。「不行，重写」是最差反馈——AI 只能再掷一次骰子。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>每个验收点提交一次</h4><p>跑通了就 <b>git commit</b>，别攒。提交信息说清楚这一步干了什么，下轮回滚、下下轮回看 diff 都靠它。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">第一轮就跑通是运气，两三轮迭代是常态。判断工作台是否就绪的标志：<b>你现在敢随便让它试</b>——因为知道最坏情况就是 <b>git checkout .</b>。</div>
+      </section>
+
+      <!-- ===== 04 核心方法 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心方法：小步、验收、先计划、后审查</h2>
+
+        <h3>小步提交：把大赌注拆成一串小赌注</h3>
+        <p>一次性描述 10 个需求，等于把 10 个赌注押在一个提示词上——错一个，后面的全建立在错误地基上。正确姿势是把任务切成<b>每步都能验证</b>的小块：先让 CLI 能跑，再加参数解析，再补测试，再管错误处理。每步一个提交，每步都有 git 兜底。步子小到什么程度？小到你 30 秒能判断这步对不对。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 一段健康的提交历史长这样</span><button class="copy" type="button">复制</button></div>
+<pre>git log --oneline
+<span class="g">a1b2c3d feat: wc-md 支持 --top 参数统计高频词</span>
+<span class="g">e4f5a6b test: 补中文混排边界用例</span>
+<span class="g">7c8d9e0 fix: 剥离围栏代码块再统计</span>
+<span class="g">1f2e3d4 feat: wc-md 第一版，测试覆盖中文与空文件</span>
+<span class="g">0a1b2c3 baseline: empty repo</span></pre>
+        </div>
+        <p>每个提交对应一次「AI 干活 → 你验收」。哪一步引入了问题，<code>git log</code> 一眼定位，<code>git revert</code> 精准撤销——这就是把赌注拆开之后的止损粒度。</p>
+
+        <h3>验收标准先行：把「好」写成可检查的句子</h3>
+        <div class="code">
+          <div class="code-head"><span>验收标准示例（直接放进提示词）</span><button class="copy" type="button">复制</button></div>
+<pre>完成定义（全部满足才算完）：
+1. node wc-md.js &lt;文件&gt; 输出词数与分钟数
+2. 围栏代码块内容不计入字数
+3. 空文件输出 0，不报错
+4. node --test 全绿
+5. 不引入任何第三方依赖</pre>
+        </div>
+        <p>验收标准的本质是<b>把判断权留在你手里</b>：AI 负责实现，你负责判定。没有验收标准，「完成」就变成它的自由发挥；有了验收标准，完成与否一句话就能机器判定——这也是后面让测试兜底的前提。</p>
+
+        <h3>让 AI 先出计划：Plan 是最便宜的迭代</h3>
+        <p>超过三步的任务，先要求「<b>先给计划，我确认后再动手</b>」。现在的终端 Agent 基本都有 Plan 模式（Claude Code、Codex、Kimi Code 都有，通常 Shift-Tab 切换）：它只读代码、列步骤、标出要动哪些文件，一个字不写。计划错了改一句话就行，代码错了就得整个回滚——<b>在计划层迭代的成本是代码层的几十分之一</b>。计划批准后，再把大计划拆成小步提交执行。</p>
+        <div class="code">
+          <div class="code-head"><span>发给 Agent 的提示词 · 计划请求</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>任务：给 wc-md 加一个 --top N 参数，输出高频词。
+不要写代码，先给我实现计划：
+1. 要动哪几个文件、各改什么
+2. 有没有更简单的替代方案，为什么选这个
+3. 拆成几个可独立验收的小步骤
+我确认后你再动手。</pre>
+        </div>
+
+        <h3>跑测试、读 diff：质量控制的两道闸</h3>
+        <p>「有测试就跑测试，没测试就让它补测试」——测试是你和 AI 之间最可靠的沟通协议：验收标准写进测试用例，模型每次改动自己就能回归。第二道闸是<b>读 diff</b>：<code>git diff</code> 之后肉眼过一遍改动，重点看三样——有没有改它不该改的文件、有没有为绕过问题留下的怪代码、有没有硬编码的魔法值。diff 是 AI 全部工作的诚实记录，读它比读全量代码快得多。</p>
+
+        <div class="note"><b>工具链地图（点名不展开）：</b>终端 Agent——<b>Claude Code、Codex、Kimi Code、OpenCode</b>，本站各有教程，适合真仓库里的工作流；AI IDE——<b>Cursor、Windsurf</b>，编辑器内联交互，适合边写边补；网页级生成——<b>v0、Lovable、Bolt</b>，从一句话直接出可预览的网页应用，适合起原型。同一个方法论，四类工具只是「聊天的界面」不同。</div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：贴在手边的四张卡片</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。搜 <b>提交</b>、<b>模板</b>、<b>密钥</b> 之类的词试试。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索原则、模板、工具或风险，比如 小步 / 验收 / 密钥" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">心法原则</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">提示词模板</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">工具地图</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">风险清单</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>原则</th><th>怎么做</th></tr></thead>
+              <tbody>
+                <tr><td class="k">小步提交</td><td>任务切到 30 秒能判断对错；每步 git commit，永不攒批</td></tr>
+                <tr><td class="k">验收标准先行</td><td>开工前把「完成」写成可检查的句子清单，贴进提示词</td></tr>
+                <tr><td class="k">先计划后动手</td><td>三步以上的任务先进 Plan 模式，确认步骤清单再放行</td></tr>
+                <tr><td class="k">测试当协议</td><td>验收标准翻译成测试用例，让回归检查自动化</td></tr>
+                <tr><td class="k">读 diff 再继续</td><td>每轮迭代后过一遍 git diff，确认没有越界改动</td></tr>
+                <tr><td class="k">反馈要具体</td><td>贴报错、说期望；不说「不行重写」这种掷骰子式反馈</td></tr>
+                <tr><td class="k">一次一个问题</td><td>发现多个 bug 先修最上游的，别一口气抛五个</td></tr>
+                <tr><td class="k">基线先行</td><td>空仓库先打 baseline 提交，才有资格谈回滚</td></tr>
+                <tr><td class="k">换策略优于硬磨</td><td>同一问题修三轮没好，退回上一提交换思路重谈</td></tr>
+                <tr><td class="k">上下文有价</td><td>长会话稀释注意力；阶段结束就压缩或新开，带一份摘要</td></tr>
+                <tr><td class="k">交出键盘不交判断</td><td>AI 出方案，你做取舍；最终合并的决定永远在你</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>模板</th><th>适用与要点</th></tr></thead>
+              <tbody>
+                <tr><td class="k">需求卡</td><td>目标 + 验收标准清单 + 边界（不引入依赖 / 不改 XX 目录）</td></tr>
+                <tr><td class="k">报错回贴</td><td>完整报错文本 + 复现命令 + 期望行为；别截图缩略</td></tr>
+                <tr><td class="k">计划请求</td><td>「先出实现计划，列出要动的文件，我确认后再写码」</td></tr>
+                <tr><td class="k">示例驱动</td><td>给输入/输出各一组样例，AI 对着样例实现和自测</td></tr>
+                <tr><td class="k">测试委托</td><td>「把验收标准写成 node:test / pytest 用例，先红后绿」</td></tr>
+                <tr><td class="k">差异指令</td><td>「只改 X，其他文件一律不动」，约束改动半径</td></tr>
+                <tr><td class="k">复述确认</td><td>「先用你的话复述需求，列歧义点」，开工前对齐</td></tr>
+                <tr><td class="k">上下文投喂</td><td>开工前把相关文件、报错日志、约定文档一次给足</td></tr>
+                <tr><td class="k">坏好对照</td><td>同一个需求写「差的问法」和「好的问法」各一遍，让它自评</td></tr>
+                <tr><td class="k">新会话重启</td><td>把已确认的结论压成一段摘要，新会话从摘要出发</td></tr>
+                <tr><td class="k">回滚重启</td><td>「回退到上一版，我们换 X 方案重来」——敢重来是特权</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>工具</th><th>定位</th></tr></thead>
+              <tbody>
+                <tr><td class="k">Claude Code</td><td>终端 Agent，长任务与仓库级改造强，Plan 模式成熟</td></tr>
+                <tr><td class="k">Codex</td><td>终端 Agent，沙箱执行，敢放权跑自动化</td></tr>
+                <tr><td class="k">Kimi Code CLI</td><td>终端 Agent，Plan 模式 + 权限三档，中文场景顺</td></tr>
+                <tr><td class="k">OpenCode</td><td>开源终端 Agent，模型可换，多 provider 一把梭</td></tr>
+                <tr><td class="k">Cursor</td><td>AI IDE，内联补全与多文件编辑，边写边聊</td></tr>
+                <tr><td class="k">Windsurf</td><td>AI IDE，Agent 流与编辑器深度结合</td></tr>
+                <tr><td class="k">v0</td><td>网页生成，一句话出可预览 UI，适合起原型</td></tr>
+                <tr><td class="k">Lovable</td><td>网页生成，从想法到全栈小应用</td></tr>
+                <tr><td class="k">Bolt</td><td>网页生成，浏览器内生成并运行全栈项目</td></tr>
+                <tr><td class="k">选型口径</td><td>真仓库选终端 Agent；局部补选 IDE；起原型选网页生成</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>风险</th><th>对策</th></tr></thead>
+              <tbody>
+                <tr><td class="k">不看代码就上线</td><td class="no">红线。上线前的 review 和测试不可跳过</td></tr>
+                <tr><td class="k">密钥进提示词</td><td>API Key、.env 永不贴进对话；用环境变量引用</td></tr>
+                <tr><td class="k">幻觉依赖</td><td>模型可能引不存在或废弃的包；装之前查一遍官方源</td></tr>
+                <tr><td class="k">越界改动</td><td>提示词圈定改动半径，diff 审查是否碰了不该碰的文件</td></tr>
+                <tr><td class="k">偷懒式修复</td><td>改不了根因就删测试/绕过校验；diff 里看到删测试要警惕</td></tr>
+                <tr><td class="k">上下文漂移</td><td>长会话后面答非所问；压缩上下文或开新会话带摘要</td></tr>
+                <tr><td class="k">脆弱快感</td><td>原型直接上生产的诱惑；数据和边界先把住再谈扩展</td></tr>
+                <tr><td class="k">自动化权限误用</td><td>全自动模式只在可信目录开；先看 git status 再放权</td></tr>
+                <tr><td class="k">测试形同虚设</td><td>测试是 AI 自己写的，覆盖了什么你得过目；删测试的 diff 一票否决</td></tr>
+                <tr><td class="k">许可证污染</td><td>让 AI 生成整段开源代码有许可风险；核心逻辑人工把关</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「提交」「验收」「密钥」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：完整 vibe 一个「Markdown 字数统计」CLI</h2>
+        <p>把 s3 的例子走完整。目标是拿到一个<b>有测试、有提交历史、随时可回滚</b>的小工具——重点不在工具本身，而在每一步的方法论动作。全程约 30 分钟。</p>
+
+        <h3>第 1 步：立基线，写需求卡</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>mkdir ~/md-stats &amp;&amp; cd ~/md-stats
+git init
+git commit --allow-empty -m <span class="g">"baseline: empty repo"</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>发给 Agent 的提示词 · 需求卡</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>用 Node 写 CLI 工具 wc-md.js。先复述需求、列歧义点，确认后再写码。
+
+目标：node wc-md.js &lt;文件.md&gt; 输出「词数 + 预计阅读分钟数（200 词/分钟）」
+
+验收标准：
+1. 围栏代码块（```…```）内容不计入
+2. 中文按字计，英文按空格分词
+3. 空文件输出 0 词，不报错
+4. 用 node:test 写测试，覆盖以上三条，先跑给我看
+5. 零第三方依赖，单文件实现</pre>
+        </div>
+        <p><small>注意三件事：要求<b>复述需求</b>（对齐先于实现）、验收标准<b>可机器判定</b>、<b>圈定了边界</b>（零依赖、单文件）。</small></p>
+
+        <h3>第 2 步：第一轮生成 + 验收</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 它交活后你做的事</span><button class="copy" type="button">复制</button></div>
+<pre>node --test                    <span class="c"># 测试是绿的？</span>
+node wc-md.js README.md        <span class="c"># 输出符合预期？</span>
+node wc-md.js empty.md         <span class="c"># 边界用例亲手试一个</span>
+
+<span class="c"># 全过 → 落袋为安</span>
+git add -A &amp;&amp; git commit -m <span class="g">"feat: wc-md v1，测试覆盖中文与空文件"</span></pre>
+        </div>
+
+        <h3>第 3 步：典型报错的迭代</h3>
+        <p>真实世界里第一版几乎总有边界问题。假设你贴了一篇带代码块的文章，字数虚高：</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 一次标准的反馈循环</span><button class="copy" type="button">复制</button></div>
+<pre>node wc-md.js post.md
+<span class="c"># 输出 2100 词 —— 明显把代码块算进去了</span>
+
+<span class="prompt">&gt; </span>post.md 里的围栏代码块被计入了（2100 词，人读约 1700）。
+  修法：解析前剥离围栏代码块。给「含代码块」补一个测试用例，
+  先红后绿，跑通贴结果。
+
+<span class="c"># 它改完：</span>
+node --test &amp;&amp; node wc-md.js post.md   <span class="c"># 全绿，数字对上了</span>
+git diff                                <span class="c"># 肉眼确认：只动了 wc-md.js 和测试</span>
+git add -A &amp;&amp; git commit -m <span class="g">"fix: 剥离围栏代码块再统计"</span></pre>
+        </div>
+        <p><small>反馈包含三要素：<b>现象</b>（2100 vs 期望 1700）、<b>假设的根因</b>、<b>验收方式</b>（先红后绿）。不贴「数字不对你看看」这种让它猜的话。</small></p>
+
+        <h3>第 4 步：读 diff，发现「偷懒式修复」</h3>
+        <p>读 diff 时最该警惕的是它<b>绕过问题而不是解决问题</b>：删测试让套件变绿、放宽断言、加 try-except 吞掉报错。看到这类改动，直接打回：「这是掩盖不是修复，回到根因。」如果三轮修不好一个点，别硬磨——<code>git reset --hard</code> 回到上一个好提交，换一种方案重新谈，往往比第五轮追问更快。</p>
+
+        <h3>第 5 步：把重复的部分沉淀下来</h3>
+        <p>这个工具做完你会发现：需求卡的结构、先红后绿的要求、读 diff 的动作，每次都一样。把「怎么跟你协作」也沉淀下来——写在仓库的 AGENTS.md 里，或更进一步做成可复用的技能（本站 <a href="skills.html">Skills（技能）教程</a> 有完整做法）。第一次 vibe 交付的是工具，第二次起，交付的还有你和 AI 的协作协议。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 最终成果盘点</span><button class="copy" type="button">复制</button></div>
+<pre>git log --oneline | wc -l      <span class="c"># 5 个提交，一步一个验收点</span>
+node --test                    <span class="c"># 测试全绿，回归有保障</span>
+ls                             <span class="c"># wc-md.js + 测试文件，零依赖</span></pre>
+        </div>
+
+        <div class="note"><b>这一套的通用性：</b>四步（需求卡 → 生成验收 → 反馈迭代 → 读 diff 落袋）不依赖任何特定工具，终端 Agent、AI IDE、网页生成器都适用。变的只是聊天窗口，不变的是<b>你始终握着验收权和回滚键</b>。</div>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个最贵的错误</h2>
+
+        <h3>坑一：不看 diff 就合并</h3>
+        <div class="note warn"><b>「能跑」和「正确」是两回事。</b>测试全绿也不代表能合并——测试可能是它自己写的、恰好覆盖不到你担心的地方。至少做到：改动文件列表过一眼（有没有越界）、新增逻辑读一遍、边界场景手点一次。这是 vibe coding 里你唯一不能交给 AI 的活。</div>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 每次「它说做完了」之后</span><button class="copy" type="button">复制</button></div>
+<pre>git status --short    <span class="c"># 改动文件清单：有没有不该动的？</span>
+git diff --stat       <span class="c"># 改动量：几十行的小事改出 800 行？追问</span>
+git diff              <span class="c"># 重点看：删掉的测试、放宽的断言、硬编码的值</span></pre>
+        </div>
+
+        <h3>坑二：一个提示词想一次到位</h3>
+        <p>「帮我做一个带用户系统、支付、后台管理的电商网站」——这种提示词的产出注定是好看的外壳加松动的地基。模型上下文有限、注意力稀释，一次塞得越多，每部分质量越差。拆成「先跑通骨架 → 再加模块 A → 再加模块 B」，每步验收、每步提交，总耗时反而更短。</p>
+        <p>一个实用的自测：把你写好的提示词里的需求逐条编号，超过三条就拆开分轮发——第一轮只留「最小能跑」的那条，其余的作为后续轮次的任务清单。你要的不是一个巨大的回复，而是一串你都能看懂的、每步可回滚的小改动。</p>
+
+        <h3>坑三：把密钥和敏感数据聊进提示词</h3>
+        <div class="note warn"><b>提示词不是保险箱：</b>它会进入会话记录、可能进入上下文缓存与日志。配置一律走环境变量，让 AI 写「从 <b>process.env.XXX</b> 读取」的代码，而不是把值发给它。真实密钥泄露过的，重置即可；别赌它不外传。</div>
+        <ul>
+          <li>永不进入提示词：API Key、数据库密码、<code>.env</code> 文件内容、生产数据、客户资料。</li>
+          <li>谨慎进入提示词：未公开的商业代码、内部文档、带真实用户信息的日志。</li>
+          <li>安全做法：密钥放环境变量或密钥管理器；示例数据先脱敏；让 AI 写「读取配置」的代码而不是替你保管配置。</li>
+        </ul>
+
+        <h3>坑四：报错了追着聊，越聊越歪</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 硬磨到第 4 轮时该做的</span><button class="copy" type="button">复制</button></div>
+<pre>git status              <span class="c"># 看看现在被改成了什么样</span>
+git reset --hard HEAD   <span class="c"># 回到上一个好提交（确认没有要保留的改动）</span>
+
+<span class="prompt">&gt; </span>刚才的方案修不动这个问题。换个思路：
+  用 &lt;另一种方案&gt; 重新实现，先讲方案再动手。</pre>
+        </div>
+        <p><small>同一问题修三轮没好转，继续追问大概率是在错误方向上加注——模型会顺着会话里的错误假设越走越深。回滚 + 换策略 + （必要时）开新会话，是把 vibe 拉回正轨的三个手动挡。</small></p>
+
+        <div class="note"><b>回头看这四个坑：</b>它们共享同一个根因——<b>跳过了本页某条方法</b>。不看 diff 是跳过了审查，一次到位是跳过了小步，密钥进提示词是跳过了安全边界，追着报错硬磨是跳过了回滚止损。vibe coding 的风险清单不长，难的不是背下来，而是在兴奋的时候仍然执行——这也正是它仍然是一门「手艺」而非「按钮」的原因。</div>
+      </section>
+
+      <!-- ===== 08 延伸资源 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>延伸方向与资源</h2>
+        <ul>
+          <li><a href="https://x.com/karpathy/status/1886192184808149383" target="_blank" rel="noopener">Karpathy 原始推文（2025-02-02）</a>——概念源头，一分钟的原文胜过十篇二手解读。</li>
+          <li><a href="https://en.wikipedia.org/wiki/Vibe_coding" target="_blank" rel="noopener">Wikipedia：Vibe coding</a>——概念的传播史与主流定义演变。</li>
+          <li><a href="https://code.claude.com/docs/en/quickstart" target="_blank" rel="noopener">Claude Code 官方文档</a>——本站配套 <a href="claude-code.html">Claude Code 教程</a> 之外的官方全览。</li>
+          <li><a href="https://developers.openai.com/codex" target="_blank" rel="noopener">OpenAI Codex 文档</a>——沙箱与自动化思路的官方说明。</li>
+          <li><a href="https://opencode.ai/docs/" target="_blank" rel="noopener">OpenCode 文档</a>——想不锁模型，从这里开始；本站配套 <a href="opencode.html">OpenCode 教程</a>。</li>
+          <li><a href="https://v0.dev" target="_blank" rel="noopener">v0</a>——网页生成路线代表，起 UI 原型最快的一档。</li>
+        </ul>
+        <div class="note"><b>学完本页去哪：</b>把 s6 的四步在任何一个 10 分钟内能跑起来的想法上完整走一遍——方法论是肌肉记忆，读十遍不如练一遍。然后按需深入具体工具：<a href="kimi-code.html">Kimi Code</a> / <a href="claude-code.html">Claude Code</a> / <a href="codex.html">Codex</a> 任选其一开始，再把重复流程沉淀成 <a href="skills.html">Skills（技能）</a>。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>工作台三件套齐了：Git 仓库（有 baseline 提交）、能跑的入口、一个装好的终端 Agent</span></label>
+          <label><input type="checkbox" data-key="c2"><span>完整走过一次四步循环：需求卡 → 生成验收 → 反馈迭代 → 读 diff 提交</span></label>
+          <label><input type="checkbox" data-key="c3"><span>写过一份可机器判定的验收标准，并把它翻译成了测试</span></label>
+          <label><input type="checkbox" data-key="c4"><span>至少一次在三轮修不动后果断回滚换策略，而不是硬磨</span></label>
+          <label><input type="checkbox" data-key="c5"><span>确认自己没把任何密钥 / 敏感数据贴进过提示词</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="opencode.html"><span>← 上一篇</span><b>OpenCode 教程</b></a>
+        <a class="next" href="skills.html"><span>下一篇 →</span><b>Skills（技能）教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 Andrej Karpathy 2025-02-02 原始推文、Wikipedia「Vibe coding」词条与 Claude Code、Codex、OpenCode、Kimi Code 等工具官方文档整理；2026-11 校对。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 工具形态迭代很快，具体功能以各工具官方文档为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

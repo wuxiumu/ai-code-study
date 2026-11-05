@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek Harness 教程 · AI Code Study</title>
+<meta name="description" content="DeepSeek Harness（dsh）上手指南：安装启动、第一次任务、harness 与 Cordis 插件架构、速查表、定时任务与插件实战、避坑与自检清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/deepseek-harness.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepSeek Harness 教程 · AI Code Study">
+<meta property="og:description" content="DeepSeek Harness（dsh）上手指南：安装启动、第一次任务、harness 与 Cordis 插件架构、速查表、定时任务与插件实战、避坑与自检清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/deepseek-harness.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DeepSeek Harness 教程 · AI Code Study">
+<meta name="twitter:description" content="DeepSeek Harness（dsh）上手指南：安装启动、第一次任务、harness 与 Cordis 插件架构、速查表、定时任务与插件实战、避坑与自检清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "DeepSeek Harness：给模型套上可执行的骨架",
+  "description": "DeepSeek Harness（dsh）上手指南：安装启动、第一次任务、harness 与 Cordis 插件架构、速查表、定时任务与插件实战、避坑与自检清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/deepseek-harness.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="deepseek-harness">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open" class="on">开源模型与智能体</a>
+      <a href="index.html#cat-ml">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-open">开源模型与智能体</a><span>/</span>
+      <b>DeepSeek Harness</b>
+    </nav>
+    <p class="eyebrow">OPEN AGENTS · <b>DEEPSEEK HARNESS</b> · 模型之外的那副骨架</p>
+    <h1>DeepSeek Harness：给模型套上<em>可执行的骨架</em></h1>
+    <p class="lede">DeepSeek 官方开源的 agent harness：一条命令启动 Web UI，理解「一切皆插件」的架构，再把定时任务和自建插件挂上去。项目处于开发者预览期，本页命令核对自 2026-11 的官方仓库与官网。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/dsh-playground</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">npm install -g @deepseek-ai/dsh</span></div>
+        <div class="term-line"><span class="out">added 1 package in 8s</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">dsh web</span></div>
+        <div class="term-line"><span class="out">DeepSeek Harness <span class="ok">developer preview</span> — starting…</span></div>
+        <div class="term-line"><span class="out">Web UI listening on <span class="ok">http://127.0.0.1:3080</span> · opening browser</span></div>
+        <div class="term-line"><span class="pr">&gt; </span><span class="cmd">分析这份 Data.xlsx，按季度汇总销售额，输出一张图表</span></div>
+        <div class="term-line"><span class="ok">任务完成 — Q3-sales.xlsx 与图表已写入工作区</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装启动</a>
+        <a href="#s3"><span class="idx">03</span>第一次任务</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>实战演练</a>
+        <a href="#s7"><span class="idx">07</span>避坑</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="ollama.html">Ollama 教程</a>
+        <a href="hermes-agent.html">Hermes Agent 教程</a>
+        <a href="pi-agent.html">Pi Agent 教程</a>
+        <a href="index.html#cat-open">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装启动</a>
+          <a href="#s3"><span class="idx">03</span>第一次任务</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>实战演练</a>
+          <a href="#s7"><span class="idx">07</span>避坑</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 它是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>它是什么：官方开源的「模型底盘」</h2>
+        <p>DeepSeek Harness（命令名 <code>dsh</code>）是 DeepSeek AI 官方开源的 agent harness，2026 年发布并全球公开预览。它解决的问题是：你手上有一个很会说话的模型，但模型本身只会生成文本——读文件、跑脚本、管进度、定时干活这些「手脚」，得靠 harness 来长出来。</p>
+        <p>官方对它的定位一句话：<b>处理文档、分析表格、写代码、定时任务</b>。它不是某个 IDE 里的补全插件，而是一个独立的任务运行环境——Web UI 或桌面应用，外加一组可组合的插件。仓库基于 Node.js，用 pnpm 管理的 monorepo，MIT 协议，README 同时提供中英文两版。</p>
+        <p>它最大的架构卖点写在仓库副标题里：<b>Everything is a Plugin（一切皆插件）</b>。模型适配器、工具注册表、界面组件，全部以插件形式挂载，底层是 Cordis 元框架。这意味着它的边界不是写死的——想接别的模型、加别的工具、改界面，走的都是同一套插件机制（详见第 04 节）。</p>
+        <p>模型来源上，它与 DeepSeek 自家模型天然配套——官网演示界面默认就是 DeepSeek 系模型档位（演示中显示 DeepSeek-V4.1-Flash 及思考强度选项）。接其他模型属于模型适配插件的范畴，预览期的支持范围以文档为准。也正因为它「什么都想干」，它和纯终端编码 agent（Claude Code、Pi 这类）不是竞品关系：前者是通用任务台，后者是代码工作流里的利器。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>开发方</dt><dd>DeepSeek AI（官方开源）</dd></div>
+          <div class="fact"><dt>命令名</dt><dd>dsh（npm 包 @deepseek-ai/dsh）</dd></div>
+          <div class="fact"><dt>语言与运行时</dt><dd>Node.js · pnpm monorepo</dd></div>
+          <div class="fact"><dt>协议</dt><dd>MIT</dd></div>
+          <div class="fact"><dt>状态</dt><dd class="no">开发者预览（破坏性变更会常态化）</dd></div>
+          <div class="fact"><dt>接入端</dt><dd>Web UI · 桌面版（macOS Apple silicon / Windows 64-bit）</dd></div>
+          <div class="fact"><dt>架构</dt><dd>Cordis 元框架 · 一切皆插件</dd></div>
+          <div class="fact"><dt>仓库热度</dt><dd>27 万+ stars（2026-11）</dd></div>
+        </dl>
+
+        <div class="note"><b>先解一下这个词：</b>harness 本义是「马具」——套在马身上的缰绳、马鞍和挽具。模型是那匹马，力气再大，没有缰绳你也不知道它会往哪跑；harness 就是那套让你能<b>驾驭</b>模型的装置：给它工具、给它上下文、替你执行动作、把结果喂回去循环。所以「给模型套上可执行的骨架」不是修辞，是它字面上的工作。</div>
+
+        <p>如果你只有十分钟，按这个顺序读这页就够了：</p>
+        <ul>
+          <li><b>第 02 节</b>——一条命令跑起来，先看到东西再谈概念；</li>
+          <li><b>第 03 节</b>——在 Web UI 里发第一条任务，学会看执行轨迹；</li>
+          <li><b>第 04 节</b>——搞懂 harness、插件、Cordis 三个词，之后看任何资料都不迷路；</li>
+          <li><b>第 06 节</b>——照着做一遍表格分析和定时任务，建立体感；</li>
+          <li><b>第 07 节</b>——预览期的坑都在这，动手前扫一眼能省很多时间。</li>
+        </ul>
+      </section>
+
+      <!-- ===== 02 安装启动 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装启动：唯一硬依赖是 Node.js</h2>
+        <p>三条路：用 <code>npx</code> 免安装直跑，最省事；全局安装固定一个 <code>dsh</code> 命令；想读源码、改代码就从仓库构建。桌面版不想碰命令行的话，官网直接下载。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">npx 直跑（推荐起步）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">全局安装</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">从源码运行</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 前提：装好 Node.js（官网明确要求先装 Node）</span>
+npx @deepseek-ai/dsh web
+
+<span class="c"># 服务器 / SSH 环境只启动服务，不抢着开浏览器</span>
+npx @deepseek-ai/dsh web --no-open
+
+<span class="c"># npx 用的缓存包不会自动更新，要拉最新版显式加 @latest</span>
+npx @deepseek-ai/dsh@latest web</pre>
+          </div>
+          <small>Web UI 默认监听 <b>http://127.0.0.1:3080</b> 并自动打开浏览器。SSH 远程启动时只打印主机地址——端口转交给 SSH 客户端或编辑器处理。首次运行 npx 会先下载包，稍等片刻。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 全局安装，得到 dsh 命令</span>
+npm install -g @deepseek-ai/dsh
+
+<span class="c"># 启动 Web UI</span>
+dsh web
+
+<span class="c"># 预览期升级：重新全局安装一次即拉到最新版</span>
+npm install -g @deepseek-ai/dsh
+
+<span class="c"># 卸载</span>
+npm uninstall -g @deepseek-ai/dsh</pre>
+          </div>
+          <small>装完先<b>重开终端</b>再敲 <code>dsh</code>，避免 PATH 没刷新。npm 全局 bin 目录必须在 PATH 里，否则会 command not found。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal · 官方 README 的源码路径</span><button class="copy" type="button">复制</button></div>
+<pre>git clone https://github.com/deepseek-ai/deepseek-harness.git
+cd deepseek-harness
+pnpm install
+pnpm run build
+pnpm dsh web</pre>
+          </div>
+          <small><code>pnpm run build</code> 准备仓库产物，<code>pnpm dsh web</code> 直接用已构建产物启动、不重新编译。想改代码边看效果，仓库开发指南里有 <code>pnpm run dev:web</code>（改源码自动重构建客户端 bundle）。</small>
+        </div>
+
+        <div class="note warn"><b>动手前先知道三件事：</b>① 这是<b>开发者预览版</b>，README 用大写字母写了「THERE WILL BE COMPATIBILITY-BREAKING CHANGES」——破坏性变更是常态；② 仓库明确要求运行前先读 <b>SAFETY.md</b>（安全须知），harness 能执行 shell、写文件，别在含敏感数据的目录里裸跑；③ 不想装命令行工具，官网 <b>deepseek.com/en/harness</b> 提供 macOS（Apple silicon）与 Windows（64-bit）桌面版下载。</div>
+      </section>
+
+      <!-- ===== 03 第一次任务 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>第一次任务：从「能打开」到「真干活」</h2>
+        <p>DeepSeek Harness 的主入口是 Web UI，不是纯终端。启动之后的所有操作都在浏览器页面里完成：左边是会话，右边是工作区文件，顶部有插件面板。下面这段把它跑起来。</p>
+
+        <div class="code">
+          <div class="code-head"><span>Terminal · 启动</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 在一个专用目录里启动（别拿系统根目录练手）</span>
+mkdir ~/dsh-playground &amp;&amp; cd ~/dsh-playground
+dsh web
+
+<span class="c"># 浏览器自动打开 http://127.0.0.1:3080</span>
+<span class="c"># 在对话框里发第一条任务，比如官网演示的这类：</span>
+<span class="prompt">&gt; </span>读一下 ./brief.docx，把里面的需求要点整理成一页 Markdown
+
+<span class="c"># 换个任务类型：读代码</span>
+<span class="prompt">&gt; </span>梳理 ./src 的模块结构，指出最该重构的文件和理由
+
+<span class="c"># 再换个：处理表格</span>
+<span class="prompt">&gt; </span>Data.xlsx 里哪个区域 Q3 环比下滑最大？给出数据依据</pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>选好目录再启动</h4><p>和其他 agent 一样，工作范围跟着启动目录走。开一个空的 playground 目录，把要处理的文件拖进去（或放好再启动），边界清楚，出错也好收拾。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>第一条任务从「只读」开始</h4><p>总结文档、解释表格、梳理代码结构——这类任务不改文件、不跑命令，最适合建立信任。确认它理解得对，再让它写东西。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>展开执行轨迹看看</h4><p>官网的 Developer tools 里有执行轨迹（trajectory）视图：每一轮的输入、模型、工具调用、耗时都能逐条展开。刚上手时多看轨迹，是理解 agent 怎么干活的最快途径。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>再让它动文件</h4><p>分析类任务跑顺了，换生成类：「按季度汇总销售额，输出一张图表」。它会读表格、算数、产出文件到工作区，你可以直接预览再让它改。</p></div>
+          </li>
+        </ul>
+
+        <div class="code">
+          <div class="code-head"><span>Web UI · 执行轨迹视图（结构示意，来自官网 Developer tools 演示）</span><button class="copy" type="button">复制</button></div>
+<pre>Turn 1 · USER       读一下 brief.docx，整理成一页 Markdown
+Turn 1 · TOOL       read   { "file_path": "./brief.docx" }      → 文档全文
+Turn 1 · ASSISTANT  需求要点共 6 条，按优先级排列如下…
+Turn 2 · USER       把第 3 条展开成可验证的验收标准
+Turn 2 · TOOL       write  { "file_path": "./summary.md" }      → 已写入工作区
+Turn 2 · TOOL       bash   { "command": "ls -la" }              → 确认文件落盘</pre>
+        </div>
+        <p><small>官网的轨迹视图里，每次工具调用还能进一步展开输入、结果、schema、耗时四张标签页。上面是按同一结构画的示意——实际界面以你装到的版本为准。</small></p>
+
+        <div class="note">界面上值得先认识的三块：<b>Plugins</b>（插件面板，能看到 Terminal、Agent loop、Subagents 等官方插件，以及标注了 Experimental 的 Scheduled tasks、Voice input、Agent teams、Auto approval review）；<b>模型档位</b>（官网演示界面默认显示 DeepSeek-V4.1-Flash 及思考档位，随版本演进）；<b>Workspace</b>（工作区，任务读写的默认边界）。</div>
+
+        <div class="note"><b>双入口备忘：</b>桌面版（macOS Apple silicon / Windows 64-bit，官网下载）与 Web UI（本页主线）功能同源，选哪个都行。差别只在载体：桌面版双击即用，Web UI 适合服务器与远程场景。两者都会随预览期一起快速演进。</div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：引擎、底盘与插件</h2>
+
+        <h3>4.1 什么是 harness——引擎与底盘，和「Agent 框架」的关系</h3>
+        <p>把汽车搬出来讲：模型是<b>发动机</b>，harness 是<b>底盘和传动</b>。发动机决定你跑多快，但方向盘、变速箱、轮子全在底盘上——没有底盘，发动机只能原地轰鸣。harness 做的就是这件事：把模型的文本输出解析成<b>工具调用</b>，替你执行（读文件、写文件、跑命令），把结果喂回模型，循环往复直到任务完成。这个循环叫 agent loop，在 DeepSeek Harness 里它本身就是一个插件。</p>
+        <p>它和「Agent 框架」（LangChain 这类）的区别也用汽车说：框架是<b>造车工具箱</b>——给你零件和图纸，你自己焊一辆；harness 是<b>整车</b>——装上就能开，但引擎盖可以打开，里面的零件（插件）能换能加。刚入门的同学先开整车，想造车了再拆开看，这个顺序比反过来省很多力气。</p>
+        <p>再往下拆一层，harness 的日常由三件事组成：<b>喂上下文</b>——把任务、文件、历史整理成模型能用的输入；<b>执行工具</b>——模型说要读哪个文件，harness 去读并把结果交回；<b>守住边界</b>——哪些操作直接做、哪些要问人、一切发生在哪个目录。以后评估任何 agent 产品，都可以拿这三件事去套，很快能看出它把力气花在了哪。</p>
+
+        <h3>4.2 一切皆插件</h3>
+        <p>仓库副标题就是这句。模型适配器（接哪家模型）、工具注册表（有哪些工具可调）、界面组件，全部是插件。你在插件面板里看到的官方插件有：<b>Terminal</b>（让智能体操作终端）、<b>Agent loop</b>（核心循环）、<b>Subagents</b>（子智能体）；实验区还有 <b>Agent teams</b>、<b>Auto approval review</b>、<b>Scheduled tasks</b>、<b>Voice input</b>。连「写插件」这件事本身也被做成了体验——官网演示的 <b>Creator mode</b> 里，用一句「帮我写个番茄钟插件」，它就自己加载插件开发技能、查运行时接口、写包、安装并验证。</p>
+        <div class="code">
+          <div class="code-head"><span>仓库结构（节选，具体以仓库为准）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># github.com/deepseek-ai/deepseek-harness 顶层目录（节选）</span>
+packages/   <span class="c"># 核心包：模型适配、工具、运行时</span>
+apps/       <span class="c"># Web UI 等应用</span>
+docs/       <span class="c"># 开发者文档</span>
+website/    <span class="c"># 官网</span>
+SAFETY.md   <span class="c"># 运行前必读的安全须知</span>
+README.zh.md <span class="c"># 中文版 README</span></pre>
+        </div>
+        <p><small>注意：仓库迭代极快（提交数已过两万五），上面只是帮你建立方位感的节选，以实际仓库为准。</small></p>
+        <div class="code">
+          <div class="code-head"><span>GitHub · 插件生态的三个官方入口（README 节选）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 1. 反馈与求助</span>
+<span class="c">#    GitHub Discussions —— 官方指定的 bug / 建议渠道</span>
+
+<span class="c"># 2. 让插件被找到</span>
+<span class="c">#    给插件仓库加 GitHub topic：dsh-plugin</span>
+
+<span class="c"># 3. 日常交流</span>
+<span class="c">#    DeepSeek Harness Discord —— README「Community and support」一节有入口</span></pre>
+        </div>
+
+        <h3>4.3 Cordis：底下的那层元框架</h3>
+        <p>DeepSeek Harness 构建在 <b>Cordis</b> 之上，官方称其设计来自论文《A Programming Paradigm for Spatiotemporal Composability》（时空可组合的编程范式）。你暂时不需要啃论文，概念层面抓住两点就够：第一，插件有<b>统一的生命周期</b>——装载、启动、停用、卸载都是框架管的，插件自己只写业务；第二，插件之间<b>可发现、可组合</b>——一个插件可以查询并调用另一个插件暴露的能力。官网演示里那个写番茄钟的会话，就通过运行时接口（inspect providers、查询 runtime slots）在检视其他插件的状态，这是「可组合」的直接体现。</p>
+        <p><small>写 Cordis 插件的具体 API 属于开发者文档的范畴，预览期变动快，本页只讲概念，写代码前以官方文档站为准。</small></p>
+
+        <h3>4.4 界面上你每天会碰到的四个东西</h3>
+        <p>打开 Web UI 之后，这四块界面会陪你度过大部分时间——先认脸，后文不再解释：</p>
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>Workspace（工作区）</dt><dd style="color:var(--ink-2)">任务的读写边界。会话里的文件操作默认落在这里，生成的 xlsx、html、md 都能直接预览。</dd></div>
+          <div class="fact"><dt>Plugins（插件面板）</dt><dd style="color:var(--ink-2)">启用/停用官方与第三方插件的地方，分 Official 与 Experimental 两区。</dd></div>
+          <div class="fact"><dt>Creator mode（创作模式）</dt><dd style="color:var(--ink-2)">用对话让 harness 给你写插件——官网演示里从一句话到装好的番茄钟插件约五分钟。</dd></div>
+          <div class="fact"><dt>Developer tools（开发者工具）</dt><dd style="color:var(--ink-2)">执行轨迹与运行时信息；工具调用展开后有输入、结果、schema、耗时四张标签页。</dd></div>
+        </dl>
+
+        <h3>4.5 模型从哪来</h3>
+        <p>官网演示界面默认搭载 DeepSeek 系模型（演示中显示 DeepSeek-V4.1-Flash 档位与思考强度选项）——自家的 harness 配自家的模型，这条路数和 Claude Code 配 Claude 模型一样。想接其他 provider，走的是模型适配插件：架构上完全支持（模型适配器本来就是插件之一），但预览期具体支持哪些 provider、怎么配置，以文档站当前版本为准，别照抄第三方攻略里的写法。</p>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：概念、命令与资源</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。项目处于预览期，命令与插件名可能随版本变化——以仓库 README 与文档站为准。忘了某个词，直接搜 <b>插件</b>、<b>web</b>、<b>定时</b> 之类的关键字。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索概念、命令、资源，比如 插件 / web / 定时" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">核心概念</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">安装启动</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">常用操作</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">配置与资源</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>概念</th><th>是什么</th></tr></thead>
+              <tbody>
+                <tr><td class="k">harness</td><td>「挽具」：把会输出的模型装进能干活的运行环境——工具、上下文、执行、循环</td></tr>
+                <tr><td class="k">dsh</td><td>DeepSeek Harness 的命令名，对应 npm 包 @deepseek-ai/dsh</td></tr>
+                <tr><td class="k">Everything is a Plugin</td><td>仓库副标题：模型适配器、工具、界面全部以插件形式接入；插件可独立装卸、互相发现与组合</td></tr>
+                <tr><td class="k">Cordis</td><td>底层插件元框架，出自论文《A Programming Paradigm for Spatiotemporal Composability》</td></tr>
+                <tr><td class="k">Agent loop</td><td>官方插件之一：模型输出 → 工具调用 → 结果回喂，循环到任务完成</td></tr>
+                <tr><td class="k">Subagents</td><td>官方插件之一：把子任务派给子智能体处理</td></tr>
+                <tr><td class="k">Terminal</td><td>官方插件之一：让智能体操作终端执行命令</td></tr>
+                <tr><td class="k">Scheduled tasks</td><td>实验性插件：按时间表周期性跑任务（第 06 节实战用它）</td></tr>
+                <tr><td class="k">Agent teams</td><td>实验性插件：多个 agent 组队协作</td></tr>
+                <tr><td class="k">Auto approval review</td><td>实验性插件：对自动批准的操作做事后复核</td></tr>
+                <tr><td class="k">Voice input</td><td>实验性插件：语音输入</td></tr>
+                <tr><td class="k">Creator mode</td><td>创作模式：用对话让 harness 自己写一个插件并安装</td></tr>
+                <tr><td class="k">Workspace</td><td>工作区：任务读写的默认边界，文件落在这里</td></tr>
+                <tr><td class="k">Trajectory</td><td>执行轨迹视图：逐轮展开输入、模型、工具调用、结果与耗时</td></tr>
+                <tr><td class="k">dsh-plugin</td><td>GitHub topic 标签：给插件仓库打上它，便于生态内被找到</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>命令 / 入口</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">npx @deepseek-ai/dsh web</td><td>免安装直跑 Web UI，默认地址 127.0.0.1:3080</td></tr>
+                <tr><td class="k">--no-open</td><td>启动服务但不自动打开浏览器</td></tr>
+                <tr><td class="k">npm install -g @deepseek-ai/dsh</td><td>全局安装，得到 dsh 命令；重跑一次即升级</td></tr>
+                <tr><td class="k">dsh web</td><td>全局安装后的启动命令</td></tr>
+                <tr><td class="k">http://127.0.0.1:3080</td><td>Web UI 默认监听地址（本地启动自动打开）</td></tr>
+                <tr><td class="k">SSH 环境启动</td><td>只打印主机地址，端口转发交给 SSH 客户端或编辑器</td></tr>
+                <tr><td class="k">git clone deepseek-ai/deepseek-harness</td><td>取源码；随后 pnpm install</td></tr>
+                <tr><td class="k">pnpm install &amp;&amp; pnpm run build</td><td>装依赖并构建仓库产物</td></tr>
+                <tr><td class="k">pnpm dsh web</td><td>用已构建产物启动，不重新编译</td></tr>
+                <tr><td class="k">pnpm run dev:web</td><td>开发模式：构建、起服务、源码变更自动重构建</td></tr>
+                <tr><td class="k">桌面版</td><td>官网下载：macOS（Apple silicon）、Windows（64-bit）</td></tr>
+                <tr><td class="k">Node.js</td><td>唯一硬依赖：官网明确「Install Node.js」后再跑命令</td></tr>
+                <tr><td class="k">127.0.0.1 本地监听</td><td>默认只监听本机回环地址，远程访问经 SSH/编辑器端口转发</td></tr>
+                <tr><td class="k">npx 缓存</td><td>npx 跑的版本不会自动更新，显式 @latest 拉新版</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>操作</th><th>怎么做</th></tr></thead>
+              <tbody>
+                <tr><td class="k">发第一条任务</td><td>对话框直接描述：整理文档、分析表格、改代码、查仓库</td></tr>
+                <tr><td class="k">看它干了什么</td><td>Developer tools 的执行轨迹：逐轮展开工具调用、结果、耗时</td></tr>
+                <tr><td class="k">启用官方插件</td><td>Plugins 面板：Terminal、Agent loop、Subagents 及实验插件</td></tr>
+                <tr><td class="k">建定时任务</td><td>启用 Scheduled tasks（实验）插件后，用自然语言约定周期</td></tr>
+                <tr><td class="k">写一个插件</td><td>Creator mode：一句「帮我写个 XX 插件」，它自建包并安装验证</td></tr>
+                <tr><td class="k">预览结果再改</td><td>生成的文档/表格/页面可预览，用对话继续修改</td></tr>
+                <tr><td class="k">提交反馈</td><td>GitHub Discussions 提 bug 与建议（README 指定的渠道）</td></tr>
+                <tr><td class="k">加入社区</td><td>Discord 社区（README「Community and support」一节）</td></tr>
+                <tr><td class="k">发布插件</td><td>插件仓库加 dsh-plugin topic 提高曝光；生态尚在早期</td></tr>
+                <tr><td class="k">安全底线</td><td>先读 SAFETY.md；第三方插件先审后装；专用目录跑任务</td></tr>
+                <tr><td class="k">切模型档位</td><td>Web UI 顶部选择模型与思考强度（官网演示位置，随版本演进）</td></tr>
+                <tr><td class="k">预览结果</td><td>生成的 xlsx / html / pdf / md 等在工作区直接预览，对话继续改</td></tr>
+                <tr><td class="k">会话管理</td><td>侧栏的会话列表（官网演示含 New Session、历史会话分组）</td></tr>
+                <tr><td class="k">装社区插件</td><td>插件面板的 Add plugin 动作（官网插件管理器演示）</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>资源 / 配置</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">官方文档站</td><td>deepseek-harness.github.io/deepseek-harness/（插件化 SDK 文档）</td></tr>
+                <tr><td class="k">仓库 README</td><td>github.com/deepseek-ai/deepseek-harness，另附中文版 README.zh.md</td></tr>
+                <tr><td class="k">SAFETY.md</td><td>运行前必读的安全须知（README 明确要求）</td></tr>
+                <tr><td class="k">CONTRIBUTING.md</td><td>贡献指南</td></tr>
+                <tr><td class="k">AGENTS.md</td><td>仓库自带的 agent 协作规范（它自己也在用 agent 开发）</td></tr>
+                <tr><td class="k">Cordis 论文</td><td>官网页脚「Cordis paper」入口，设计理论出处</td></tr>
+                <tr><td class="k">官网</td><td>deepseek.com/en/harness：定位介绍 + 桌面版下载</td></tr>
+                <tr><td class="k">配置文件</td><td>预览期未在本页固化任何配置文件名——以文档站当前版本为准</td></tr>
+                <tr><td class="k">版本引用</td><td>README 附 2026 年的引用条目；预览期没有固定版本承诺</td></tr>
+                <tr><td class="k">THIRD_PARTY_NOTICES.md</td><td>第三方依赖及其许可证的披露文件</td></tr>
+                <tr><td class="k">BENCHMARK.md</td><td>仓库自带的基准测试说明</td></tr>
+                <tr><td class="k">Makefile</td><td><b>make help</b> 列出 Web / Desktop 相关构建目标</td></tr>
+                <tr><td class="k">docs/ · website/</td><td>仓库内的开发者文档目录与官网源码目录</td></tr>
+                <tr><td class="k">中文 README</td><td>仓库根目录 README.zh.md（「English | 中文」双语切换）</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「插件」「web」「定时」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：从分析一张表到挂上定时器</h2>
+        <p>下面四个步骤串起它最典型的用法，场景与流程均出自官方页面演示过的能力。跟着做完，你对它的能力边界就有体感了。</p>
+
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>文档类任务（docx / pdf / md）</dt><dd style="color:var(--ink-2)">总结、改写、格式转换——官网文件类型面板里有 Word、PDF、Markdown。从「只读总结」起步最稳。</dd></div>
+          <div class="fact"><dt>表格类任务（xlsx / csv）</dt><dd style="color:var(--ink-2)">汇总、对比、画图——官网演示的招牌场景，见步骤二。</dd></div>
+          <div class="fact"><dt>代码类任务（仓库 / 单文件）</dt><dd style="color:var(--ink-2)">梳理结构、修 bug、跑测试——把工作区当仓库用，官网演示含 label.ts 改动与 diff 预览。</dd></div>
+          <div class="fact"><dt>周期类任务（周报 / 巡检）</dt><dd style="color:var(--ink-2)">Scheduled tasks 插件接管重复劳动，见步骤三。</dd></div>
+        </dl>
+
+        <h3>步骤一：准备一个专属工作区</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>mkdir ~/reports &amp;&amp; cd ~/reports
+cp ~/Downloads/Data.xlsx .
+dsh web          <span class="c"># 浏览器打开 127.0.0.1:3080</span>
+
+<span class="c"># 或用 npx 免安装起一个临时实例</span>
+<span class="c"># npx @deepseek-ai/dsh web</span></pre>
+        </div>
+        <p>把要处理的文件放进工作区再启动，智能体的每次读写都发生在你能看见的地方。</p>
+
+        <h3>步骤二：让它分析表格并产出文件</h3>
+        <div class="code">
+          <div class="code-head"><span>Web UI · 对话（输出为示意）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt; </span>分析 Data.xlsx：按季度汇总各区域销售额，标注同比变化，输出一张柱状图
+
+<span class="c"># 它会读表格 → 计算 → 生成文件到工作区，类似：</span>
+<span class="ok">已生成 Q4-sales-summary.xlsx 与 chart.html，可在工作区预览</span>
+
+<span class="c"># 看完预览，用一句话继续迭代：</span>
+<span class="prompt">&gt; </span>同比改成环比，图表配色换成深色，另存一份 PDF 版
+
+<span class="ok">已更新 Q4-sales-summary.xlsx，新增 chart.pdf</span></pre>
+        </div>
+        <p>生成的东西直接预览，不满意就继续对话改。这比手写 Python 脚本快在：<b>迭代是说话，不是改代码</b>——改三版图表的成本是三句话，而不是三次调试。</p>
+
+        <h3>步骤三：启用 Scheduled tasks，挂上周期任务</h3>
+        <p>在插件面板启用实验性的 <b>Scheduled tasks</b> 插件，然后用一句自然语言约定周期。它解决的问题很具体：总有一类活儿是「每周都得做一遍」的——周报、数据汇总、定期备份检查，人容易忘，定时器不会。官网演示过这个流程——「每周五 17:00（北京时间），汇总本周项目笔记生成周报」——它通过工具生成了一条定时规则，结构大致如下（节选自官网演示界面）：</p>
+        <div class="code">
+          <div class="code-head"><span>官网演示 · schedule_create 调用（节选）</span><button class="copy" type="button">复制</button></div>
+<pre>{
+  "prompt": "Summarize this week's project notes in a weekly report.",
+  "title": "Weekly project report",
+  "weekly": { "time": "17:00:00", "time_zone": "Asia/Shanghai", "weekdays": [5] }
+}</pre>
+        </div>
+        <p><small>weekdays 数组里的 5 表示周五。字段结构以插件当前版本为准——这正是预览期该有的心态。</small></p>
+
+        <h3>步骤四：Creator mode 写个小插件收尾</h3>
+        <p>官网演示里最惊艳的一段：对它说「帮我写一个番茄钟插件」，它会自己走完整个开发流程。拆开看官网演示里它做了什么：</p>
+        <ul>
+          <li>加载 <code>cordis-plugin-development</code> 技能，进入插件开发流程；</li>
+          <li>检视运行时：inspect providers、查询 runtime slots，确认界面挂载点；</li>
+          <li>写出插件包：package.json 与 client.js（演示中 600+ 行前端逻辑）；</li>
+          <li>调用插件管理器（plugin_manager · install_bundle）安装插件；</li>
+          <li>验证插件运行状态，交付一个悬浮在工作区的番茄钟计时器。</li>
+        </ul>
+        <p>这件事的启示比功能本身重要：<b>插件即产物</b>。你不需要先学 Cordis API 才能动手——先让 Creator mode 生成一个能跑的插件，再读它的源码学结构，比从零啃文档快得多。演示全程约五分钟。</p>
+
+        <h3>步骤五：验收与收尾</h3>
+        <p>自动化挂上去之后别急着撒手。头两三周每天看一眼定时任务的产出，确认质量稳定再拉长检查间隔；执行轨迹是你验收的主要工具——每周打开轨迹视图，抽查它在计划时间到底执行了什么。建议的验收节奏：</p>
+        <div class="code">
+          <div class="code-head"><span>验收清单（建议节奏）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 每天：定时任务是否如期产出、内容是否可直接用</span>
+<span class="c"># 每周：Developer tools 里抽查 1-2 次执行的完整轨迹</span>
+<span class="c"># 每次升级 dsh 之后：手动重跑一遍核心任务，观察一周再谈依赖</span>
+
+<span class="c"># 产出文件建议纳入版本控制，变更可回溯</span>
+cd ~/reports &amp;&amp; git init &amp;&amp; git add -A &amp;&amp; git commit -m <span class="g">"weekly report baseline"</span></pre>
+        </div>
+
+        <div class="note"><b>复习一下这条链路：</b>工作区放文件 → 对话驱动分析 → 产出可预览 → 定时器接管重复劳动 → 顺手让 harness 给自己长出新能力。每一环都可以单独用，串起来就是一个小型自动化工作台。</div>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：预览期的四个典型误区</h2>
+
+        <h3>坑一：把它当稳定的 CLI 工具链来依赖</h3>
+        <p>README 用大写字母警告「将有破坏性变更」。这意味着：你写的自动化脚本、依赖的输出格式、记住的界面布局，都可能在下次更新后失效。对策——升级前扫一眼 README 与 Discussions；核心流程在升级后先手动跑一遍；别把不可复现的一次性结果当成可长期依赖的产物。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 升级前后核对（npm 安装）</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 本地装的版本</span>
+npm ls -g @deepseek-ai/dsh
+
+<span class="c"># npm 上的最新版本（标准 npm 查询，任何发布的包都适用）</span>
+npm view @deepseek-ai/dsh version
+
+<span class="c"># 不一致就升级；升级后先手动跑一遍核心任务再观察</span>
+npm install -g @deepseek-ai/dsh</pre>
+        </div>
+        <div class="note warn"><b>一条硬建议：</b>预览期项目里，<b>README 就是最新的文档，第三方教程（包括本页）都会过时</b>。命令对不上时，永远回到仓库看当前版本怎么说。</div>
+
+        <h3>坑二：以为它是纯终端编码 Agent</h3>
+        <p>它和 Claude Code、Pi 那类终端编码工具不同：主入口是 Web UI 与桌面端，写代码只是「文档、表格、代码、定时任务」四类能力之一。如果你要的是轻量终端编码 agent，直接看本站的 <a href="pi-agent.html">Pi Agent 教程</a>或 <a href="hermes-agent.html">Hermes Agent 教程</a>，别拿 dsh 硬套那个用法。</p>
+
+        <h3>坑三：模型与 provider 想当然</h3>
+        <p>官网演示界面默认搭载 DeepSeek 系模型（演示中显示 DeepSeek-V4.1-Flash 档位）。接其他模型走的是模型适配插件——具体怎么配、支持哪些 provider，以文档站当前版本为准。本页刻意没有固化任何配置文件名，因为你现在搜到的「攻略」很可能已经不是这个版本的写法。</p>
+        <div class="note warn"><b>自查两问：</b>我现在用的模型是谁家的、思考档位是多少？我贴进工作区的数据，授权范围给到了哪一级？——每次接新 provider、换新数据源时都过一遍这两问，能挡住大部分事故。</div>
+
+        <h3>坑四：忽略安全边界</h3>
+        <p>它能执行 shell、写文件、装卸插件。仓库把 SAFETY.md 放在 README 里明确要求先读，这不是走过场：给它的目录要专用、要可控；第三方插件在生态早期鱼龙混杂，先读源码再安装；敏感数据（生产配置、客户数据）不要放进工作区。这一条在预览期比在成熟产品里更重要，因为审批与沙箱机制本身也在迭代。</p>
+        <div class="code">
+          <div class="code-head"><span>Terminal · 最小安全姿势</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 1. 专用空目录，不碰系统与生产路径</span>
+mkdir ~/dsh-playground &amp;&amp; cd ~/dsh-playground
+
+<span class="c"># 2. 运行前先读安全须知</span>
+open https://github.com/deepseek-ai/deepseek-harness/blob/master/SAFETY.md
+
+<span class="c"># 3. 装第三方插件前，先到插件仓库读源码</span>
+<span class="c">#    （认准 dsh-plugin topic 只是发现渠道，不是安全认证）</span></pre>
+        </div>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与资源</h2>
+        <ul>
+          <li><b>官方仓库</b>：<a href="https://github.com/deepseek-ai/deepseek-harness">github.com/deepseek-ai/deepseek-harness</a> —— README（中英双语）、SAFETY.md、开发指南，一切以这里为准。</li>
+          <li><b>开发者文档站</b>：<a href="https://deepseek-harness.github.io/deepseek-harness/">deepseek-harness.github.io/deepseek-harness/</a> —— 插件化 SDK 文档，写插件前必读。</li>
+          <li><b>官网</b>：<a href="https://www.deepseek.com/en/harness">deepseek.com/en/harness</a> —— 定位介绍、桌面版下载（macOS Apple silicon / Windows 64-bit）、Cordis 论文入口。</li>
+          <li><b>GitHub Discussions</b>：README 指定的反馈渠道——bug、建议、插件生态讨论都在这里。</li>
+          <li><b>Discord 社区</b>：README「Community and support」一节有入口，插件生态交流的主阵地。</li>
+          <li><b>Cordis 论文</b>：《A Programming Paradigm for Spatiotemporal Composability》——想深挖「一切皆插件」的理论根基再读。</li>
+          <li><b>中文版 README</b>：仓库根目录的 README.zh.md —— 英文阅读吃力时从这里起步。</li>
+          <li><b>第三方报道</b>：The New Stack 等技术媒体对其开源发布的报道——看社区怎么解读「一切皆插件」这个架构取向。</li>
+        </ul>
+        <div class="note"><b>下一步去哪：</b>看完这页你理解了 harness 这个概念，接下来两条路——想读一个「小到能读完源码」的极简 harness，去 <a href="pi-agent.html">Pi Agent 教程</a>；想先把开源模型在本机跑起来再谈骨架，去 <a href="ollama.html">Ollama 教程</a>。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>Node.js 就绪，<b>npx @deepseek-ai/dsh web</b> 或 <b>dsh web</b> 能打开 127.0.0.1:3080</span></label>
+          <label><input type="checkbox" data-key="c2"><span>读过仓库 <b>SAFETY.md</b>，并在专用空目录里跑过第一条只读任务</span></label>
+          <label><input type="checkbox" data-key="c3"><span>在执行轨迹视图里展开过至少一次工具调用，看懂了它干了什么</span></label>
+          <label><input type="checkbox" data-key="c4"><span>在插件面板启用过至少一个官方插件（Terminal / Scheduled tasks 等）</span></label>
+          <label><input type="checkbox" data-key="c5"><span>知道这是开发者预览版：升级方式、破坏性变更风险、命令以 README 为准</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="hermes-agent.html"><span>← 上一篇</span><b>Hermes Agent 教程</b></a>
+        <a class="next" href="pi-agent.html"><span>下一篇 →</span><b>Pi Agent 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 DeepSeek Harness 官方仓库 README（github.com/deepseek-ai/deepseek-harness，含中文版 README.zh.md）与官网 deepseek.com/en/harness 整理，2026-11 核对；项目处于开发者预览期，具体命令、插件与界面以仓库与文档站的当前版本为准。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 预览期迭代快，一切以官方 README 为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

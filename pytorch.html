@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PyTorch 教程 · AI Code Study</title>
+<meta name="description" content="PyTorch 上手指南：pip 安装与 CUDA 版本选择、Tensor 与 autograd、nn.Module、Dataset 与 DataLoader、手写 MNIST 训练循环、state_dict 保存加载、避坑与自检清单。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/pytorch.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PyTorch 教程 · AI Code Study">
+<meta property="og:description" content="PyTorch 上手指南：pip 安装与 CUDA 版本选择、Tensor 与 autograd、nn.Module、Dataset 与 DataLoader、手写 MNIST 训练循环、state_dict 保存加载、避坑与自检清单。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/pytorch.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PyTorch 教程 · AI Code Study">
+<meta name="twitter:description" content="PyTorch 上手指南：pip 安装与 CUDA 版本选择、Tensor 与 autograd、nn.Module、Dataset 与 DataLoader、手写 MNIST 训练循环、state_dict 保存加载、避坑与自检清单。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "PyTorch：像写 Python 一样写深度学习",
+  "description": "PyTorch 上手指南：pip 安装与 CUDA 版本选择、Tensor 与 autograd、nn.Module、Dataset 与 DataLoader、手写 MNIST 训练循环、state_dict 保存加载、避坑与自检清单。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/pytorch.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="pytorch">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml" class="on">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-ml">机器学习框架</a><span>/</span>
+      <b>PyTorch</b>
+    </nav>
+    <p class="eyebrow">MACHINE LEARNING · <b>PYTORCH</b> · 研究者最爱的动态图框架</p>
+    <h1>PyTorch：像写 Python 一样<em>写深度学习</em></h1>
+    <p class="lede">这页带你把 PyTorch 2.x 装起来、跑起来：Tensor 当数组用、autograd 自动求导、nn.Module 搭积木，最后手写一个完整的 MNIST 训练循环——五步循环背下来，任何深度学习论文代码你都能读懂骨架。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/ml-playground</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">pip install torch torchvision</span></div>
+        <div class="term-line"><span class="out">Successfully installed <span class="ok">torch-2.15.0</span> …</span></div>
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">python</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">import torch; torch.__version__</span></div>
+        <div class="term-line"><span class="out">'2.15.0'</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">torch.rand(2, 3)</span></div>
+        <div class="term-line"><span class="out">tensor([[0.3380, 0.3845, 0.3217], [0.8337, 0.9050, 0.2650]]）（示意输出）</span> <span class="ok">装好了，先在 CPU 上跑</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装与环境</a>
+        <a href="#s3"><span class="idx">03</span>五分钟上手</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>API 速查</a>
+        <a href="#s6"><span class="idx">06</span>实战：MNIST</a>
+        <a href="#s7"><span class="idx">07</span>避坑清单</a>
+        <a href="#s8"><span class="idx">08</span>进阶与资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="machine-learning.html">机器学习教程</a>
+        <a href="scikit-learn.html">Scikit-learn 教程</a>
+        <a href="tensorflow.html">TensorFlow 教程</a>
+        <a href="langchain.html">LangChain 教程</a>
+        <a href="index.html#cat-ml">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装与环境</a>
+          <a href="#s3"><span class="idx">03</span>五分钟上手</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>API 速查</a>
+          <a href="#s6"><span class="idx">06</span>实战：MNIST</a>
+          <a href="#s7"><span class="idx">07</span>避坑清单</a>
+          <a href="#s8"><span class="idx">08</span>进阶与资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 它是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>Meta 的动态图框架：研究者为什么选它</h2>
+        <p>PyTorch 是 Meta 开源的深度学习框架，如今是深度学习研究界事实上的主流——翻最近几年的顶会论文开源代码，绝大多数是 PyTorch 写的。它的气质和 TensorFlow 正相反：没有 <code>model.fit()</code> 这类大包大办，而是把训练循环摊开成一个普通 Python <code>for</code> 循环，每一步你都看得见、改得动。</p>
+        <p>这叫<b>动态图</b>（define-by-run）：代码执行到哪，计算图就现场建到哪。好处是调试体验跟写普通 Python 完全一样——print、断点、assert 都能直接用在张量运算上；代价是要自己写训练循环（也就十几行，第 06 节手把手写）。2.0 引入的 <b>torch.compile</b> 把这份灵活性补上了性能：你的循环代码不用改，套一层编译就能明显提速。</p>
+        <p>适合谁：要读/复现论文代码的研究者、想真正吃透「训练到底发生了什么」的学习者、用 Hugging Face 生态（transformers 等几乎全是 PyTorch）做 NLP/多模态的工程师。只想快速出个能用的模型，Keras 那条路更短——见 <a href="tensorflow.html">TensorFlow 教程</a>。</p>
+        <p>生态怎么配：训练主线之外，<b>torchvision</b>（视觉数据集、预训练模型、transforms）和 <b>torchaudio</b>（音频）是同一家官方扩展；NLP 与多模态则主要靠 Hugging Face 生态，其示例代码几乎清一色 PyTorch。本页会用到 torchvision 的 MNIST 数据集，见第 06 节。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>最新稳定版</dt><dd>2.15.0（2026-11 核对）</dd></div>
+          <div class="fact"><dt>Python 要求</dt><dd>≥ 3.11</dd></div>
+          <div class="fact"><dt>开发方</dt><dd>Meta 发起，PyTorch 基金会托管</dd></div>
+          <div class="fact"><dt>协议</dt><dd>BSD-3 开源</dd></div>
+          <div class="fact"><dt>语言</dt><dd>Python（核心为 C++/CUDA）</dd></div>
+          <div class="fact"><dt>执行方式</dt><dd>动态图 eager，2.0+ 可 torch.compile</dd></div>
+          <div class="fact"><dt>GPU 支持</dt><dd>NVIDIA CUDA / AMD ROCm，Apple Silicon 走 MPS</dd></div>
+          <div class="fact"><dt>macOS CUDA</dt><dd class="no">无 CUDA 版——Apple GPU 走 MPS 后端</dd></div>
+        </dl>
+
+        <div class="note"><b>为什么研究者偏爱它：</b>模型就是一个 Python 类（nn.Module），训练循环就是 for 循环，没有隐藏的执行引擎。读别人的代码 = 读普通的面向对象 Python。这份「所见即所得」让新想法从论文到代码的路径最短，也让 2.x 的 torch.compile 有底气承诺「代码不用改，跑起来更快」。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：CPU 一条命令，GPU 看显卡</h2>
+        <p>PyTorch 的安装取决于两件事：系统（macOS / Linux / Windows）和计算平台（CPU / 哪一代 CUDA）。官方在 <a href="https://pytorch.org/get-started/locally/" target="_blank" rel="noopener">pytorch.org/get-started/locally</a> 做了个选择器，点几下就生成你机器对应的命令——下面是当前常见组合。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">pip（macOS / CPU）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">Linux + NVIDIA GPU</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">验证安装</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># macOS（Apple Silicon）或任何 CPU 环境：直接从 PyPI 装</span>
+pip install torch torchvision
+
+<span class="c"># torch 本体 + torchvision（视觉数据集与模型库，第 06 节要用）</span>
+python -c <span class="g">"import torch; print(torch.__version__)"</span></pre>
+          </div>
+          <small>macOS 的 wheel 是 CPU 构建，跑训练走 Apple Silicon 的 <b>MPS</b> 后端（<code>torch.backends.mps.is_available()</code> 检测），速度比纯 CPU 快。支持 macOS 10.15（Catalina）及以上，具体以官方文档为准。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># Linux + NVIDIA：从 PyTorch 官方 wheel 索引装对应 CUDA 版本</span>
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu132
+
+<span class="c"># cu132 / cu134 等标签对应不同 CUDA 版本，以官方选择器生成的命令为准</span></pre>
+          </div>
+          <small>近几个版本起，Linux 上直接 <code>pip install torch</code> 的 PyPI 默认 wheel 也自带 CUDA 运行库（无需在本机另装 CUDA Toolkit，体积不小）。Windows 同样用选择器生成命令；AMD 显卡看官方 ROCm 说明。装完见下一个 tab 验证。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 版本与 CUDA 可用性一行验证</span>
+python -c <span class="g">"import torch; print(torch.__version__); print(torch.cuda.is_available())"</span>
+
+<span class="c"># 有 NVIDIA 卡且装对版本应输出 True；</span>
+<span class="c"># True 却跑不了 GPU？先看驱动：nvidia-smi 有输出再回来查 torch</span>
+
+<span class="c"># Apple Silicon 检查 MPS</span>
+python -c <span class="g">"import torch; print(torch.backends.mps.is_available())"</span></pre>
+          </div>
+          <small><code>torch.cuda.is_available()</code> 为 False 不代表装坏了——CPU 版本来就没有 CUDA，本页所有示例都能在 CPU 上跑完。</small>
+        </div>
+
+        <div class="note warn"><b>pip 源与体积提醒：</b>CUDA 版 wheel 有几个 GB，下不动先确认网络；公司内网/国内环境常配 pip 镜像，但 PyTorch 的 CUDA wheel 只在官方索引上，<code>--index-url</code> 那段别删。装 CUDA 版遇到和本机驱动不匹配的报错，降一级 CUDA 标签重装通常比升驱动省事。</div>
+      </section>
+
+      <!-- ===== 03 五分钟上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>五分钟上手：前向、反向、查梯度</h2>
+        <p>PyTorch 的全部心智模型就三句话：数据是 Tensor，模型是一层层的 nn.Module，<code>loss.backward()</code> 自动把梯度算好写进每个参数。先用 8 行代码亲眼看到它。</p>
+
+        <div class="code">
+          <div class="code-head"><span>first_grad.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># python first_grad.py</span>
+import torch
+import torch.nn as nn
+
+model = nn.Linear(4, 2)              <span class="c"># 一层全连接：4 维进，2 维出</span>
+x = torch.randn(3, 4)                <span class="c"># 3 条 4 维样本</span>
+y = model(x)                         <span class="c"># 前向传播</span>
+print(y.shape)                       <span class="c"># torch.Size([3, 2])</span>
+
+loss = (y ** 2).mean()               <span class="c"># 随手定义一个标量损失</span>
+loss.backward()                      <span class="c"># 反向传播：梯度已写进参数的 .grad</span>
+print(model.weight.grad.shape)       <span class="c"># torch.Size([2, 4])</span></pre>
+          </div>
+
+        <p>两个值得注意的细节：<code>model(x)</code> 并不直接调用 forward，而是走 nn.Module 的 <code>__call__</code>——它顺带挂接了 hook 等机制，但按「调用即前向」理解不会错；<code>loss.backward()</code> 一次只反传一个标量，所以损失函数永远要把结果聚合成一个数（mean / sum），张量要反传得显式给出 gradient 参数。</p>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>建张量</h4><p>输入数据用 <code>torch.randn</code> 造：shape 是 (样本数, 特征数)。所有 numpy 能干的事 Tensor 都能干，还多一个「能算梯度」的超能力。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>前向传播</h4><p><code>model(x)</code> 就是调用，返回输出张量。<code>nn.Linear(4, 2)</code> 内部有 weight 和 bias 两个参数，创建时自动随机初始化。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>定义损失、backward</h4><p>只要 loss 是标量张量，<code>loss.backward()</code> 就沿整个计算图反推，把每个参数的梯度写进它的 <code>.grad</code> 属性——这就是 autograd，你一行求导公式都不用写。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>查梯度</h4><p><code>model.weight.grad</code> 的形状和 weight 本身一样，这就是「loss 对每个权重的影响程度」。有了梯度，优化器才知道参数往哪边挪。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">这就是 PyTorch 的骨架：前向算结果，backward 算梯度。剩下的「用梯度更新参数、循环多少轮」在第 06 节补全——补全后就是完整的训练循环。跟 <a href="tensorflow.html">TensorFlow</a> 的 GradientTape 对应着看，概念一一映射。</div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：Tensor、autograd、nn 与五步循环</h2>
+
+        <h3>Tensor：一切的起点</h3>
+        <p>Tensor 是带「设备」和「类型」标签的多维数组。跟 numpy 的关系是重点：几乎无缝互转（且共享内存），区别是 Tensor 能上 GPU、能进 autograd 图。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt;&gt;&gt; </span>import torch, numpy as np
+<span class="prompt">&gt;&gt;&gt; </span>t = torch.tensor([[1.0, 2.0], [3.0, 4.0]])    <span class="c"># 从数据建</span>
+<span class="prompt">&gt;&gt;&gt; </span>r = torch.randn(2, 3)                          <span class="c"># 正态随机，参数初始化常用</span>
+<span class="prompt">&gt;&gt;&gt; </span>t.shape, t.dtype, t.device
+<span class="out">(torch.Size([2, 2]), torch.float32, device(type='cpu'))</span>
+
+<span class="prompt">&gt;&gt;&gt; </span>a = np.ones((2, 2))
+<span class="prompt">&gt;&gt;&gt; </span>n = torch.from_numpy(a)                        <span class="c"># 与 numpy 共享内存！</span>
+<span class="prompt">&gt;&gt;&gt; </span>n[0, 0] = 9.0; a[0, 0]
+<span class="out">9.0</span>
+<span class="prompt">&gt;&gt;&gt; </span>n.numpy()                                      <span class="c"># 转回 numpy（GPU 上要先 t.cpu()）</span></pre>
+          </div>
+
+        <h3>autograd：自动求导三件套</h3>
+        <p>三件套是：<b>requires_grad</b>（声明「这个张量要追踪梯度」）、<b>backward()</b>（沿计算图反传）、<b>.grad / zero_grad</b>（读梯度、清梯度）。模型参数默认 requires_grad=True，所以日常只需记住另外两件。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre><span class="prompt">&gt;&gt;&gt; </span>x = torch.tensor(3.0, requires_grad=True)
+<span class="prompt">&gt;&gt;&gt; </span>y = x ** 2 + 2 * x                    <span class="c"># y = x² + 2x，导数 2x + 2</span>
+<span class="prompt">&gt;&gt;&gt; </span>y.backward()
+<span class="prompt">&gt;&gt;&gt; </span>x.grad                                 <span class="c"># x=3 处应为 8</span>
+<span class="out">tensor(8.)</span>
+<span class="prompt">&gt;&gt;&gt; </span>x.grad.zero_()                        <span class="c"># 下一次 backward 前清零——</span>
+<span class="c"># .grad 是累加的，不清零梯度会越滚越大，这是新手第一大坑（见第 07 节）</span></pre>
+          </div>
+
+        <h3>nn.Module：模型的积木</h3>
+        <p>每个模型都继承 <code>nn.Module</code>，写两个方法：<b>__init__</b> 里声明有哪些子模块（层），<b>forward</b> 里定义数据怎么流过它们。<code>self.xxx = nn.Linear(...)</code> 一赋值，这些层的参数就自动注册进 <code>model.parameters()</code>，优化器、保存加载全靠这个注册表。</p>
+        <div class="code">
+          <div class="code-head"><span>mlp.py</span><button class="copy" type="button">复制</button></div>
+<pre>import torch.nn as nn
+
+class MLP(nn.Module):
+    def __init__(self):
+        super().__init__()               <span class="c"># 必调：初始化注册表</span>
+        self.net = nn.Sequential(        <span class="c"># 按顺序组一层串</span>
+            nn.Flatten(),                <span class="c"># (N, 1, 28, 28) -&gt; (N, 784)</span>
+            nn.Linear(784, 256),
+            nn.ReLU(),
+            nn.Linear(256, 10),
+        )
+
+    def forward(self, x):                <span class="c"># 定义前向；model(x) 即调用它</span>
+        return self.net(x)
+
+model = MLP()
+print(sum(p.numel() for p in model.parameters()))   <span class="c"># 203530（权重 + 偏置都算上）</span></pre>
+          </div>
+
+        <h3>Dataset、DataLoader 与训练五步循环</h3>
+        <p>自定义数据集实现 <code>__len__</code> 和 <code>__getitem__</code> 两个方法；<code>DataLoader</code> 接手剩下的事——组批、打乱、多进程加载。<b>训练五步循环</b>（前向 → 清零 → 反向 → 更新 → 记录）是 PyTorch 的「九九乘法表」，第 06 节实战里原样出现：</p>
+        <div class="code">
+          <div class="code-head"><span>train_loop.py · 五步骨架</span><button class="copy" type="button">复制</button></div>
+<pre>from torch.utils.data import Dataset, DataLoader
+
+class MyData(Dataset):
+    def __len__(self): ...        <span class="c"># 样本总数</span>
+    def __getitem__(self, i): ... <span class="c"># 第 i 条样本，返回 (特征, 标签)</span>
+
+loader = DataLoader(MyData(), batch_size=64, shuffle=True)
+
+for epoch in range(num_epochs):
+    for x, y in loader:
+        pred = model(x)               <span class="c"># 1 前向</span>
+        optimizer.zero_grad()         <span class="c"># 2 清零（必须在 backward 前）</span>
+        loss = criterion(pred, y)
+        loss.backward()               <span class="c"># 3 反向</span>
+        optimizer.step()              <span class="c"># 4 更新</span>
+        running += loss.item()        <span class="c"># 5 记录（.item() 取出 python 数字）</span></pre>
+          </div>
+        <p><small>清零放前向之后、backward 之前，顺序怎么摆都不影响正确性，但「清零在 backward 之前」是死规矩——忘了清就是梯度累积。DataLoader 的 <code>shuffle=True</code> 每个 epoch 重新洗牌，别自己手工打乱；数据读取慢时给 DataLoader 加 <code>num_workers=4</code> 开子进程并行加载（Windows/macOS 记得把主逻辑放进 <code>if __name__ == "__main__"</code> 保护里）。</small></p>
+      </section>
+
+      <!-- ===== 05 API 速查 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>API 速查：常用的就这几张表</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了某个函数叫什么，直接搜 <b>view</b>、<b>梯度</b>、<b>loss</b>、<b>保存</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索张量、autograd、nn、训练工具，比如 view / 梯度 / state_dict" aria-label="搜索 PyTorch API">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="API 分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">张量操作</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">autograd</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">nn 模块</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">训练工具</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">torch.tensor([[1., 2.]])</td><td>从数据创建张量</td></tr>
+                <tr><td class="k">torch.zeros(2, 3) / torch.ones(2, 3)</td><td>常量张量</td></tr>
+                <tr><td class="k">torch.rand(2, 3) / torch.randn(2, 3)</td><td>均匀 / 正态随机张量</td></tr>
+                <tr><td class="k">t.shape / t.dtype / t.device</td><td>形状、数据类型、所在设备</td></tr>
+                <tr><td class="k">t.view(2, 6) / t.reshape(...)</td><td>改形状；view 要求内存连续，reshape 更宽容</td></tr>
+                <tr><td class="k">t.permute(2, 0, 1)</td><td>调换维度顺序，图像通道转换常用</td></tr>
+                <tr><td class="k">t.sum() / t.mean() / t.max()</td><td>归约运算；dim= 指定沿哪个维</td></tr>
+                <tr><td class="k">torch.matmul(a, b) / a @ b</td><td>矩阵乘法</td></tr>
+                <tr><td class="k">t.numpy() / torch.from_numpy(a)</td><td>与 numpy 互转，共享内存；GPU 张量先 t.cpu()</td></tr>
+                <tr><td class="k">t.to("cuda") / t.cpu() / t.to(device)</td><td>跨设备搬运张量</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">torch.tensor(..., requires_grad=True)</td><td>创建时打开梯度追踪</td></tr>
+                <tr><td class="k">x.requires_grad_(True)</td><td>就地打开追踪（方法名末尾下划线 = 就地修改）</td></tr>
+                <tr><td class="k">loss.backward()</td><td>沿计算图反向传播，梯度写进各张量的 .grad</td></tr>
+                <tr><td class="k">x.grad</td><td>读梯度；累加特性——backward 前要先清零</td></tr>
+                <tr><td class="k">optimizer.zero_grad()</td><td>训练循环里清零参数梯度的标准位置</td></tr>
+                <tr><td class="k">with torch.no_grad():</td><td>推理/评估时关闭建图，省内存又提速</td></tr>
+                <tr><td class="k">x.detach()</td><td>从计算图分离出一份不带梯度的张量</td></tr>
+                <tr><td class="k">loss.backward(retain_graph=True)</td><td>需要多次 backward 同一张图时保留它</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">nn.Module</td><td>模型基类：实现 __init__（装层）与 forward（流数据）</td></tr>
+                <tr><td class="k">nn.Linear(784, 256)</td><td>全连接层，自带 weight 与 bias</td></tr>
+                <tr><td class="k">nn.Conv2d(1, 32, 3)</td><td>二维卷积层：入通道、出通道、核大小</td></tr>
+                <tr><td class="k">nn.ReLU() / nn.Sigmoid()</td><td>激活函数层</td></tr>
+                <tr><td class="k">nn.Sequential(...)</td><td>把一层串按顺序打包，forward 一行搞定</td></tr>
+                <tr><td class="k">nn.CrossEntropyLoss()</td><td>多分类标准损失：输入原始 logits，内部含 log-softmax</td></tr>
+                <tr><td class="k">nn.MSELoss() / nn.L1Loss()</td><td>回归损失：均方误差 / 平均绝对误差</td></tr>
+                <tr><td class="k">model.parameters()</td><td>所有可训练参数，传给优化器的就是它</td></tr>
+                <tr><td class="k">model.train() / model.eval()</td><td>训练 / 评估模式切换（影响 Dropout、BatchNorm）</td></tr>
+                <tr><td class="k">model.state_dict()</td><td>参数字典，保存加载都走它</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>API</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">torch.utils.data.Dataset</td><td>自定义数据集：实现 __len__ 与 __getitem__</td></tr>
+                <tr><td class="k">DataLoader(ds, batch_size=64, shuffle=True)</td><td>组批、打乱、多进程加载一条龙</td></tr>
+                <tr><td class="k">torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)</td><td>随机梯度下降，老牌基线</td></tr>
+                <tr><td class="k">torch.optim.AdamW(model.parameters(), lr=1e-3)</td><td>多数场景的默认选择</td></tr>
+                <tr><td class="k">optimizer.step()</td><td>按当前梯度更新一步参数</td></tr>
+                <tr><td class="k">torch.save(model.state_dict(), "model.pth")</td><td>官方推荐：只存参数字典</td></tr>
+                <tr><td class="k">model.load_state_dict(torch.load("model.pth"))</td><td>加载参数（load 建议加 map_location=device）</td></tr>
+                <tr><td class="k">torch.device("cuda" if torch.cuda.is_available() else "cpu")</td><td>设备无关写法，模型和数据都 .to(device)</td></tr>
+                <tr><td class="k">torchvision.datasets.MNIST(root, train, download)</td><td>内置视觉数据集，第一个实战标配</td></tr>
+                <tr><td class="k">torchvision.transforms.ToTensor()</td><td>PIL 图像转 0~1 张量</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的 API。换个词试试，比如「view」「梯度」「loss」「保存」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>实战：手写 MNIST 训练循环</h2>
+        <p>MNIST：6 万张 28×28 手写数字训练图 + 1 万张测试图，10 类。这次不用 Sequential 凑合，用标准姿势：自定义 nn.Module、DataLoader、手写训练循环、评估、保存——一套全流程。目标：CPU 上几分钟，测试集准确率到 <b>0.97 左右</b>。</p>
+
+        <h3>第 1 步：数据、模型、优化器</h3>
+        <div class="code">
+          <div class="code-head"><span>mnist_train.py · 准备</span><button class="copy" type="button">复制</button></div>
+<pre>import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+
+transform = transforms.ToTensor()                 <span class="c"># 像素 0~255 转 0~1 张量</span>
+train_ds = datasets.MNIST(<span class="g">"data"</span>, train=True,  download=True, transform=transform)
+test_ds  = datasets.MNIST(<span class="g">"data"</span>, train=False, download=True, transform=transform)
+train_loader = DataLoader(train_ds, batch_size=64, shuffle=True)
+test_loader  = DataLoader(test_ds,  batch_size=256)
+
+<span class="c"># 设备无关写法：有 CUDA 用 CUDA，否则 CPU（Apple Silicon 可改成 "mps"）</span>
+device = torch.device(<span class="g">"cuda"</span> if torch.cuda.is_available() <span class="g">else "cpu"</span>)
+
+class MLP(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Flatten(),                          <span class="c"># (N, 1, 28, 28) -&gt; (N, 784)</span>
+            nn.Linear(784, 128),
+            nn.ReLU(),
+            nn.Dropout(0.2),                       <span class="c"># 防过拟合</span>
+            nn.Linear(128, 10),                    <span class="c"># 输出 10 类的 logits</span>
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+model = MLP().to(device)                           <span class="c"># 模型搬上设备</span>
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)</pre>
+          </div>
+
+        <h3>第 2 步：手写训练循环（五步循环原样出现）</h3>
+        <div class="code">
+          <div class="code-head"><span>mnist_train.py · 训练</span><button class="copy" type="button">复制</button></div>
+<pre>for epoch in range(3):
+    model.train()                                  <span class="c"># 训练模式：Dropout 生效</span>
+    running = 0.0
+    for x, y in train_loader:
+        x, y = x.to(device), y.to(device)          <span class="c"># 数据搬上同一设备</span>
+
+        pred = model(x)                            <span class="c"># 1 前向</span>
+        optimizer.zero_grad()                      <span class="c"># 2 清零（不清会累积）</span>
+        loss = criterion(pred, y)
+        loss.backward()                            <span class="c"># 3 反向</span>
+        optimizer.step()                           <span class="c"># 4 更新</span>
+
+        running += loss.item() * len(y)            <span class="c"># 5 记录本批 loss</span>
+
+    print(f<span class="g">"epoch {epoch + 1}  loss {running / len(train_ds):.4f}"</span>)
+
+<span class="c"># epoch 1  loss 0.3901（示意输出，数值随随机初始化波动）</span>
+<span class="c"># epoch 2  loss 0.1967（示意输出）</span>
+<span class="c"># epoch 3  loss 0.1453（示意输出）</span></pre>
+          </div>
+        <p><small>CrossEntropyLoss 的输入是<b>原始 logits</b>（没过 softmax 的输出），别自己在 forward 里加 softmax——加了反而错，它内部已经含 log-softmax。loss 乘 len(y) 再除以总样本数，是按样本数加权平均的标准写法。</small></p>
+
+        <h3>第 3 步：评估、保存、加载</h3>
+        <div class="code">
+          <div class="code-head"><span>mnist_train.py · 评估与保存</span><button class="copy" type="button">复制</button></div>
+<pre>model.eval()                                       <span class="c"># 评估模式：Dropout 关闭</span>
+correct = 0
+with torch.no_grad():                              <span class="c"># 不建计算图：省内存、更快</span>
+    for x, y in test_loader:
+        x, y = x.to(device), y.to(device)
+        pred = model(x).argmax(dim=1)              <span class="c"># logits 最大者当预测类别</span>
+        correct += (pred == y).sum().item()
+
+print(f<span class="g">"测试集准确率 {correct / len(test_ds):.3f}"</span>)    <span class="c"># 0.97x 左右（示意输出）</span>
+
+<span class="c"># 保存：只存参数字典（官方推荐），换环境加载不依赖代码路径</span>
+torch.save(model.state_dict(), <span class="g">"mnist_mlp.pth"</span>)
+
+<span class="c"># 加载：先有同结构模型，再灌参数</span>
+model2 = MLP().to(device)
+model2.load_state_dict(torch.load(<span class="g">"mnist_mlp.pth"</span>, map_location=device))
+model2.eval()</pre>
+          </div>
+
+        <h3>第 4 步：Apple Silicon 上换 MPS 提速</h3>
+        <p>Mac 上没有 CUDA，但 Apple Silicon 的 GPU 可以走 MPS 后端——PyTorch 把它抽象成又一个 device 字符串，训练循环一行都不用改：</p>
+        <div class="code">
+          <div class="code-head"><span>mnist_train.py · 设备探测三选一</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># CUDA / MPS / CPU 三选一，替换第 1 步里的 device 那行即可</span>
+if torch.cuda.is_available():
+    device = torch.device(<span class="g">"cuda"</span>)
+elif torch.backends.mps.is_available():
+    device = torch.device(<span class="g">"mps"</span>)
+else:
+    device = torch.device(<span class="g">"cpu"</span>)
+
+<span class="c"># model.to(device)、x.to(device) 原样保留——这就是 device 无关写法的意义</span></pre>
+          </div>
+        <p><small>个别算子在 MPS 上尚未实现时会回退 CPU 或报错，官方文档「MPS backend」页列了限制清单；遇到疑难先把 device 换回 CPU 复现问题，再去查文档。</small></p>
+        <p class="muted"><small>所有 epoch 输出数字均为示意输出：参数初始化带随机性，不同机器结果会小幅波动；准确率稳定落在 0.96~0.98 区间。想接着练手：把 MLP 换成两轮 Conv2d + MaxPool2d 的小 CNN，同样训练循环不用改，准确率还能再上一个台阶。</small></p>
+      </section>
+
+      <!-- ===== 07 避坑 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：梯度、eval、device 与保存</h2>
+
+        <h3>坑一：忘了 optimizer.zero_grad()，梯度越滚越大</h3>
+        <p>PyTorch 的 <code>.grad</code> 是<b>累加</b>设计（方便梯度累积等高级用法），但日常训练每一步都从零开始算——忘了清零，第 2 轮的梯度 = 第 1 轮 + 第 2 轮之和，loss 曲线会剧烈震荡甚至发散。症状：明明 lr 正常，loss 却越训越大。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 错误写法：只有 forward + backward，梯度永远在叠加</span>
+pred = model(x); loss.backward(); optimizer.step()
+
+<span class="c"># 正确：backward 之前清零（set_to_none=True 是默认行为，直接释放旧梯度）</span>
+optimizer.zero_grad()          <span class="c"># 放 backward 之前，一步都不能省</span>
+pred = model(x); loss.backward(); optimizer.step()</pre>
+          </div>
+
+        <h3>坑二：评估时忘 model.eval() 和 torch.no_grad()</h3>
+        <p>这两件事管的是不同开关，经常一起用所以容易漏。<b>eval()</b> 切模式：让 Dropout 停止随机置零、BatchNorm 用全局统计——漏了它，评估结果每个 batch 都在抖；<b>no_grad()</b> 切计算图：评估不需要梯度，漏了它白占内存还拖慢速度。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre>model.eval()
+with torch.no_grad():
+    ...                      <span class="c"># 评估、推理都放这里</span>
+model.train()                <span class="c"># 回到训练循环前切回来，别一路 eval 到底</span></pre>
+          </div>
+        <div class="note warn"><b>自查口诀：</b>代码里出现 <code>with torch.no_grad()</code> 却没见过 <code>model.eval()</code>，多半漏了；反过来只有 eval 没有 no_grad，评估会莫名变慢、显存爬升。</div>
+
+        <h3>坑三：模型和数据不在同一个设备</h3>
+        <p>经典报错 <b>Expected all tensors to be on the same device</b>：模型 .to(device) 了，数据没搬；或者 GPU 上算完的结果直接 .numpy()（numpy 只认 CPU）。规则一句话：<b>模型、输入、标签三者同设备</b>。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre>model = MLP().to(device)                    <span class="c"># 模型上设备</span>
+x, y = x.to(device), y.to(device)           <span class="c"># 输入和标签也上同一设备</span>
+
+result = model(x)
+result.cpu().numpy()                        <span class="c"># GPU 张量先 .cpu() 再转 numpy</span>
+
+<span class="c"># 排查口诀：print(t.device) 逐个看，找到 cpu 的那个搬过去</span></pre>
+          </div>
+
+        <h3>坑四：torch.save(model) 整个存，换个目录就加载失败</h3>
+        <p><code>torch.save(model)</code> 用 pickle 序列化整个对象，里面记着「模型类在哪个文件哪个路径」——换个目录/环境加载就报 AttributeError，官方明确不推荐。标准姿势是 <b>state_dict</b>：只存参数字典，加载时模型结构由你自己的代码定义。</p>
+        <div class="code">
+          <div class="code-head"><span>python</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 不推荐：torch.save(model, "m.pt") —— 绑死类的定义位置</span>
+
+<span class="c"># 推荐：存 state_dict，加载方自己 import 模型类</span>
+torch.save(model.state_dict(), "mnist_mlp.pth")
+model2 = MLP()                                          <span class="c"># 结构在本项目里现建</span>
+model2.load_state_dict(torch.load("mnist_mlp.pth", map_location=device))
+model2.eval()
+
+<span class="c"># 推理场景没有梯度，load 时配 map_location 指定设备，跨机器最稳</span></pre>
+          </div>
+      </section>
+
+      <!-- ===== 08 进阶 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶：官方教程与生态入口</h2>
+        <p>本页只覆盖训练主线，下面这些是官方入口，按需取用：</p>
+        <ul>
+          <li><a href="https://pytorch.org/tutorials/" target="_blank" rel="noopener">官方教程库</a> —— 从 Learn the Basics 到分布式训练的成套教程，持续更新。</li>
+          <li><a href="https://pytorch.org/docs/stable/" target="_blank" rel="noopener">API 文档</a> —— torch / autograd / nn / optim 的完整参考。</li>
+          <li><a href="https://pytorch.org/get-started/locally/" target="_blank" rel="noopener">安装选择器</a> —— 选 OS + 包管理器 + CUDA 版本，生成你机器的安装命令。</li>
+          <li><a href="https://pytorch.org/get-started/pytorch-2-x/" target="_blank" rel="noopener">PyTorch 2.x 特性总览</a> —— torch.compile 等新一代加速特性的官方说明。</li>
+          <li><a href="https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html" target="_blank" rel="noopener">60 分钟闪电战</a> —— 官方入门四连：Tensor、autograd、神经网络、分类实战。</li>
+          <li><a href="https://pytorch.org/vision/stable/" target="_blank" rel="noopener">torchvision 文档</a> —— 视觉数据集、预训练模型、transforms 全家桶。</li>
+          <li><a href="https://github.com/pytorch/pytorch" target="_blank" rel="noopener">GitHub 仓库</a> —— Release Notes 追版本变化（torch.compile 的新特性也在这发布）。</li>
+        </ul>
+        <div class="note"><b>学完下一步去哪：</b>① 拿 torchvision 的 CIFAR-10 把 MLP 换成 CNN，练完对卷积的手感；② 读 <a href="https://huggingface.co/learn" target="_blank" rel="noopener">Hugging Face 课程</a>，transformers 生态全是 PyTorch 代码；③ 回 <a href="tensorflow.html">TensorFlow 教程</a> 用 Keras 重写同一个 MNIST，体会「高层 API」和「手写循环」两条路线的取舍；④ 模型能跑了再回头看 torch.compile 和 AMP 混合精度加速。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>装好 torch，<b>torch.__version__</b> 打出 2.x，<b>torch.cuda.is_available()</b> 结果符合你的硬件预期</span></label>
+          <label><input type="checkbox" data-key="c2"><span>第 03 节跑通：backward 之后能打印出 <b>model.weight.grad</b> 的形状</span></label>
+          <label><input type="checkbox" data-key="c3"><span>背得出训练五步：<b>前向 → 清零 → 反向 → 更新 → 记录</b>，说得清清零为什么不能省</span></label>
+          <label><input type="checkbox" data-key="c4"><span>MNIST 全连接跑完 3 个 epoch，准确率 0.96+，<b>mnist_mlp.pth</b> 已保存且能加载</span></label>
+          <label><input type="checkbox" data-key="c5"><span>说得清 <b>model.eval()</b> 和 <b>torch.no_grad()</b> 分别管什么、为什么要一起用</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="tensorflow.html"><span>← 上一篇</span><b>TensorFlow 教程</b></a>
+        <a class="next" href="langchain.html"><span>下一篇 →</span><b>LangChain 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 PyTorch 官方文档与教程（pytorch.org/tutorials、pytorch.org/get-started/locally、pytorch.org/docs）整理，版本信息（torch 2.15、CUDA wheel 标签）核对于 2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 深度学习框架迭代很快，具体 API 与安装参数以官方文档当前版本为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

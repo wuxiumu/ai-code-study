@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>机器学习教程 · AI Code Study</title>
+<meta name="description" content="机器学习全景入门：什么是机器学习、三大类问题、标准工作流、过拟合与评估指标、经典算法地图，以及用 scikit-learn 跑通的完整实战。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/machine-learning.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习教程 · AI Code Study">
+<meta property="og:description" content="机器学习全景入门：什么是机器学习、三大类问题、标准工作流、过拟合与评估指标、经典算法地图，以及用 scikit-learn 跑通的完整实战。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/machine-learning.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="机器学习教程 · AI Code Study">
+<meta name="twitter:description" content="机器学习全景入门：什么是机器学习、三大类问题、标准工作流、过拟合与评估指标、经典算法地图，以及用 scikit-learn 跑通的完整实战。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "机器学习：让数据替你写规则",
+  "description": "机器学习全景入门：什么是机器学习、三大类问题、标准工作流、过拟合与评估指标、经典算法地图，以及用 scikit-learn 跑通的完整实战。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/machine-learning.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="machine-learning">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml" class="on">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-ml">机器学习框架</a><span>/</span>
+      <b>机器学习</b>
+    </nav>
+    <p class="eyebrow">MACHINE LEARNING · <b>ML</b> · 从数据到模型的全景图</p>
+    <h1>机器学习：让数据<em>替你写规则</em></h1>
+    <p class="lede">这一篇讲地图：机器学习到底是什么、和普通程序差在哪、三大类问题怎么分、一个项目从数据到部署要走哪几步。概念先立住，动手细节交给下一页的 Scikit-learn 教程。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">python3 — 训练与预测</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">from sklearn.datasets import load_digits</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">from sklearn.model_selection import train_test_split</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">from sklearn.svm import SVC</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">X_tr, X_te, y_tr, y_te = train_test_split(*load_digits(return_X_y=True), random_state=0)</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">pred = SVC(gamma=0.001).fit(X_tr, y_tr).predict(X_te)   # fit 训练 → predict 预测</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">(pred == y_te).mean()                                  # 准确率</span></div>
+        <div class="term-line"><span class="ok">0.9955555555555555 ← 模型在没见过的数据上的正确率</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>什么是机器学习</a>
+        <a href="#s2"><span class="idx">02</span>环境准备</a>
+        <a href="#s3"><span class="idx">03</span>第一个实验</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>完整实战</a>
+        <a href="#s7"><span class="idx">07</span>避坑指南</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="scikit-learn.html">Scikit-learn 教程</a>
+        <a href="tensorflow.html">TensorFlow 教程</a>
+        <a href="pytorch.html">PyTorch 教程</a>
+        <a href="langchain.html">LangChain 教程</a>
+        <a href="index.html#cat-ml">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>什么是机器学习</a>
+          <a href="#s2"><span class="idx">02</span>环境准备</a>
+          <a href="#s3"><span class="idx">03</span>第一个实验</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>完整实战</a>
+          <a href="#s7"><span class="idx">07</span>避坑指南</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 什么是机器学习 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>什么是机器学习：程序不再由人一行行写死</h2>
+        <p>普通程序是<b>人写规则</b>：数据进，规则加工，答案出。垃圾邮件过滤如果靠人写规则——「含『中奖』就拦」——发件人换个字你就输了。机器学习把方向倒过来：<b>数据 + 答案进，规则（模型）出</b>。你给它几千封标注好的「垃圾 / 正常」邮件，它自己学出一条会随数据变化的决策边界。</p>
+        <p>它和<b>统计学</b>共用大量数学（回归、最大似然），但侧重不同：统计关心「变量之间为什么有关系」，要解释系数与显著性；机器学习关心「下一次预测得准不准」，要泛化。它和<b>深度学习</b>是包含关系：深度学习是机器学习的一个子分支，靠多层神经网络自动学特征，擅长图像、语音、文本这类非结构化数据；而在 Excel 式的<b>表格数据</b>上，树模型等经典方法至今常常更强、更快、更省数据。</p>
+        <p>怎么判断你的问题适不适合上机器学习？三个信号：一是<b>规则写不完</b>——垃圾邮件的花样永远在变，写规则追不上；二是<b>数据在积累</b>——历史订单、点击、标签越攒越多，模式藏在里面；三是<b>允许概率性错误</b>——预测 95% 准就能产生价值，不需要数学上 100% 的证明。三条都占，就是机器学习的主场；一条都不占，写个 if-else 更便宜。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>一句话定义</dt><dd>从数据中自动归纳规则，用于预测未知</dd></div>
+          <div class="fact"><dt>学科包含关系</dt><dd>人工智能 ⊃ 机器学习 ⊃ 深度学习</dd></div>
+          <div class="fact"><dt>三大类问题</dt><dd>监督学习 / 无监督学习 / 强化学习</dd></div>
+          <div class="fact"><dt>核心目标</dt><dd>泛化：在没见过的数据上依然准</dd></div>
+          <div class="fact"><dt>数学基础</dt><dd>线性代数、概率统计、微积分（遇到再补即可）</dd></div>
+          <div class="fact"><dt>主流语言</dt><dd>Python 生态最完整（sklearn / PyTorch）</dd></div>
+          <div class="fact"><dt>影响结果的第一因素</dt><dd>数据与特征质量，其次才是算法</dd></div>
+          <div class="fact"><dt>入门硬件</dt><dd class="no">经典 ML 不需要 GPU，笔记本就行</dd></div>
+        </dl>
+
+        <div class="note"><b>什么时候用深度学习：</b>数据是图片、音频、长文本等非结构化数据，且量级够大（万级以上样本），用神经网络；数据是数据库里一张张表格、样本量几千到几十万、还要求能解释——先用树模型和线性模型，这是 90% 业务问题的形状。本页讲通用地图，经典 ML 的动手篇在 <b>Scikit-learn 教程</b>，深度学习在 <b>TensorFlow / PyTorch 教程</b>。</div>
+      </section>
+
+      <!-- ===== 02 环境准备 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>环境准备：一个虚拟环境，四个包</h2>
+        <p>机器学习的 Python 标配四件套：<b>numpy</b>（数组运算）、<b>pandas</b>（表格处理）、<b>matplotlib</b>（画图）、<b>scikit-learn</b>（经典 ML 算法全集）。装在虚拟环境里，别污染系统 Python。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">venv + pip（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">conda</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">在线 Notebook</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 建一个独立环境（Python 建议 3.10 以上，越新越好）</span>
+python3 -m venv .venv
+source .venv/bin/activate      <span class="c"># Windows 用 .venv\Scripts\activate</span>
+
+<span class="c"># 一条命令装齐四件套</span>
+python -m pip install numpy pandas matplotlib scikit-learn</pre>
+          </div>
+          <small>scikit-learn 会自动带上 numpy 和 scipy；新版本对 Python 有最低版本要求（当前要求 3.11+，以 <b>scikit-learn.org/stable/install.html</b> 为准）。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 装了 Anaconda / Miniconda 的话</span>
+conda create -n ml python=3.11
+conda activate ml
+
+conda install scikit-learn pandas matplotlib</pre>
+          </div>
+          <small>conda 自带预编译的科学计算栈，Windows 上省去不少编译麻烦；记得用 <b>conda-forge</b> 渠道，更新更及时。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Colab / Kaggle Notebook</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 浏览器打开 Google Colab 或 Kaggle Notebooks，新建笔记本</span>
+<span class="c"># 环境已预装好全部四件套，第一格直接验证：</span>
+import sklearn
+print(sklearn.__version__)</pre>
+          </div>
+          <small>零安装上手，还送免费 GPU（做深度学习时有用）。缺点是数据要上传，项目一大还得回本地。</small>
+        </div>
+
+        <div class="note warn"><b>别往系统 Python 里装包：</b>没有虚拟环境时，pip 升级一个依赖可能弄坏系统工具。装错位置不可怕，可怕的是「在 A 环境能跑、B 环境报错」排查半天。每个项目一个 <b>.venv</b>，是机器学习工程化的第一课。</div>
+      </section>
+
+      <!-- ===== 03 第一个实验 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>第一个实验：10 行跑通一次「学习」</h2>
+        <p>概念可以先放一放，用 scikit-learn 内置的手写数字数据集，把「训练 → 预测 → 打分」这个闭环跑起来。整个过程就是三行核心调用。</p>
+
+        <div class="code">
+          <div class="code-head"><span>first_model.py</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 1797 张 8x8 手写数字灰度图：每行一个样本，64 个像素值当特征</span>
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+
+X, y = load_digits(return_X_y=True)
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, random_state=0)
+
+model = SVC(gamma=0.001)     <span class="c"># 1. 选模型（此刻只是个空壳）</span>
+model.fit(X_tr, y_tr)        <span class="c"># 2. 训练：从数据里学出规则</span>
+print(model.score(X_te, y_te))
+<span class="c"># 0.9956 —— 打分用的是模型从没见过的数据</span></pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>找数据</h4><p>内置数据集一行拿到，不用下载。真实项目里，「找数据、洗数据」往往占掉八成时间——算法反而是最不花时间的部分。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>先切分，再动手</h4><p><code>train_test_split</code> 把数据分成训练集和测试集。测试集是一张「密封试卷」，从写下第一行代码起就不许偷看，最后才能拆。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>fit：唯一「学习」发生的地方</h4><p>调用 <code>fit</code> 之前模型只是一堆默认参数；调用之后，模型内部的参数被数据改写——这就是机器学习里「学习」二字的全部含义。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>score：只能考一次的期末考</h4><p><code>score</code> / <code>predict</code> 只对测试集用。分数不满意，回训练集改特征、换模型，而不是动测试集——动了它，分数就再也不可信。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">跑通了？恭喜，你已经完成了机器学习的最小闭环。但这个流程在生产环境不成立：特征要清洗、模型要调参、评估要交叉验证——完整的工程姿势在第 06 节实战里。</div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：三大类、八步流程、两个坑</h2>
+
+        <h3>三大类问题：看数据有没有「标准答案」</h3>
+        <p>区分哪一类问题，看的是你手上有没有标签（正确答案）。有标签就是监督学习，没有就是无监督学习，靠环境给反馈的就是强化学习。绝大多数业务问题落在前两类。</p>
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>监督学习 Supervised</dt><dd style="color:var(--ink-2)">有标签。预测数值叫<b>回归</b>（房价、销量），预测类别叫<b>分类</b>（垃圾邮件、疾病诊断）。代表算法：线性回归、逻辑回归、随机森林。</dd></div>
+          <div class="fact"><dt>无监督学习 Unsupervised</dt><dd style="color:var(--ink-2)">无标签。让模型自己找结构：<b>聚类</b>把用户分成几群（K-Means），<b>降维</b>把几百个特征压成几个（PCA），常用于探索数据。</dd></div>
+          <div class="fact"><dt>强化学习 Reinforcement</dt><dd style="color:var(--ink-2)">没有标签，只有奖励信号。智能体试错行动，奖励高就多做。下棋、机器人控制、游戏 AI。概念了解即可，入门阶段动手少。</dd></div>
+        </dl>
+
+        <h3>标准工作流：八步一个闭环</h3>
+        <p>不管什么算法，一个机器学习项目都走这条流水线。顺序不能乱——最常见的事故就是在第 4 步之前就把信息泄漏给了模型。</p>
+        <ol>
+          <li><b>收集数据</b>：明确预测目标是什么、标签从哪来、一条样本代表什么。</li>
+          <li><b>清洗</b>：处理缺失值、去重、修异常值。垃圾进，垃圾出。</li>
+          <li><b>特征工程</b>：把原始数据变成模型能吃的数字——类别编码、数值缩放、构造新特征。这一步对结果的影响常常大于换算法。</li>
+          <li><b>切分数据</b>：先留出测试集，再谈训练。顺序反了就是自欺欺人。</li>
+          <li><b>训练</b>：从最简单的模型开始（逻辑回归、决策树），先跑通再变强。</li>
+          <li><b>评估</b>：测试集 + 交叉验证看泛化能力，选对指标（第 05 节速查）。</li>
+          <li><b>调参</b>：网格搜索或随机搜索超参数；提升有限，别陷进去。</li>
+          <li><b>部署与监控</b>：导出模型上线，持续监控数据漂移——真实数据会变，模型会过期。</li>
+        </ol>
+        <p>八步里最值钱的往往是第三步。<b>特征工程</b>的典型操作：把「城市名」拆成经纬度或人均收入档位、把「下单时间」拆出星期几和小时、把两个原始字段相除造出「客单价」。原始数据里的一个细节被翻译成模型能直接用的信号，涨分常常比换十次算法都多。</p>
+
+        <h3>过拟合、欠拟合与偏差-方差</h3>
+        <p><b>过拟合</b>是把训练集「背」下来了：训练分数极高，测试分数明显掉。原因是模型太复杂或数据太少。<b>欠拟合</b>是模型太简单，连训练集都学不好，两边分数都低。诊断只要一行——把两个分数摆在一起看：</p>
+
+        <div class="code">
+          <div class="code-head"><span>诊断模式 · 典型三种形态</span><button class="copy" type="button">复制</button></div>
+<pre>训练集 99.5%  |  测试集 71.2%   <span class="c">← 过拟合：背题了，要正则化 / 更多数据 / 简化模型</span>
+训练集 62.0%  |  测试集 61.8%   <span class="c">← 欠拟合：模型太简单，加特征 / 换更强的模型</span>
+训练集 97.8%  |  测试集 97.1%   <span class="c">← 健康：两者接近且都高</span></pre>
+        </div>
+
+        <p>理论上这叫<b>偏差-方差权衡</b>：模型太简单偏差大（学不会），太复杂方差大（换一批数据结果就变）。实践中不用背术语，记住两条对策即可：<b>正则化</b>（给模型复杂度罚分，比如 L1/L2、限制树的深度）压方差；<b>加数据、加有效特征</b>降偏差。</p>
+
+        <h3>交叉验证与评估指标</h3>
+        <p>一次 train/test 切分的分数有运气成分。<b>K 折交叉验证</b>把训练集分成 K 份，轮流用 K-1 份训练、1 份验证，取平均——既用了每一条数据，又能看出模型稳不稳：</p>
+
+        <div class="code">
+          <div class="code-head"><span>cross_val_score 的用法</span><button class="copy" type="button">复制</button></div>
+<pre>from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(model, X_tr, y_tr, cv=5)
+<span class="c"># 5 折各得一个分：例如 [0.96, 0.95, 0.97, 0.94, 0.96]</span>
+print(scores.mean(), scores.std())   <span class="c"># 均值看水平，标准差看稳定性</span></pre>
+        </div>
+
+        <p><b>指标怎么选：</b>回归看 RMSE、MAE、R²；分类看准确率、精确率、召回率、F1、AUC。<b>类别不平衡时准确率会骗人</b>——99% 的样本是「正常」，无脑全猜「正常」就有 99% 准确率，但对抓坏人毫无用处。这时要看精确率 / 召回率 / F1，甚至只看少数类的召回。完整的指标速查和算法地图在下一节。</p>
+
+        <div class="note"><b>一个反直觉的事实：</b>新手以为调参和换算法最提分，老手的顺序是先修数据（标签错漏、泄漏、特征质量），再换特征，最后才调参。分数不好看，先怀疑数据。</div>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：工作流、算法、指标、术语</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了某个词，直接搜 <b>召回</b>、<b>过拟合</b>、<b>聚类</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索阶段、算法、指标，比如 召回 / 聚类 / 过拟合" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">工作流阶段</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">经典算法</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">评估指标</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">术语表</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>阶段</th><th>要做什么</th></tr></thead>
+              <tbody>
+                <tr><td class="k">明确问题</td><td>预测什么？标签从哪来？一条样本代表什么？</td></tr>
+                <tr><td class="k">探索性分析 EDA</td><td>看分布、缺失比例、异常值、类别是否平衡</td></tr>
+                <tr><td class="k">清洗</td><td>缺失值处理、去重、异常值修正</td></tr>
+                <tr><td class="k">特征工程</td><td>类别编码、数值缩放、构造 / 筛选特征</td></tr>
+                <tr><td class="k">切分数据</td><td>先留测试集（train_test_split），再谈其他</td></tr>
+                <tr><td class="k">训练</td><td>从简单模型开始 fit，先跑通再变强</td></tr>
+                <tr><td class="k">评估</td><td>测试集 + 交叉验证；按业务选对指标</td></tr>
+                <tr><td class="k">调参</td><td>GridSearchCV / RandomizedSearchCV 穷举或采样</td></tr>
+                <tr><td class="k">部署监控</td><td>保存模型上线，监控数据漂移与效果衰减</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>算法</th><th>一句话定位</th></tr></thead>
+              <tbody>
+                <tr><td class="k">线性回归</td><td>回归的第一基线，系数可解释</td></tr>
+                <tr><td class="k">逻辑回归</td><td>分类的第一基线，输出概率，快而稳</td></tr>
+                <tr><td class="k">KNN</td><td>看 K 个最近邻投票，直观但预测慢</td></tr>
+                <tr><td class="k">朴素贝叶斯</td><td>文本分类的传统强项，训练飞快</td></tr>
+                <tr><td class="k">决策树</td><td>可画图解释，但单棵树容易过拟合</td></tr>
+                <tr><td class="k">随机森林</td><td>多棵树投票（bagging），默认强基线</td></tr>
+                <tr><td class="k">梯度提升 XGBoost / LightGBM</td><td>表格数据竞赛冠军常客，梯度提升家族</td></tr>
+                <tr><td class="k">SVM</td><td>小样本高维数据强，核技巧扩到非线性</td></tr>
+                <tr><td class="k">K-Means</td><td>无监督聚类：指定 K，按距离分群</td></tr>
+                <tr><td class="k">PCA</td><td>无监督降维：压缩特征、可视化</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>指标</th><th>含义与适用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">准确率 Accuracy</td><td>全对比例；类别不平衡时会骗人</td></tr>
+                <tr><td class="k">精确率 Precision</td><td>预测为正里真正对的比例；误报代价高时看它</td></tr>
+                <tr><td class="k">召回率 Recall</td><td>真实为正被抓住的比例；漏报代价高时看它</td></tr>
+                <tr><td class="k">F1</td><td>精确率与召回率的调和平均，二者兼顾</td></tr>
+                <tr><td class="k">ROC-AUC</td><td>与阈值无关的排序能力，比较模型整体好坏</td></tr>
+                <tr><td class="k">混淆矩阵</td><td>四象限看清「错成什么」的原始明细</td></tr>
+                <tr><td class="k">RMSE</td><td>回归误差（均方根），大误差罚得重</td></tr>
+                <tr><td class="k">MAE</td><td>回归平均绝对误差，对异常值更鲁棒</td></tr>
+                <tr><td class="k">R²</td><td>回归解释了多少方差，越接近 1 越好</td></tr>
+                <tr><td class="k">交叉验证均值 ± 标准差</td><td>比单次切分可信，还能看出稳定性</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>术语</th><th>解释</th></tr></thead>
+              <tbody>
+                <tr><td class="k">特征 Feature</td><td>描述样本的一个输入变量，表格里的一列</td></tr>
+                <tr><td class="k">标签 Label</td><td>要预测的目标，表格里的「答案」列</td></tr>
+                <tr><td class="k">样本 Sample</td><td>一条数据，表格里的一行</td></tr>
+                <tr><td class="k">训练集 / 测试集</td><td>学规则用的 / 最后考试用的，不能混</td></tr>
+                <tr><td class="k">验证集</td><td>调参用的那部分；不参加最终训练</td></tr>
+                <tr><td class="k">超参数 Hyperparameter</td><td>训练前由人定的旋钮（树深、学习率）</td></tr>
+                <tr><td class="k">参数 Parameter</td><td>训练中学出来的内部数值（权重、系数）</td></tr>
+                <tr><td class="k">泛化 Generalization</td><td>在没见过的数据上的表现，唯一重要的目标</td></tr>
+                <tr><td class="k">过拟合 Overfitting</td><td>背题：训练分高测试分低</td></tr>
+                <tr><td class="k">正则化 Regularization</td><td>给模型复杂度罚分，压住过拟合</td></tr>
+                <tr><td class="k">数据泄漏 Leakage</td><td>考试信息混进了训练过程，分数虚高</td></tr>
+                <tr><td class="k">基线 Baseline</td><td>先跑通的简单模型，任何新模型都要打赢它</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「召回」「聚类」「泄漏」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 完整实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>完整实战：用内置数据集走完八步工作流</h2>
+        <p>下面用 scikit-learn 内置的手写数字数据集，把「切分 → 基线 → 调参 → 终评 → 保存」完整走一遍。代码可整体复制运行，只依赖 scikit-learn 和 joblib（sklearn 自带）。</p>
+
+        <h3>第一步：加载数据并切分</h3>
+        <div class="code">
+          <div class="code-head"><span>ml_digits.py · 数据准备</span><button class="copy" type="button">复制</button></div>
+<pre>import numpy as np
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report, confusion_matrix
+import joblib
+
+<span class="c"># 1797 个样本，64 个特征（8x8 像素），10 类数字</span>
+X, y = load_digits(return_X_y=True)
+print(X.shape, y.shape)          <span class="c"># (1797, 64) (1797,)</span>
+
+X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y)   <span class="c"># 分层抽样</span></pre>
+        </div>
+
+        <h3>第二步：基线模型 + 交叉验证</h3>
+        <div class="code">
+          <div class="code-head"><span>ml_digits.py · 基线</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 规范写法：缩放器包进 Pipeline，随模型一起交叉验证，杜绝泄漏</span>
+base = make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000))
+scores = cross_val_score(base, X_tr, y_tr, cv=5)
+print(scores.mean().round(4), scores.std().round(4))
+<span class="c"># 5 折平均约 0.97 —— 这就是必须打败的基线</span></pre>
+        </div>
+
+        <h3>第三步：网格搜索调参</h3>
+        <div class="code">
+          <div class="code-head"><span>ml_digits.py · 调参</span><button class="copy" type="button">复制</button></div>
+<pre>param_grid = {
+    <span class="g">"C"</span>: [0.1, 1, 10],            <span class="c"># 正则强度，越大越信数据</span>
+    <span class="g">"gamma"</span>: [0.0001, 0.001, 0.01], <span class="c"># RBF 核的影响半径</span>
+}
+search = GridSearchCV(SVC(), param_grid, cv=5, n_jobs=-1)
+search.fit(X_tr, y_tr)             <span class="c"># 3 x 3 = 9 组参数 x 5 折 = 45 次训练</span>
+
+print(search.best_params_)
+print(search.best_score_.round(4)) <span class="c"># 交叉验证下的最佳成绩，约 0.99</span></pre>
+        </div>
+
+        <h3>第四步：测试集终评与保存模型</h3>
+        <div class="code">
+          <div class="code-head"><span>ml_digits.py · 终评与保存</span><button class="copy" type="button">复制</button></div>
+<pre>best = search.best_estimator_      <span class="c"># 已在全量训练集上重新拟合</span>
+pred = best.predict(X_te)
+
+print(best.score(X_te, y_te))      <span class="c"># 测试集分数：全程只算这一次</span>
+print(classification_report(y_te, pred))   <span class="c"># 每一类的精确率 / 召回率 / F1</span>
+print(confusion_matrix(y_te, pred))        <span class="c"># 哪些数字容易被认错成哪些</span>
+
+joblib.dump(best, <span class="g">"digits_svc.joblib"</span>)     <span class="c"># 保存模型</span>
+model = joblib.load(<span class="g">"digits_svc.joblib"</span>)
+print(model.predict(X_te[:3]))     <span class="c"># 加载后直接预测新样本</span></pre>
+        </div>
+
+        <div class="note"><b>预期输出（scikit-learn 1.9.1 实测）：</b>基线 5 折均值 <b>0.9703 ± 0.0091</b>；最佳参数 <code>{'C': 10, 'gamma': 0.001}</code>，交叉验证 0.9918；测试集 <b>0.9889</b>。混淆矩阵里最容易混的是 8、9 和 5——符合人眼直觉。</div>
+
+        <div class="note"><b>这份骨架可以直接搬走：</b>换数据集 = 换前 5 行；换模型 = 换 <code>param_grid</code> 里那一小段。真正的项目无非是在这条骨架上，把特征工程和指标选择做得更细。</div>
+      </section>
+
+      <!-- ===== 07 避坑指南 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个让分数不可信的经典错误</h2>
+
+        <h3>坑一：数据泄漏——「先标准化后切分」</h3>
+        <p>如果在切分<b>之前</b>对全量数据做标准化、特征选择或填充，测试集的统计信息就混进了训练过程——分数虚高，上线就跌。正确顺序是把预处理装进 Pipeline，让缩放只在训练折内 fit：</p>
+        <div class="code">
+          <div class="code-head"><span>错误 vs 正确</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 错：全量数据先标准化，再切分 —— 测试集信息泄漏进训练</span>
+X_scaled = StandardScaler().fit_transform(X)
+X_tr, X_te = train_test_split(X_scaled)
+
+<span class="c"># 对：把预处理放进 Pipeline，交给交叉验证分折处理</span>
+pipe = make_pipeline(StandardScaler(), LogisticRegression())
+cross_val_score(pipe, X, y, cv=5)</pre>
+        </div>
+
+        <h3>坑二：类别不平衡时只看准确率</h3>
+        <p>欺诈检测里 99% 的交易是正常的。一个「全猜正常」的模型准确率 99%，召回率 0%——业务价值为零。凡是不平衡数据，先看混淆矩阵，主指标选少数类的召回率或 F1，而不是 accuracy。</p>
+        <div class="note warn"><b>判断方法：</b>拿到数据先 <code>print(np.bincount(y))</code> 或 <code>y.value_counts(normalize=True)</code>。少数类占比低于两三成，就按下平衡问题对待（分层抽样、class_weight、过采样等）。</div>
+
+        <h3>坑三：在测试集上反复调参</h3>
+        <p>测试集每被「看」一次，就泄一次密。调十轮模型都朝测试集分数优化，它就变成了验证集，最终汇报的数字不再可信。纪律是：<b>调参只用交叉验证，测试集终评只做一次</b>；数据充裕时干脆切成训练 / 验证 / 测试三份。</p>
+
+        <h3>坑四：一上来就上深度学习</h3>
+        <p>表格数据 + 几万样本，梯度提升树通常比神经网络更强、更快、更可解释，还不需要 GPU。深度学习的主场是图像、语音、文本等非结构化数据。先用简单模型建立基线，再决定要不要上重武器——基线打不赢的复杂模型，不值得上线。</p>
+        <div class="code">
+          <div class="code-head"><span>选型速判 · 三个问题</span><button class="copy" type="button">复制</button></div>
+<pre>1. 数据是一张表格吗？            是 → 线性模型 / 树模型起步（sklearn）
+2. 是图像、语音、文本这类数据吗？  是 → 卷积 / Transformer（深度学习）
+3. 样本量 &lt; 1 万，且要能解释？    是 → 逻辑回归 + 特征工程，别上重武器</pre>
+        </div>
+      </section>
+
+      <!-- ===== 08 进阶资源 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与资源</h2>
+        <p>概念立住之后，按「动手 → 课程 → 数据」三路推进，比按顺序啃书有效得多。</p>
+        <ul>
+          <li><a href="https://scikit-learn.org/stable/user_guide.html">scikit-learn 用户指南</a>——经典 ML 最值得通读的官方文档，每章带代码。</li>
+          <li><a href="https://www.coursera.org/specializations/machine-learning-introduction">Andrew Ng《Machine Learning Specialization》</a>（Coursera）——最经典的入门课，概念讲解的地基。</li>
+          <li><a href="https://www.kaggle.com/learn">Kaggle Learn</a>——免费短课（Intro to ML、Feature Engineering），边学边在 Notebook 里练。</li>
+          <li><a href="https://www.kaggle.com/datasets">Kaggle Datasets</a>——从入门玩具到百万行业务数据的数据集仓库，配 Notebook 直接练手。</li>
+          <li><a href="https://archive.ics.uci.edu">UCI 机器学习数据集仓库</a>——经典公开数据集的老巢，找中小规模练手数据先来这里。</li>
+          <li><a href="https://developers.google.com/machine-learning/crash-course">Google Machine Learning Crash Course</a>——十几小时的速成课，配练习，概念复习很好用。</li>
+          <li>书：《Hands-On Machine Learning with Scikit-Learn, Keras &amp; TensorFlow》（Aurélien Géron）——从经典 ML 一路写到深度学习的实操圣经。</li>
+        </ul>
+        <div class="note"><b>下一步去哪：</b>经典 ML 的动手细节（统一 API、Pipeline、调参规范）看本站 <b>Scikit-learn 教程</b>；想进图像与文本的深度世界，去 <b>TensorFlow / PyTorch 教程</b>。把第 06 节的骨架在 Kaggle 的 Titanic 数据集上重跑一遍，是最好的衔接练习。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>能说清监督 / 无监督 / 强化学习的区别，各举一个例子</span></label>
+          <label><input type="checkbox" data-key="c2"><span>环境建在虚拟环境里，<code>import sklearn</code> 不报错</span></label>
+          <label><input type="checkbox" data-key="c3"><span>独立跑通了第 06 节的 digits 完整流程（基线 → 调参 → 终评 → 保存）</span></label>
+          <label><input type="checkbox" data-key="c4"><span>能识别过拟合的信号（训练分高测试分低），说得出至少两种对策</span></label>
+          <label><input type="checkbox" data-key="c5"><span>知道测试集只在最后碰一次；面对不平衡数据会改用召回率 / F1 看模型</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="pi-agent.html"><span>← 上一篇</span><b>Pi Agent 教程</b></a>
+        <a class="next" href="scikit-learn.html"><span>下一篇 →</span><b>Scikit-learn 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 scikit-learn 官方文档（用户指南与示例）及《Hands-On Machine Learning》《Introduction to Machine Learning with Python》等经典教材整理，2026-11。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 工具与数据集链接以官方站点当前版本为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

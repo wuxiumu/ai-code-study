@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scikit-learn 教程 · AI Code Study</title>
+<meta name="description" content="Scikit-learn 上手指南：安装、统一 API、内置数据集、Pipeline 与 ColumnTransformer 规范写法、交叉验证与调参速查，以及一个可跑的表格数据完整实战。">
+<!-- SEO-HEAD-START -->
+<link rel="canonical" href="https://ai-code-study.chiguashentan.com/scikit-learn.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scikit-learn 教程 · AI Code Study">
+<meta property="og:description" content="Scikit-learn 上手指南：安装、统一 API、内置数据集、Pipeline 与 ColumnTransformer 规范写法、交叉验证与调参速查，以及一个可跑的表格数据完整实战。">
+<meta property="og:url" content="https://ai-code-study.chiguashentan.com/scikit-learn.html">
+<meta property="og:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<meta property="og:site_name" content="AI Code Study">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Scikit-learn 教程 · AI Code Study">
+<meta name="twitter:description" content="Scikit-learn 上手指南：安装、统一 API、内置数据集、Pipeline 与 ColumnTransformer 规范写法、交叉验证与调参速查，以及一个可跑的表格数据完整实战。">
+<meta name="twitter:image" content="https://ai-code-study.chiguashentan.com/assets/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Scikit-learn：一套 fit / predict 走天下",
+  "description": "Scikit-learn 上手指南：安装、统一 API、内置数据集、Pipeline 与 ColumnTransformer 规范写法、交叉验证与调参速查，以及一个可跑的表格数据完整实战。",
+  "author": {"@type": "Organization", "name": "AI Code Study"},
+  "dateModified": "2026-11-05",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "https://ai-code-study.chiguashentan.com/scikit-learn.html"}
+}
+</script>
+<!-- SEO-HEAD-END -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1A16'/%3E%3Cpath d='M9 11l6 5-6 5' stroke='%2359C99B' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 21h6' stroke='%23D8E6DF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+
+<!-- BAIDU-ANALYTICS-START -->
+<script src="assets/config.js"></script>
+<script>
+(function(){
+  var cfg = window.ACS_CONFIG || {};
+  if (!cfg.baiduId) return;
+  var _hmt = _hmt || [];
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + cfg.baiduId;
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- BAIDU-ANALYTICS-END -->
+</head>
+<body data-page="scikit-learn">
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="logo" href="index.html"><span class="pr">❯</span> AI Code Study</a>
+    <nav aria-label="全站导航">
+      <a href="index.html#cat-basics">入门基础</a>
+      <a href="index.html#cat-tools">AI 编程工具</a>
+      <a href="index.html#cat-open">开源模型与智能体</a>
+      <a href="index.html#cat-ml" class="on">机器学习框架</a>
+      <a href="index.html#cat-vision">视觉与自动化</a>      <a href="contact.html">联系我们</a>
+    </nav>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ===== 顶部 ===== -->
+  <header class="top">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span>
+      <a href="index.html#cat-ml">机器学习框架</a><span>/</span>
+      <b>Scikit-learn</b>
+    </nav>
+    <p class="eyebrow">MACHINE LEARNING · <b>SCIKIT-LEARN</b> · Python 机器学习标准库</p>
+    <h1>Scikit-learn：一套 <em>fit / predict</em> 走天下</h1>
+    <p class="lede">装上库，用统一 API 训练第一个分类器；再用 Pipeline + ColumnTransformer 把表格数据的预处理、交叉验证和调参串成一条流水线。这一页代码比概念多，全部可跑。</p>
+
+    <div class="term" aria-label="终端演示">
+      <div class="term-bar">
+        <i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="term-title">zsh — ~/ml-playground</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line"><span class="pr">$ </span><span class="cmd">python -m pip install scikit-learn</span></div>
+        <div class="term-line"><span class="out">Successfully installed joblib-… numpy-… </span><span class="ok">scikit-learn-1.9.1</span><span class="out"> scipy-…</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">from sklearn.datasets import load_wine</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">from sklearn.ensemble import RandomForestClassifier</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">from sklearn.model_selection import train_test_split</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">X_tr, X_te, y_tr, y_te = train_test_split(*load_wine(return_X_y=True), random_state=0)</span></div>
+        <div class="term-line"><span class="pr">&gt;&gt;&gt; </span><span class="cmd">RandomForestClassifier(random_state=0).fit(X_tr, y_tr).score(X_te, y_te)</span></div>
+        <div class="term-line"><span class="ok">1.0 —— fit 训练、score 打分，全程各一行</span> <span class="caret"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== 左侧索引 ===== -->
+    <aside class="side">
+      <p class="side-title">目录</p>
+      <nav id="toc">
+        <a href="#s1"><span class="idx">01</span>它是什么</a>
+        <a href="#s2"><span class="idx">02</span>安装</a>
+        <a href="#s3"><span class="idx">03</span>快速上手</a>
+        <a href="#s4"><span class="idx">04</span>核心概念</a>
+        <a href="#s5"><span class="idx">05</span>速查表</a>
+        <a href="#s6"><span class="idx">06</span>表格数据实战</a>
+        <a href="#s7"><span class="idx">07</span>避坑指南</a>
+        <a href="#s8"><span class="idx">08</span>进阶资源</a>
+        <a href="#s9"><span class="idx">09</span>收尾自检</a>
+      </nav>
+      <p class="side-title">相关教程</p>
+      <nav>
+        <a href="machine-learning.html">机器学习教程</a>
+        <a href="tensorflow.html">TensorFlow 教程</a>
+        <a href="pytorch.html">PyTorch 教程</a>
+        <a href="langchain.html">LangChain 教程</a>
+        <a href="index.html#cat-ml">全部教程 →</a>
+      </nav>
+    </aside>
+
+    <main>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav>
+          <a href="#s1"><span class="idx">01</span>它是什么</a>
+          <a href="#s2"><span class="idx">02</span>安装</a>
+          <a href="#s3"><span class="idx">03</span>快速上手</a>
+          <a href="#s4"><span class="idx">04</span>核心概念</a>
+          <a href="#s5"><span class="idx">05</span>速查表</a>
+          <a href="#s6"><span class="idx">06</span>表格数据实战</a>
+          <a href="#s7"><span class="idx">07</span>避坑指南</a>
+          <a href="#s8"><span class="idx">08</span>进阶资源</a>
+          <a href="#s9"><span class="idx">09</span>收尾自检</a>
+        </nav>
+      </details>
+
+      <!-- ===== 01 它是什么 ===== -->
+      <section class="block" id="s1">
+        <p class="sec-num">01</p>
+        <h2>它是什么：经典机器学习的「标准库」</h2>
+        <p>Scikit-learn 建在 <b>NumPy / SciPy</b> 之上，把十几年的经典机器学习算法——线性模型、决策树、随机森林、SVM、聚类、降维——统一成同一套 API：<b>构造 → fit 训练 → predict / transform 使用 → score 打分</b>。它从 2007 年一个 Google Summer of Code 项目起步，由法国国家信息与自动化研究院（Inria）等机构带领社区维护至今，是 Python 机器学习事实上的标准起点。</p>
+        <p>「统一」是它最大的价值：换模型只换一两行代码；<b>Pipeline</b> 能把预处理和模型串成一个对象；<b>GridSearchCV</b> 能对整条管道统一调参。学的是一套接口，用到的是整个算法库。</p>
+
+        <dl class="facts">
+          <div class="fact"><dt>当前稳定版</dt><dd>1.9.1（2026-09 发布，以官网为准）</dd></div>
+          <div class="fact"><dt>许可证</dt><dd>BSD-3，商用项目可放心集成</dd></div>
+          <div class="fact"><dt>语言</dt><dd>Python（热点代码用 Cython 编译加速）</dd></div>
+          <div class="fact"><dt>运行依赖</dt><dd>NumPy、SciPy、joblib、threadpoolctl</dd></div>
+          <div class="fact"><dt>Python 版本</dt><dd>较新版本要求 3.11+（以安装页为准）</dd></div>
+          <div class="fact"><dt>GPU</dt><dd class="no">不支持，经典 ML 在 CPU 上就够快</dd></div>
+          <div class="fact"><dt>不做的事</dt><dd>深度学习、强化学习请用 PyTorch / TensorFlow</dd></div>
+          <div class="fact"><dt>名字来历</dt><dd>SciPy Toolkit（scikit）系列之一，learn 最出名</dd></div>
+        </dl>
+
+        <div class="note"><b>什么时候选它：</b>数据是一张表格（数据库导出、CSV、Excel），任务是回归 / 分类 / 聚类 / 降维，样本量几千到几百万——scikit-learn 几乎总是第一选择。图像、语音、长文本的端到端深度学习则交给 PyTorch 或 TensorFlow。</div>
+      </section>
+
+      <!-- ===== 02 安装 ===== -->
+      <section class="block" id="s2">
+        <p class="sec-num">02</p>
+        <h2>安装：一条 pip，或者一条 conda</h2>
+        <p>官方推荐装进虚拟环境。二进制轮子直接下载安装，<b>不需要 C 编译器</b>，连依赖一起装好。</p>
+
+        <div class="tabs" role="tablist" aria-label="安装方式">
+          <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">pip（推荐）</button>
+          <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b">conda</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c">验证安装</button>
+        </div>
+
+        <div class="panel" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 建独立环境（scikit-learn 1.9 要 Python 3.11+）</span>
+python3 -m venv .venv
+source .venv/bin/activate       <span class="c"># Windows: .venv\Scripts\activate</span>
+
+python -m pip install scikit-learn
+
+<span class="c"># 已装过，升级到最新：</span>
+python -m pip install -U scikit-learn</pre>
+          </div>
+          <small>会自动带上 numpy、scipy、joblib。装完 <b>import sklearn</b> 验证。</small>
+        </div>
+
+        <div class="panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>conda create -n sklearn python=3.11
+conda activate sklearn
+
+<span class="c"># conda-forge 渠道版本更新最快</span>
+conda install -c conda-forge scikit-learn</pre>
+          </div>
+          <small>conda 会整包管理科学计算依赖，Windows 上尤其省心。pip 和 conda 别混用在同一个环境里。</small>
+        </div>
+
+        <div class="panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c" hidden>
+          <div class="code">
+            <div class="code-head"><span>Terminal · 两个验证命令</span><button class="copy" type="button">复制</button></div>
+<pre>python -c <span class="g">"import sklearn; print(sklearn.__version__)"</span>
+
+<span class="c"># 详细环境报告：排查问题先跑这个</span>
+python -c <span class="g">"import sklearn; sklearn.show_versions()"</span></pre>
+          </div>
+          <small><b>show_versions()</b> 会打印 sklearn / numpy / scipy 版本与系统信息，报 issue 或搜问题前先跑一遍。</small>
+        </div>
+
+        <div class="note warn"><b>别用 sudo pip 往系统 Python 装包：</b>会污染系统依赖，升级还可能弄坏系统工具。永远在虚拟环境里 <code>python -m pip install</code>；Windows 下若 pip 装不上，优先换 conda。</div>
+      </section>
+
+      <!-- ===== 03 快速上手 ===== -->
+      <section class="block" id="s3">
+        <p class="sec-num">03</p>
+        <h2>快速上手：十行以内的第一个分类器</h2>
+        <p>用内置的红酒数据集（178 条样本、13 个化学特征、3 个品种）走一次完整流程。注意每一行的分工：载入、切分、训练、打分，各占一两行。</p>
+
+        <div class="code">
+          <div class="code-head"><span>first_clf.py</span><button class="copy" type="button">复制</button></div>
+<pre>from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+X, y = load_wine(return_X_y=True)     <span class="c"># 数据:直接拿到 numpy 数组</span>
+
+X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=0.25, random_state=0, stratify=y)
+
+clf = RandomForestClassifier(random_state=0)
+clf.fit(X_tr, y_tr)                   <span class="c"># 训练:一行</span>
+print(clf.score(X_te, y_te))          <span class="c"># 评分:还是一行,这份数据能到 1.0</span>
+print(clf.predict(X_te[:3]))          <span class="c"># 预测新样本的类别</span></pre>
+        </div>
+
+        <ul class="steps">
+          <li class="step">
+            <span class="n">01</span>
+            <div><h4>载入数据</h4><p><code>load_wine()</code> 一行拿到。<code>return_X_y=True</code> 直接返回特征矩阵 X 和标签 y，不绕弯。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">02</span>
+            <div><h4>切分并分层</h4><p><code>train_test_split</code> 留出 25% 当测试集；<code>stratify=y</code> 让两份数据的类别比例保持一致，小数据集必加。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">03</span>
+            <div><h4>fit：所有学习的入口</h4><p>sklearn 里任何模型都这样用：先构造（超参在括号里），再 <code>fit</code>。换模型就是换这两行。</p></div>
+          </li>
+          <li class="step">
+            <span class="n">04</span>
+            <div><h4>score / predict</h4><p><code>score</code> 给出测试集默认指标（分类是准确率）；<code>predict</code> 输出具体预测。这一步之后才谈调参。</p></div>
+          </li>
+        </ul>
+
+        <div class="note">想让第一个分类器立刻变强：把 <code>RandomForestClassifier</code> 换成 <code>SVC</code> 或 <code>LogisticRegression</code>，其余一行不动。这就是统一 API 的甜头，下一节展开。</div>
+      </section>
+
+      <!-- ===== 04 核心概念 ===== -->
+      <section class="block" id="s4">
+        <p class="sec-num">04</p>
+        <h2>核心概念：统一 API、数据集、Pipeline、调参</h2>
+
+        <h3>统一 API：换模型只换一行</h3>
+        <p>sklearn 把每个模型都做成「估计器（estimator）」类，接口完全一致。想比较三个模型？一个 for 循环就够，不用读三份文档：</p>
+
+        <div class="code">
+          <div class="code-head"><span>同一个循环，三种模型</span><button class="copy" type="button">复制</button></div>
+<pre>from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+
+for model in [LogisticRegression(max_iter=1000),
+              RandomForestClassifier(random_state=0),
+              SVC()]:
+    model.fit(X_tr, y_tr)              <span class="c"># 同一个 fit</span>
+    print(model.__class__.__name__,
+          model.score(X_te, y_te))     <span class="c"># 同一个 score</span></pre>
+        </div>
+
+        <p>这也是学习方法论：先跑通最简单的逻辑回归当基线，再逐个换更强的模型比较——成本只剩一行 import。</p>
+
+        <dl class="facts" style="grid-template-columns:1fr">
+          <div class="fact"><dt>fit(X, y)</dt><dd style="color:var(--ink-2)">学习：从数据估计参数。监督模型要传标签 y；转换器只吃 X（学均值、方差这类统计量）。</dd></div>
+          <div class="fact"><dt>predict(X)</dt><dd style="color:var(--ink-2)">预测：训练好的模型对新样本输出类别或数值。</dd></div>
+          <div class="fact"><dt>transform(X)</dt><dd style="color:var(--ink-2)">变换：转换器专用，按 fit 学到的统计量改写数据。fit_transform 是两步合一步。</dd></div>
+          <div class="fact"><dt>score(X, y)</dt><dd style="color:var(--ink-2)">打分：模型默认指标——分类给准确率，回归给 R²。想换指标用 metrics 模块。</dd></div>
+        </dl>
+
+        <h3>内置数据集：load_*、fetch_*、make_*</h3>
+        <p>三组前缀记牢：<b>load_</b> 玩具数据随包自带；<b>fetch_</b> 真实数据首次运行才下载；<b>make_</b> 按需合成数据。</p>
+
+        <div class="code">
+          <div class="code-head"><span>datasets 常用入口</span><button class="copy" type="button">复制</button></div>
+<pre>from sklearn import datasets
+
+iris   = datasets.load_iris()          <span class="c"># 150x4 鸢尾花三分类</span>
+digits = datasets.load_digits()        <span class="c"># 1797 个 8x8 手写数字</span>
+wine   = datasets.load_wine()          <span class="c"># 178x13 红酒三分类</span>
+
+<span class="c"># 回归练习用加州房价:20640 条 x 8 特征,首次运行联网下载</span>
+housing = datasets.fetch_california_housing()
+
+<span class="c"># 旧教程里的 load_boston 已在 1.2 版被移除(伦理问题),别再用</span>
+Xs, ys = datasets.make_classification(n_samples=1000, random_state=0)</pre>
+        </div>
+
+        <p><code>load_wine()</code> 不带 <code>return_X_y</code> 时返回 Bunch 对象，用 <code>.data</code>、<code>.target</code>、<code>.feature_names</code> 取内容——探索数据时这个形态更好用。</p>
+
+        <h3>预处理与 Pipeline：transformer 串成一条线</h3>
+        <p>另一类对象叫「转换器（transformer）」：提供 <code>fit</code>（学参数，如均值方差）和 <code>transform</code>（应用变换）。<b>StandardScaler、OneHotEncoder、SimpleImputer</b> 都是。把转换器和模型装进 <b>Pipeline</b>，一次 fit 全部按序执行：</p>
+
+        <div class="code">
+          <div class="code-head"><span>pipeline_demo.py</span><button class="copy" type="button">复制</button></div>
+<pre>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+pipe = Pipeline([
+    (<span class="g">"scaler"</span>, StandardScaler()),        <span class="c"># 第一步:标准化</span>
+    (<span class="g">"model"</span>,  LogisticRegression()),    <span class="c"># 第二步:模型</span>
+])
+
+pipe.fit(X_tr, y_tr)      <span class="c"># 一次调用:先 fit 缩放,再训练模型</span>
+pipe.score(X_te, y_te)    <span class="c"># 评分时同样的顺序自动重放</span></pre>
+        </div>
+
+        <p>为什么非要装管道？两个理由：<b>防泄漏</b>——缩放参数只在训练折上 fit，交叉验证时每折自动重做；<b>可部署</b>——管道是一个整体，保存、加载、上线都只搬一个对象，不会漏掉某个预处理步骤。</p>
+
+        <h3>交叉验证与调参：GridSearchCV 一件套</h3>
+        <p><code>cross_val_score</code> 五折验证看泛化；<code>GridSearchCV</code> 穷举参数组合并内置交叉验证。对管道调参时，用<b>双下划线</b>定位深处的参数：</p>
+
+        <div class="code">
+          <div class="code-head"><span>对整条管道调参</span><button class="copy" type="button">复制</button></div>
+<pre>from sklearn.model_selection import cross_val_score, GridSearchCV
+
+print(cross_val_score(pipe, X_tr, y_tr, cv=5).mean().round(3))
+
+param_grid = {<span class="g">"model__C"</span>: [0.1, 1, 10]}
+<span class="c">#          model 这一步的 C 参数 —— 双下划线 = 「走进去」</span>
+
+grid = GridSearchCV(pipe, param_grid, cv=5, n_jobs=-1)
+grid.fit(X_tr, y_tr)
+print(grid.best_params_, grid.best_score_.round(3))</pre>
+        </div>
+
+        <p><code>n_jobs=-1</code> 让所有 CPU 核一起算。搜完的 <code>grid</code> 本身就是训练好的最佳模型，直接 <code>grid.score(X_te, y_te)</code> 做终评。参数空间一大，网格组合数会指数爆炸——那时换 <b>RandomizedSearchCV</b>：同样参数下随机采样固定次数（<code>n_iter</code>），往往花 1/10 的时间找到差不多好的组合。完整的实战组合见第 06 节。</p>
+      </section>
+
+      <!-- ===== 05 速查表 ===== -->
+      <section class="block" id="s5">
+        <p class="sec-num">05</p>
+        <h2>速查表：核心类、预处理、模型选择、数据集</h2>
+        <p class="muted" style="font-size:14px">下面这块表格能搜。忘了类名，直接搜 <b>编码</b>、<b>交叉验证</b>、<b>聚类</b> 之类的词。</p>
+
+        <div class="searchable">
+          <div class="search-row">
+            <input class="search-input" type="search" placeholder="搜索类名、用途，比如 缩放 / onehot / 调参" aria-label="搜索速查表">
+            <span class="hint search-count"></span>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="速查分类">
+            <button role="tab" id="tab-flags" aria-selected="true" aria-controls="panel-flags">核心类</button>
+            <button role="tab" id="tab-slash" aria-selected="false" aria-controls="panel-slash">预处理</button>
+            <button role="tab" id="tab-keys" aria-selected="false" aria-controls="panel-keys">模型选择与评估</button>
+            <button role="tab" id="tab-sub" aria-selected="false" aria-controls="panel-sub">数据集与工具</button>
+          </div>
+
+          <div class="panel" id="panel-flags" role="tabpanel" aria-labelledby="tab-flags">
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>类（sklearn.xxx）</th><th>用途</th></tr></thead>
+              <tbody>
+                <tr><td class="k">linear_model.LinearRegression</td><td>线性回归，回归的第一基线</td></tr>
+                <tr><td class="k">linear_model.LogisticRegression</td><td>线性分类器，输出概率</td></tr>
+                <tr><td class="k">ensemble.RandomForestClassifier</td><td>随机森林分类，默认强基线</td></tr>
+                <tr><td class="k">ensemble.RandomForestRegressor</td><td>随机森林回归</td></tr>
+                <tr><td class="k">ensemble.HistGradientBoostingClassifier</td><td>直方图加速的梯度提升，大数据集首选</td></tr>
+                <tr><td class="k">svm.SVC</td><td>支持向量机分类，小样本高维强</td></tr>
+                <tr><td class="k">neighbors.KNeighborsClassifier</td><td>K 近邻投票</td></tr>
+                <tr><td class="k">naive_bayes.MultinomialNB</td><td>多项朴素贝叶斯，文本分类常客</td></tr>
+                <tr><td class="k">cluster.KMeans</td><td>K 均值聚类（无监督）</td></tr>
+                <tr><td class="k">decomposition.PCA</td><td>主成分降维（无监督）</td></tr>
+                <tr><td class="k">pipeline.Pipeline</td><td>把预处理与模型串成一个对象</td></tr>
+                <tr><td class="k">compose.ColumnTransformer</td><td>按列分派不同 transformer</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-slash" role="tabpanel" aria-labelledby="tab-slash" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>转换器</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">StandardScaler</td><td>均值 0、方差 1；线性模型 / SVM 前必配</td></tr>
+                <tr><td class="k">MinMaxScaler</td><td>压到 [0, 1] 区间</td></tr>
+                <tr><td class="k">RobustScaler</td><td>按中位数和四分位缩放，抗异常值</td></tr>
+                <tr><td class="k">OneHotEncoder</td><td>类别列展开为 0/1 列；线上记得 handle_unknown="ignore"</td></tr>
+                <tr><td class="k">OrdinalEncoder</td><td>类别转整数编号，适合有序类别</td></tr>
+                <tr><td class="k">SimpleImputer</td><td>缺失值填充：mean / median / most_frequent</td></tr>
+                <tr><td class="k">KNNImputer</td><td>用近邻样本估算缺失值</td></tr>
+                <tr><td class="k">PolynomialFeatures</td><td>构造多项式与交互特征</td></tr>
+                <tr><td class="k">FunctionTransformer</td><td>把任意函数包装成 transformer</td></tr>
+                <tr><td class="k">PowerTransformer</td><td>把偏态分布拉向正态</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-keys" role="tabpanel" aria-labelledby="tab-keys" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>函数 / 类</th><th>作用</th></tr></thead>
+              <tbody>
+                <tr><td class="k">train_test_split</td><td>一次性切分；分类任务记得 stratify=y</td></tr>
+                <tr><td class="k">cross_val_score</td><td>K 折交叉验证得分，返回每折分数</td></tr>
+                <tr><td class="k">cross_validate</td><td>一次算多个指标 + 拟合耗时</td></tr>
+                <tr><td class="k">GridSearchCV</td><td>网格穷举调参，内置交叉验证</td></tr>
+                <tr><td class="k">RandomizedSearchCV</td><td>参数空间大时随机采样，更快</td></tr>
+                <tr><td class="k">StratifiedKFold</td><td>分层 K 折，保持每折类别比例</td></tr>
+                <tr><td class="k">classification_report</td><td>一次输出精确率 / 召回率 / F1</td></tr>
+                <tr><td class="k">confusion_matrix</td><td>混淆矩阵，看清错在哪</td></tr>
+                <tr><td class="k">mean_squared_error</td><td>回归 MSE；开平方即 RMSE</td></tr>
+                <tr><td class="k">r2_score</td><td>R²，回归解释方差比例</td></tr>
+                <tr><td class="k">joblib.dump / load</td><td>保存 / 加载训练好的模型</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel" id="panel-sub" role="tabpanel" aria-labelledby="tab-sub" hidden>
+            <table>
+              <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+              <thead><tr><th>入口</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td class="k">load_iris()</td><td>150 条 x 4 特征，鸢尾花三分类</td></tr>
+                <tr><td class="k">load_digits()</td><td>1797 个 8x8 手写数字，10 分类</td></tr>
+                <tr><td class="k">load_wine()</td><td>178 条 x 13 特征，红酒三分类</td></tr>
+                <tr><td class="k">fetch_california_housing()</td><td>20640 条 x 8 特征回归；首次联网下载</td></tr>
+                <tr><td class="k">fetch_openml()</td><td>从 OpenML 在线拉取公开数据集</td></tr>
+                <tr><td class="k">make_classification()</td><td>合成分类数据，练手 / 测试用</td></tr>
+                <tr><td class="k">make_regression()</td><td>合成回归数据</td></tr>
+                <tr><td class="k">make_blobs()</td><td>合成团状数据，练聚类</td></tr>
+                <tr><td class="k">Bunch 对象</td><td>load_* 默认返回：.data / .target / .feature_names</td></tr>
+                <tr><td class="k">sklearn.show_versions()</td><td>打印版本与环境，排障第一步</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="no-result" hidden>没有匹配的条目。换个词试试，比如「缩放」「编码」「调参」。</p>
+        </div>
+      </section>
+
+      <!-- ===== 06 表格数据实战 ===== -->
+      <section class="block" id="s6">
+        <p class="sec-num">06</p>
+        <h2>表格数据实战：数值列 + 类别列的规范全流程</h2>
+        <p>真实业务数据几乎都是「数值列 + 类别列 + 缺失值」。下面用合成数据演示规范写法：<b>ColumnTransformer 分列处理 → Pipeline 整体串联 → 交叉验证 → 网格调参 → 测试集终评</b>。依赖 pandas，一条 <code>pip install pandas</code> 即可，代码可整体复制运行。</p>
+
+        <h3>第一步：造一张「脏」表</h3>
+        <div class="code">
+          <div class="code-head"><span>tabular_pipeline.py · 数据准备</span><button class="copy" type="button">复制</button></div>
+<pre>import numpy as np
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+
+rng = np.random.default_rng(42)
+n = 600
+df = pd.DataFrame({
+    <span class="g">"age"</span>:    rng.integers(18, 70, n).astype(float),
+    <span class="g">"income"</span>: rng.normal(6000, 2000, n).round(2),
+    <span class="g">"city"</span>:   rng.choice([<span class="g">"北京"</span>, <span class="g">"上海"</span>, <span class="g">"广州"</span>, <span class="g">"深圳"</span>], n),
+    <span class="g">"device"</span>: rng.choice([<span class="g">"ios"</span>, <span class="g">"android"</span>, <span class="g">"web"</span>], n),
+})
+df.loc[df.sample(frac=0.10, random_state=0).index, <span class="g">"device"</span>] = np.nan
+df.loc[df.sample(frac=0.05, random_state=1).index, <span class="g">"income"</span>] = np.nan</pre>
+        </div>
+
+        <h3>第二步：目标变量与分列预处理器</h3>
+        <div class="code">
+          <div class="code-head"><span>tabular_pipeline.py · ColumnTransformer</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 目标:与特征相关的规则 + 噪声,模拟真实标签</span>
+filled = df[<span class="g">"income"</span>].fillna(df[<span class="g">"income"</span>].median())
+logit = (filled - 6000) / 1500 + (df[<span class="g">"city"</span>] == <span class="g">"上海"</span>) * 0.8
+y = (logit + rng.normal(0, 1, n) &gt; 0.8).astype(int)
+
+num_cols = [<span class="g">"age"</span>, <span class="g">"income"</span>]
+cat_cols = [<span class="g">"city"</span>, <span class="g">"device"</span>]
+
+preprocess = ColumnTransformer(transformers=[
+    (<span class="g">"num"</span>, Pipeline([
+        (<span class="g">"impute"</span>, SimpleImputer(strategy=<span class="g">"median"</span>)),
+        (<span class="g">"scale"</span>,  StandardScaler())]), num_cols),
+    (<span class="g">"cat"</span>, Pipeline([
+        (<span class="g">"impute"</span>, SimpleImputer(strategy=<span class="g">"most_frequent"</span>)),
+        (<span class="g">"onehot"</span>, OneHotEncoder(handle_unknown=<span class="g">"ignore"</span>))]), cat_cols),
+])
+
+clf = Pipeline([(<span class="g">"prep"</span>, preprocess),
+                (<span class="g">"model"</span>, RandomForestClassifier(random_state=0))])</pre>
+        </div>
+
+        <h3>第三步：交叉验证、调参、终评</h3>
+        <div class="code">
+          <div class="code-head"><span>tabular_pipeline.py · 训练与评估</span><button class="copy" type="button">复制</button></div>
+<pre>X_tr, X_te, y_tr, y_te = train_test_split(
+    df, y, test_size=0.2, random_state=42, stratify=y)
+
+<span class="c"># 交叉验证:整条管道(含填充、缩放、编码)每折重新 fit,无泄漏</span>
+cv = cross_val_score(clf, X_tr, y_tr, cv=5)
+print(cv.mean().round(3), cv.std().round(3))
+
+<span class="c"># 网格调参:双下划线直达管道深处的模型参数</span>
+param_grid = {<span class="g">"model__n_estimators"</span>: [200, 500],
+              <span class="g">"model__max_depth"</span>: [None, 8]}
+search = GridSearchCV(clf, param_grid, cv=5, n_jobs=-1)
+search.fit(X_tr, y_tr)
+print(search.best_params_)
+
+<span class="c"># 测试集终评(只做一次);顺手看 onehot 展开后的特征名</span>
+print(round(search.score(X_te, y_te), 3))
+names = search.best_estimator_.named_steps[<span class="g">"prep"</span>].get_feature_names_out()
+print(list(names)[:6])</pre>
+        </div>
+
+        <div class="note"><b>预期输出（scikit-learn 1.9.1 实测）：</b>交叉验证 <b>0.769 ± 0.030</b>；最佳参数 <code>{'model__max_depth': None, 'model__n_estimators': 500}</code>；测试集 <b>0.767</b>；展开后的特征名形如 <code>num__age</code>、<code>cat__city_上海</code>——前缀就是管道里的步骤名，一眼能对上来源。</div>
+
+        <div class="note"><b>这段骨架值得背下来：</b>数值列「填充 → 缩放」、类别列「填充 → 独热」，ColumnTransformer 合流，Pipeline 接模型——这是 sklearn 处理表格数据的标准姿势。换成自己的数据，只需改 <code>num_cols</code> / <code>cat_cols</code> 和模型那两行。</div>
+      </section>
+
+      <!-- ===== 07 避坑指南 ===== -->
+      <section class="block" id="s7">
+        <p class="sec-num">07</p>
+        <h2>避坑：四个最常见的翻车点</h2>
+
+        <h3>坑一：预处理泄漏——在全量数据上先 fit</h3>
+        <p>「先 scaler 全量 fit，再切分」是最高频的错误：测试集的均值方差混进了训练。sklearn 的解法就是把预处理装进 Pipeline / ColumnTransformer，让 <code>cross_val_score</code> 每折自己重新 fit 转换器。</p>
+        <div class="code">
+          <div class="code-head"><span>错误 vs 正确</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 错:全量数据先标准化,测试集信息已泄漏</span>
+X_scaled = StandardScaler().fit_transform(X)
+
+<span class="c"># 对:交给管道,分折处理</span>
+pipe = Pipeline([(<span class="g">"s"</span>, StandardScaler()), (<span class="g">"m"</span>, SVC())])
+cross_val_score(pipe, X, y, cv=5)</pre>
+        </div>
+
+        <h3>坑二：线上遇到没见过的类别</h3>
+        <p>训练集里城市只有四个，上线后用户填了「杭州」——默认配置的 <code>OneHotEncoder</code> 会直接报错。加 <code>handle_unknown="ignore"</code>，未知类别编码成全零行，预测照常进行。</p>
+        <div class="note warn"><b>同类问题：</b>数值列也可能出现训练时没见过的极端值。SimpleImputer 与缩放器照常处理，但要在监控里盯住「未知类别占比」——占比突然升高，说明数据分布变了，该重训模型了。</div>
+
+        <h3>坑三：忘了 stratify，小数据集切出偏差</h3>
+        <p>178 条、3 类的红酒数据，若不分层随机切 25%，某一折可能几乎抽不到某一类。分类任务切分时一律带上 <code>stratify=y</code>，交叉验证则默认用 StratifiedKFold（分类器场景下 GridSearchCV 会自动启用）。</p>
+        <div class="code">
+          <div class="code-head"><span>切分对比</span><button class="copy" type="button">复制</button></div>
+<pre><span class="c"># 不分层:小数据集可能切出「某类样本不足」的测试集</span>
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.25)
+
+<span class="c"># 分层:两份数据的类别比例与全量一致,分类任务的默认写法</span>
+X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=0.25, stratify=y)</pre>
+        </div>
+
+        <h3>坑四：保存的模型跨版本加载失败</h3>
+        <div class="code">
+          <div class="code-head"><span>Terminal</span><button class="copy" type="button">复制</button></div>
+<pre>joblib.dump(clf, <span class="g">"model.joblib"</span>)
+<span class="c"># 加载端 sklearn 版本不一致时,可能直接报错或行为变化</span>
+python -c <span class="g">"import sklearn; print(sklearn.__version__)"</span></pre>
+        </div>
+        <p><code>joblib.dump</code> 本质是 pickle，绑定了训练时的 sklearn 版本。上线前<b>固定版本</b>（requirements.txt 里写死 <code>scikit-learn==x.y.z</code>），升级前先用原版本导出预测结果做回归测试。</p>
+      </section>
+
+      <!-- ===== 08 进阶资源 ===== -->
+      <section class="block" id="s8">
+        <p class="sec-num">08</p>
+        <h2>进阶方向与资源</h2>
+        <p>sklearn 的文档质量是开源界的标杆，顺着官方资源走，比到处搜博客靠谱。</p>
+        <ul>
+          <li><a href="https://scikit-learn.org/stable/user_guide.html">官方用户指南</a>——按算法分章，每章配示例代码，值得通读一遍。</li>
+          <li><a href="https://scikit-learn.org/stable/auto_examples/index.html">示例画廊</a>——几百个可跑的官方示例，找「某模型怎么画图」先来这里。</li>
+          <li><a href="https://github.com/scikit-learn/scikit-learn">GitHub 仓库</a>——提 issue、看源码实现；Cython 热点代码也在里面。</li>
+          <li><a href="https://inria.github.io/scikit-learn-mooc/">scikit-learn MOOC</a>——Inria 出品的免费系统课程，视频 + Notebook 练习。</li>
+          <li><a href="https://imbalanced-learn.org/stable/">imbalanced-learn</a>——官方生态的类别不平衡扩展（过采样 / 欠采样），接口与 sklearn 兼容。</li>
+          <li>书：《Hands-On Machine Learning with Scikit-Learn, Keras &amp; TensorFlow》（Aurélien Géron）——第 1-2 部分正是 sklearn 的最佳配套读物。</li>
+        </ul>
+        <div class="note"><b>下一步去哪：</b>把第 06 节的骨架套到 Kaggle 的 Titanic 数据集上练一遍；表格数据想再进一步，学 <b>HistGradientBoosting</b> 与特征工程；想进入图像 / 文本的深度学习世界，去本站 <b>TensorFlow</b> 或 <b>PyTorch</b> 教程——那边的「训练循环」要自己写了。</div>
+      </section>
+
+      <!-- ===== 09 收尾自检 ===== -->
+      <section class="block" id="s9">
+        <p class="sec-num">09</p>
+        <h2>收尾：照着勾一遍</h2>
+        <div class="check" id="checklist">
+          <label><input type="checkbox" data-key="c1"><span>虚拟环境装好 sklearn，<code>sklearn.__version__</code> 能打印出版本号</span></label>
+          <label><input type="checkbox" data-key="c2"><span>独立跑通第 03 节的 first_clf.py，并换过一次模型对比分数</span></label>
+          <label><input type="checkbox" data-key="c3"><span>能说清 fit / predict / transform / score 各自干什么</span></label>
+          <label><input type="checkbox" data-key="c4"><span>用 Pipeline + ColumnTransformer 跑通了第 06 节完整流程</span></label>
+          <label><input type="checkbox" data-key="c5"><span>会用双下划线给管道里的模型调参，知道为什么预处理必须放进管道</span></label>
+        </div>
+        <p class="count" id="checkCount">0 / 5</p>
+      </section>
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="pager" aria-label="教程导航">
+        <a class="prev" href="machine-learning.html"><span>← 上一篇</span><b>机器学习教程</b></a>
+        <a class="next" href="tensorflow.html"><span>下一篇 →</span><b>TensorFlow 教程</b></a>
+      </nav>
+
+      <footer>
+        <p>页面内容依据 scikit-learn.org 官方文档（用户指南、安装说明与 API 参考）整理，当前稳定版 1.9.1（2026-11 核对）。</p>
+        <p class="site-foot"><a href="index.html">← 返回首页</a> · AI Code Study · 共 21 门教程 · 版本迭代较快，具体参数与 API 以官方文档为准。</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">已复制</div>
+
+<script src="assets/site.js"></script>
+</body>
+</html>
